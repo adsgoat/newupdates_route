@@ -1,6 +1,11 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+// import "./globals.css";
+import "../styles/global.css";
+// import "@/lib/agGridSetup";
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 
+import SessionProviderWrapper from "../layouts/SessionProvider/session"
+// import AuthGuard from "../layouts/AuthLayout/AuthGuard"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -22,7 +27,19 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        <link rel="icon" type="image/png" href="/ssk1.png" />
+
+      </head>
+      <body className="min-h-full flex flex-col">
+        {/* <SessionProviderWrapper> */}
+        {/* <AuthGuard /> */}
+        {/* {children} */}
+        <AntdRegistry>
+          {children}
+        </AntdRegistry>
+        {/* </SessionProviderWrapper> */}
+      </body>
     </html>
   );
 }
