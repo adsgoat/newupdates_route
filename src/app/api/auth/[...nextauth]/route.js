@@ -143,6 +143,7 @@ import NextAuth from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
 import getRedisClient from "@/lib/redis"
 import { decodeJwt } from "jose";
+import jwt from 'jsonwebtoken';
 
 export const authOptions = {
     secret: process.env.NEXTAUTH_SECRET,
@@ -179,7 +180,7 @@ export const authOptions = {
             /**
              * First login
              */
-            console.log(account, "account");
+            // console.log(account, "account");
             if (account) {
                 const email = profile?.email || token.email;
                 const payload = decodeJwt(account.access_token);
@@ -187,7 +188,9 @@ export const authOptions = {
                     ...(payload?.FB_Mnet ? { FB_Mnet: payload?.FB_Mnet } : {}),
                     ...(payload?.FB_TonicRsoc ? { FB_TonicRsoc: payload?.FB_TonicRsoc } : {}),
                 }
+                const jwttoken = jwt.sign({ email: email }, "siddu", { expiresIn: '6h' });
                 // console.log(userData, "userData");
+                await client.set(`auth_token_${email}`, jwttoken)
                 await client.set(
                     `auth_${email}`,
                     JSON.stringify({
