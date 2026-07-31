@@ -188,7 +188,7 @@ export const authOptions = {
                     ...(payload?.FB_Mnet ? { FB_Mnet: payload?.FB_Mnet } : {}),
                     ...(payload?.FB_TonicRsoc ? { FB_TonicRsoc: payload?.FB_TonicRsoc } : {}),
                 }
-                const jwttoken = jwt.sign({ email: email }, "siddu", { expiresIn: '6h' });
+                const jwttoken = jwt.sign({ email: email }, process.env.Jwt_Secret, { expiresIn: '6h' });
                 // console.log(userData, "userData");
                 await client.set(`auth_token_${email}`, jwttoken)
                 await client.set(
