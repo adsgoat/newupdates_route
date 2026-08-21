@@ -187,7 +187,12 @@ export const authOptions = {
                 const userData = {
                     ...(payload?.FB_Mnet ? { FB_Mnet: payload?.FB_Mnet } : {}),
                     ...(payload?.FB_TonicRsoc ? { FB_TonicRsoc: payload?.FB_TonicRsoc } : {}),
+                    ...(payload?.FB_Predicto ? { FB_Predicto: payload?.FB_Predicto } : {}),
+                    ...(payload?.FB_Botup ? { FB_Botup: payload?.FB_Botup } : {}),
+                    ...(payload?.FB_Media ? { FB_Media: payload?.FB_Media } : {}),
+                    ...(payload?.FB_Affinity ? { FB_Affinity: payload?.FB_Affinity } : {}),
                 }
+
                 const jwttoken = jwt.sign({ email: email }, process.env.Jwt_Secret, { expiresIn: '6h' });
                 // console.log(userData, "userData");
                 await client.set(`auth_token_${email}`, jwttoken)
@@ -198,6 +203,15 @@ export const authOptions = {
                         refreshToken: account.refresh_token,
                         idToken: account.id_token,
                         expiresAt: account.expires_at,
+                    })
+                );
+                await client.set(
+                    `userdetails_${email}`,
+                    JSON.stringify({
+                        email: payload.email,
+                        role: payload.role,
+                        username: payload.preferred_username,
+                        gender: payload.gender
                     })
                 );
                 await client.set(
