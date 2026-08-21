@@ -1,0 +1,140 @@
+/* Reduce checkbox size globally */
+.ag-checkbox {
+  width: 15px;
+  height: 15px;
+}
+
+.ag-checkbox-input-wrapper {
+  transform: scale(0.85);
+  transform-origin: center;
+}
+.ag-group-checkbox {
+    width: 15px;
+    height: 15px;
+    margin-right: 8px;
+}
+.ag-theme-quartz .ag-group-contracted,
+.ag-theme-quartz .ag-group-expanded {
+    margin-right: 2px !important;
+}
+.ag-theme-quartz-dark .ag-group-contracted,
+.ag-theme-quartz-dark .ag-group-expanded {
+    margin-right: 2px !important;
+}
+
+/* Budget Modal dark theme styling */
+/* Dark theme modal header background and title text */
+.dark-theme-modal .ant-modal-header {
+  background-color: #333 !important;
+  /* border-bottom: 1px solid #333 !important; */
+}
+
+/* ant modal title color */
+.dark-theme-modal .ant-modal-title {
+  color: white !important;
+}
+
+/* Modal content background */
+.dark-theme-modal .ant-modal-content {
+  background-color: #333 !important;
+  color: white !important;
+}
+
+/* TextArea inside modal */
+.dark-theme-modal .ant-modal-content textarea {
+  background-color: #2a2a2a !important;
+  color: white !important;
+  border: 1px solid #444 !important;
+}
+
+/* Placeholder inside textarea */
+.dark-theme-modal .ant-modal-content textarea::placeholder {
+  color: #ccc !important;
+  opacity: 1;
+}
+
+.ag-group-cell-wrapper {
+    display: flex;
+    align-items: center;
+}
+.blinking-circle {
+  width: 10px;
+  height: 10px;
+  background-color: green;
+  border-radius: 50%;
+  animation: blink 1s infinite;
+}
+
+.blinking-circle-1 {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  animation: blink 1s infinite;
+}
+
+.blinking-circle-3 {
+  width: 10px;
+  height: 10px;
+  background-color: rgb(18, 47, 110);
+  border-radius: 50%;
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+/* Dark theme modal header background and title text */
+.dark-theme-modal .ant-modal-header {
+  background-color: #333 !important;
+  /* border-bottom: 1px solid #333 !important; */
+}
+
+/* ant modal title color */
+.dark-theme-modal .ant-modal-title {
+  color: white !important;
+}
+
+/* Modal content background */
+.dark-theme-modal .ant-modal-content {
+  background-color: #333 !important;
+  color: white !important;
+}
+
+/* TextArea inside modal */
+.dark-theme-modal .ant-modal-content textarea {
+  background-color: #2a2a2a !important;
+  color: white !important;
+  border: 1px solid #444 !important;
+}
+
+/* Placeholder inside textarea */
+.dark-theme-modal .ant-modal-content textarea::placeholder {
+  color: #ccc !important;
+  opacity: 1;
+}
+.ag-menu-option.custom-reset-columns-item .ag-menu-option-text {
+  background-color: rgb(105, 105, 164);
+  color: white;
+}
+
+.ag-menu-option.custom-reset-columns-item:hover .ag-menu-option-text {
+  background-color: darkblue;
+}
+.ag-menu-option.custom-new-item .ag-menu-option-text {
+  background-color: skyblue;
+  margin-top: 5px;
+  color: black;
+}
+
+.ag-menu-option.custom-new-item:hover .ag-menu-option-text {
+  background-color: deepskyblue;
+  margin-top: 5px;
+}
