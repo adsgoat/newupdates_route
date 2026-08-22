@@ -14,7 +14,7 @@ import "@/lib/agGridSetup";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
-export default function CampaignTable({ theme, userData, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, campaignMap, adsetMap, commentsMap, Camapignlevelstatus, setCamapignlevelstatus, campaignComments, setCampaignComments, adLevelCreatives, setAdLevelCreatives, searchValue, showCampaignLevel, gridRef, activeTab, activeTabForLiveReports, setSelectedCampaigns, moveToNextTab, setLeafCampaigns, leafCampaigns, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs, refresh }) {
+export default function CampaignTable({ theme, userData, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, campaignMap, adsetMap, commentsMap, Camapignlevelstatus, setCamapignlevelstatus, campaignComments, setCampaignComments, adLevelCreatives, setAdLevelCreatives, searchValue, showCampaignLevel, gridRef, activeTab, activeTabForLiveReports, setSelectedCampaigns, moveToNextTab, setLeafCampaigns, leafCampaigns, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs, refresh, userdetails }) {
     const { message } = App.useApp();
     const [loading, setLoading] = useState(true);
     const [dataLoader, setDataLoader] = useState(false);
@@ -45,7 +45,6 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
     const maxNetworkHour = useRef();
     const lastCampaignFetch = useRef(null);
     const apiClient = axios;
-    const userdetails = { email: "praveen@adsgoat.in", role: "admin", userName: "Praveen" }
     const accountsAccess = userData[updatedRevenuePartner];
     const handleBulkStatusSubmit = async () => {
         try {
@@ -72,7 +71,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                         campaignid: item.campaignid,
                         Account: String(item.accountNumber),    // ✅ update *this* row’s account
                         campaignname: item.campaignname,
-                        updatedBy: userdetails?.userName,
+                        updatedBy: userdetails?.username,
                         updatedUserEmail: userdetails?.email,
                         updateType: "Campaign status updated",
                         updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -133,7 +132,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                     campaignid: item.campaignid,       // cents
                     Account: item.accountNumber,    // ✅ update *this* row’s account
                     campaignname: item.campaignname,
-                    updatedBy: userdetails?.userName,
+                    updatedBy: userdetails?.username,
                     updatedUserEmail: userdetails?.email,
                     updateType: "Campaign pin updated",
                     updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -191,7 +190,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                     campaignid: item.campaignid,       // cents
                     Account: item.accountNumber,    // ✅ update *this* row’s account
                     campaignname: item.campaignname,
-                    updatedBy: userdetails?.userName,
+                    updatedBy: userdetails?.username,
                     updatedUserEmail: userdetails?.email,
                     updateType: "Campaign comment cleared",
                     updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -251,7 +250,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                 campaignid: item.campaignid,       // cents
                 Account: item.accountNumber,    // ✅ update *this* row’s account
                 campaignname: item.campaignname,
-                updatedBy: userdetails?.userName,
+                updatedBy: userdetails?.username,
                 updatedUserEmail: userdetails?.email,
                 updateType: "Category comment cleared",
                 updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -324,7 +323,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                 campaignid: item.campaignid,
                 Account: item.accountNumber,    // ✅ update *this* row’s account
                 campaignname: item.campaignname,
-                updatedBy: userdetails?.userName,
+                updatedBy: userdetails?.username,
                 updatedUserEmail: userdetails?.email,
                 updateType: "Campaign pin updated",
                 updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -727,7 +726,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                             campaignid: campaignid,       // cents
                             Account: String(rowAccount),    // ✅ update *this* row’s account
                             campaignname: campaignName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Campain status updated",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -794,7 +793,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                         campaignid: campaignid,       // cents
                         Account: rowAccount,    // ✅ update *this* row’s account
                         campaignname: campaignName,
-                        updatedBy: userdetails?.userName,
+                        updatedBy: userdetails?.username,
                         updatedUserEmail: userdetails?.email,
                         updateType: "Campaign pin updated",
                         updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -865,7 +864,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                             campaignid: campaignid,       // cents
                             Account: rowAccount,    // ✅ update *this* row’s account
                             campaignname: campaignName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Campaign comment updated",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -936,7 +935,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                             campaignid: campaignid,       // cents
                             Account: rowAccount,    // ✅ update *this* row’s account
                             campaignname: campaignName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Campaign comment cleared",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),

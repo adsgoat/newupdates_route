@@ -13,7 +13,7 @@ import "@/lib/agGridSetup";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
-export default function AdsetTable({ theme, userData, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, campaignMap, adsetMap, commentsMap, Camapignlevelstatus, setCamapignlevelstatus, campaignComments, setCampaignComments, adLevelCreatives, setAdLevelCreatives, searchValue, gridRef, activeTab, activeTabForLiveReports, selectedAdsets, selectedCampaigns, showAdLevel, leafCampaigns, setLeafCampaigns, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs, refresh }) {
+export default function AdsetTable({ theme, userData, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, campaignMap, adsetMap, commentsMap, Camapignlevelstatus, setCamapignlevelstatus, campaignComments, setCampaignComments, adLevelCreatives, setAdLevelCreatives, searchValue, gridRef, activeTab, activeTabForLiveReports, selectedAdsets, selectedCampaigns, showAdLevel, leafCampaigns, setLeafCampaigns, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs, refresh, userdetails }) {
     const { message } = App.useApp();
     const [loading, setLoading] = useState(true);
     const [dataLoader, setDataLoader] = useState(false);
@@ -44,7 +44,6 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
     const cronStatus = useRef();
     const maxHour = useRef();
     const maxNetworkHour = useRef();
-    const userdetails = { email: "praveen@adsgoat.in", role: "admin", userName: "Praveen" }
     const onGridReady = ({ api }) => {
         gridRef.current = { api };
     };
@@ -367,7 +366,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                         ad_id: item.adid,
                         adname: item.adName,
                         adsetname: item.adsetname,
-                        updatedBy: userdetails?.userName,
+                        updatedBy: userdetails?.username,
                         updatedUserEmail: userdetails?.email,
                         updateType: "Ad status updated",
                         updateAt: moment()
@@ -465,7 +464,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                     campaignname: item.campaignname,
                     adsetname: item.adsetname,
                     adname: item.adName,
-                    updatedBy: userdetails?.userName,
+                    updatedBy: userdetails?.username,
                     updatedUserEmail: userdetails?.email,
                     updateType: "Ad comment cleared",
                     updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -544,7 +543,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                     campaignname: item.campaignname,
                     adsetname: item.adsetname,
                     adname: item.adName,
-                    updatedBy: userdetails?.userName,
+                    updatedBy: userdetails?.username,
                     updatedUserEmail: userdetails?.email,
                     updateType: "Ad comment cleared",
                     updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -610,7 +609,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                 campaignid: item.campaignid,       // cents
                 Account: item.accountNumber,    // ✅ update *this* row’s account
                 campaignname: item.campaignname,
-                updatedBy: userdetails?.userName,
+                updatedBy: userdetails?.username,
                 updatedUserEmail: userdetails?.email,
                 updateType: "Category comment cleared",
                 updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -689,7 +688,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                 campaignname: item.campaignname,
                 adsetname: item.adsetname,
                 adname: item.adName || item.adname,
-                updatedBy: userdetails?.userName,
+                updatedBy: userdetails?.username,
                 updatedUserEmail: userdetails?.email,
                 updateType: "Ad pin updated",
                 updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -863,7 +862,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                             campaignname: campaignName,
                             adsetname: adsetName,
                             adname: adName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Ad status updated",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -960,7 +959,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                         campaignname: campaignName,
                         adsetname: adsetName,
                         adname: adName,
-                        updatedBy: userdetails?.userName,
+                        updatedBy: userdetails?.username,
                         updatedUserEmail: userdetails?.email,
                         updateType: "Ad pin updated",
                         updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -1037,7 +1036,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                             campaignname: campaignName,
                             adsetname: adsetName,
                             adname: adName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Ad comment updated",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -1114,7 +1113,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                             campaignname: campaignName,
                             adsetname: adsetName,
                             adname: adName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Ad comment cleared",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),

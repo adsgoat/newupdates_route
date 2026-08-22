@@ -6,7 +6,7 @@ import CampaignTable from "./campaign/page";
 import AdsetTable from "./adset/page";
 import AdTable from './ad/page';
 import SearchFilters from "../searchfilters/page"
-const DailyReports = ({ theme, userData, activeTab, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, campaignMap, adsetMap, commentsMap, Camapignlevelstatus, setCamapignlevelstatus, campaignComments, setCampaignComments, adLevelCreatives, setAdLevelCreatives, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs }) => {
+const DailyReports = ({ theme, userData, activeTab, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, campaignMap, adsetMap, commentsMap, Camapignlevelstatus, setCamapignlevelstatus, campaignComments, setCampaignComments, adLevelCreatives, setAdLevelCreatives, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs, userdetails }) => {
     const [selectedCampaigns, setSelectedCampaigns] = useState([])
     const [selectedAdsets, setSelectedAdsets] = useState([])
     const [selectedAds, setSelectedAds] = useState([])
@@ -161,6 +161,7 @@ const DailyReports = ({ theme, userData, activeTab, updatedRevenuePartner, updat
                     taxDetails={taxDetails}
                     refreshTabs={refreshTabs}
                     refresh={refresh}
+                    userdetails={userdetails}
                 />
             ),
         },
@@ -230,6 +231,7 @@ const DailyReports = ({ theme, userData, activeTab, updatedRevenuePartner, updat
                     taxDetails={taxDetails}
                     refreshTabs={refreshTabs}
                     refresh={refresh}
+                    userdetails={userdetails}
                 />
             ),
         },
@@ -298,6 +300,7 @@ const DailyReports = ({ theme, userData, activeTab, updatedRevenuePartner, updat
                     taxDetails={taxDetails}
                     refreshTabs={refreshTabs}
                     refresh={refresh}
+                    userdetails={userdetails}
                 />
             ),
         },

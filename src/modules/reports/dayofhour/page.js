@@ -14,7 +14,7 @@ import "@/lib/agGridSetup";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
-export default function DayOfHourTable({ theme, userData, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, campaignMap, adsetMap, commentsMap, Camapignlevelstatus, setCamapignlevelstatus, campaignComments, setCampaignComments, adLevelCreatives, setAdLevelCreatives, searchValue, showCampaignLevel, activeTab, activeTabForLiveReports, setSelectedCampaigns, moveToNextTab, leafCampaigns, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs }) {
+export default function DayOfHourTable({ theme, userData, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, campaignMap, adsetMap, commentsMap, Camapignlevelstatus, setCamapignlevelstatus, campaignComments, setCampaignComments, adLevelCreatives, setAdLevelCreatives, searchValue, showCampaignLevel, activeTab, activeTabForLiveReports, setSelectedCampaigns, moveToNextTab, leafCampaigns, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs, userdetails }) {
     // console.log(userColumnStructure, "userColumnStructure");
     const { message } = App.useApp();
     const [loading, setLoading] = useState(true);
@@ -41,7 +41,6 @@ export default function DayOfHourTable({ theme, userData, updatedRevenuePartner,
     const maxNetworkHour = useRef();
     const lastCampaignFetch = useRef(null);
     const apiClient = axios;
-    const userdetails = { email: "praveen@adsgoat.in", role: "admin", userName: "Praveen" }
 
     const onGridReady = ({ api }) => {
         gridRef.current = { api };
@@ -388,7 +387,7 @@ export default function DayOfHourTable({ theme, userData, updatedRevenuePartner,
                             campaignid: campaignid,       // cents
                             Account: String(rowAccount),    // ✅ update *this* row’s account
                             campaignname: campaignName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Campain status updated",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -455,7 +454,7 @@ export default function DayOfHourTable({ theme, userData, updatedRevenuePartner,
                         campaignid: campaignid,       // cents
                         Account: rowAccount,    // ✅ update *this* row’s account
                         campaignname: campaignName,
-                        updatedBy: userdetails?.userName,
+                        updatedBy: userdetails?.username,
                         updatedUserEmail: userdetails?.email,
                         updateType: "Campaign pin updated",
                         updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -526,7 +525,7 @@ export default function DayOfHourTable({ theme, userData, updatedRevenuePartner,
                             campaignid: campaignid,       // cents
                             Account: rowAccount,    // ✅ update *this* row’s account
                             campaignname: campaignName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Campaign comment updated",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -597,7 +596,7 @@ export default function DayOfHourTable({ theme, userData, updatedRevenuePartner,
                             campaignid: campaignid,       // cents
                             Account: rowAccount,    // ✅ update *this* row’s account
                             campaignname: campaignName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Campaign comment cleared",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),

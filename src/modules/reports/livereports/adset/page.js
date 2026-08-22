@@ -14,7 +14,7 @@ import "@/lib/agGridSetup";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
-export default function AdsetTable({ theme, userData, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, campaignMap, adsetMap, commentsMap, Camapignlevelstatus, setCamapignlevelstatus, campaignComments, setCampaignComments, adLevelCreatives, setAdLevelCreatives, searchValue, gridRef, showAdsetLevel, selectedCampaigns, activeTab, activeTabForLiveReports, moveToNextTab, leafCampaigns, setLeafCampaigns, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs, refresh }) {
+export default function AdsetTable({ theme, userData, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, campaignMap, adsetMap, commentsMap, Camapignlevelstatus, setCamapignlevelstatus, campaignComments, setCampaignComments, adLevelCreatives, setAdLevelCreatives, searchValue, gridRef, showAdsetLevel, selectedCampaigns, activeTab, activeTabForLiveReports, moveToNextTab, leafCampaigns, setLeafCampaigns, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs, refresh, userdetails }) {
     const { message } = App.useApp();
     const [loading, setLoading] = useState(true);
     const [dataLoader, setDataLoader] = useState(false);
@@ -24,11 +24,9 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
     const [selectedCampaignIdForHistory, setSelectedCampaignIdForHistory] = useState(null);
     const [selectedAccountForHistory, setSelectedAccountForHistory] = useState(null);
     const [allProfitLossArray, setallProfitLossArray] = useState([]);
-    // const [leafCampaigns, setLeafCampaigns] = useState([]);
     const [insideInput, setInsideInput] = useState("");
     const [campaignStatusFilter, setCampaignStatusFilter] = useState("All");
     const [typeFilter, setTypeFilter] = useState("All");
-
     const [isBulkCommentModalVisible, setIsBulkCommentModalVisible] = useState(false);
     const [comment, setComment] = useState("");
     const [isBulkStatusModalVisible, setIsBulkStatusModalVisible] = useState(false);
@@ -45,7 +43,6 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
     const maxHour = useRef();
     const maxNetworkHour = useRef();
     const apiClient = axios;
-    const userdetails = { email: "praveen@adsgoat.in", role: "admin", userName: "Praveen" }
     const onGridReady = ({ api }) => {
         gridRef.current = { api };
     };
@@ -347,7 +344,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                         Account: String(item.accountNumber),    // ✅ update *this* row’s account
                         campaignname: item.campaignname,
                         adsetname: item.adsetname,
-                        updatedBy: userdetails?.userName,
+                        updatedBy: userdetails?.username,
                         updatedUserEmail: userdetails?.email,
                         updateType: "Adset status updated",
                         updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -425,7 +422,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                     Account: item.accountNumber,    // ✅ update *this* row’s account
                     campaignname: item.campaignname,
                     adsetname: item.adsetname,
-                    updatedBy: userdetails?.userName,
+                    updatedBy: userdetails?.username,
                     updatedUserEmail: userdetails?.email,
                     updateType: "Adset pin updated",
                     updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -499,7 +496,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                     Account: item.accountNumber,    // ✅ update *this* row’s account
                     campaignname: item.campaignname,
                     adsetname: item.adsetname,
-                    updatedBy: userdetails?.userName,
+                    updatedBy: userdetails?.username,
                     updatedUserEmail: userdetails?.email,
                     updateType: "Adset comment cleared",
                     updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -565,7 +562,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                 campaignid: item.campaignid,       // cents
                 Account: item.accountNumber,    // ✅ update *this* row’s account
                 campaignname: item.campaignname,
-                updatedBy: userdetails?.userName,
+                updatedBy: userdetails?.username,
                 updatedUserEmail: userdetails?.email,
                 updateType: "Category comment cleared",
                 updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -641,7 +638,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                 Account: item.accountNumber,    // ✅ update *this* row’s account
                 campaignname: item.campaignname,
                 adsetname: item.adsetname,
-                updatedBy: userdetails?.userName,
+                updatedBy: userdetails?.username,
                 updatedUserEmail: userdetails?.email,
                 updateType: "Adset pin updated",
                 updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -800,7 +797,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                             Account: String(rowAccount),    // ✅ update *this* row’s account
                             campaignname: campaignName,
                             adsetname: adsetName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Adset status updated",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -877,7 +874,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                         Account: rowAccount,    // ✅ update *this* row’s account
                         campaignname: campaignName,
                         adsetname: adsetName,
-                        updatedBy: userdetails?.userName,
+                        updatedBy: userdetails?.username,
                         updatedUserEmail: userdetails?.email,
                         updateType: "Adset pin updated",
                         updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -950,7 +947,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                             Account: rowAccount,    // ✅ update *this* row’s account
                             campaignname: campaignName,
                             adsetname: adsetName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Adset comment updated",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),
@@ -1024,7 +1021,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                             Account: rowAccount,    // ✅ update *this* row’s account
                             campaignname: campaignName,
                             adsetname: adsetName,
-                            updatedBy: userdetails?.userName,
+                            updatedBy: userdetails?.username,
                             updatedUserEmail: userdetails?.email,
                             updateType: "Adset comment cleared",
                             updateAt: moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm:ss A"),

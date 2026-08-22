@@ -15,7 +15,7 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 import { RxSwitch } from "react-icons/rx";
 const { Text } = Typography;
 
-export default function HourlyTable({ theme, userData, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, Camapignlevelstatus, campaignComments, activeTab, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs }) {
+export default function HourlyTable({ theme, userData, updatedRevenuePartner, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, userColumnStructure, Camapignlevelstatus, campaignComments, activeTab, handleColumnMove, getMainMenuItems, customColumns, taxDetails, refreshTabs, userdetails }) {
     const { message } = App.useApp();
     const [loading, setLoading] = useState(true);
     const [dataLoader, setDataLoader] = useState(false);
@@ -30,7 +30,6 @@ export default function HourlyTable({ theme, userData, updatedRevenuePartner, up
     const maxNetworkHour = useRef();
     const lastCampaignFetch = useRef(null);
     const apiClient = axios;
-    const userdetails = { email: "praveen@adsgoat.in", role: "admin", userName: "Praveen" };
     const [latestHour, setLatestHour] = useState(0);
     const [showAllHours, setShowAllHours] = useState(false);
 

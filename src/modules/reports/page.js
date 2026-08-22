@@ -22,8 +22,7 @@ import KeywordTable from "./keywordreports/page"
 import CountryReports from "./countryreports/page"
 import { sanitizeNumericValue, computeRPC, computeCPCLC, computeCPL, computeNCPL, computeMargin, computeFMargin, computeROI, computeCTR, computeAggregatedRPC, computeAggregatedCPCLC, computeAggregatedNCPL, computeAggregatedCPL, computeAggregatedMargin, computeAggregatedFMargin, computeAggregatedROI, computeAggregatedCTR, cpcSpender1, customAggFunc } from "./columndefs/functions/customcolumn";
 const { useBreakpoint } = Grid;
-export default function ReportsPage({ userData, cache }) {
-  console.log(userData);
+export default function ReportsPage({ userData, cache, userdetails }) {
   const taxDetails = Object.entries(userData).flatMap(
     ([network, accounts]) =>
       accounts.map((account) => ({
@@ -243,6 +242,7 @@ export default function ReportsPage({ userData, cache }) {
                 customColumns={customColumns}
                 taxDetails={taxDetails}
                 refreshTabs={refreshTabs}
+                userdetails={userdetails}
               />
             ),
           },
@@ -275,6 +275,7 @@ export default function ReportsPage({ userData, cache }) {
                 customColumns={customColumns}
                 taxDetails={taxDetails}
                 refreshTabs={refreshTabs}
+                userdetails={userdetails}
               />
             )
           },
@@ -307,6 +308,7 @@ export default function ReportsPage({ userData, cache }) {
                 customColumns={customColumns}
                 taxDetails={taxDetails}
                 refreshTabs={refreshTabs}
+                userdetails={userdetails}
               />)
             ,
           },
@@ -331,6 +333,7 @@ export default function ReportsPage({ userData, cache }) {
                 customColumns={customColumns}
                 taxDetails={taxDetails}
                 refreshTabs={refreshTabs}
+                userdetails={userdetails}
               />
             ),
           },
@@ -363,6 +366,7 @@ export default function ReportsPage({ userData, cache }) {
                 customColumns={customColumns}
                 taxDetails={taxDetails}
                 refreshTabs={refreshTabs}
+                userdetails={userdetails}
               />
             )
           },
@@ -395,6 +399,7 @@ export default function ReportsPage({ userData, cache }) {
                 customColumns={customColumns}
                 taxDetails={taxDetails}
                 refreshTabs={refreshTabs}
+                userdetails={userdetails}
               />)
             ,
           },
@@ -419,6 +424,7 @@ export default function ReportsPage({ userData, cache }) {
                 customColumns={customColumns}
                 taxDetails={taxDetails}
                 refreshTabs={refreshTabs}
+                userdetails={userdetails}
               />
             ),
           },
@@ -451,6 +457,7 @@ export default function ReportsPage({ userData, cache }) {
                 customColumns={customColumns}
                 taxDetails={taxDetails}
                 refreshTabs={refreshTabs}
+                userdetails={userdetails}
               />
             )
           },
@@ -483,6 +490,7 @@ export default function ReportsPage({ userData, cache }) {
                 customColumns={customColumns}
                 taxDetails={taxDetails}
                 refreshTabs={refreshTabs}
+                userdetails={userdetails}
               />)
             ,
           },
@@ -519,6 +527,7 @@ export default function ReportsPage({ userData, cache }) {
                 customColumns={customColumns}
                 taxDetails={taxDetails}
                 refreshTabs={refreshTabs}
+                userdetails={userdetails}
               />,
           },
         ];
@@ -540,6 +549,7 @@ export default function ReportsPage({ userData, cache }) {
                 updatedTime={updatedTime}
                 userData={userData}
                 refreshTabs={refreshTabs}
+                userdetails={userdetails}
               />,
           },
         ];
@@ -578,6 +588,7 @@ export default function ReportsPage({ userData, cache }) {
           customColumns={customColumns}
           taxDetails={taxDetails}
           refreshTabs={refreshTabs}
+          userdetails={userdetails}
         />
       ),
     },
@@ -610,6 +621,7 @@ export default function ReportsPage({ userData, cache }) {
           customColumns={customColumns}
           taxDetails={taxDetails}
           refreshTabs={refreshTabs}
+          userdetails={userdetails}
         />
       ),
     },
@@ -631,6 +643,7 @@ export default function ReportsPage({ userData, cache }) {
           customColumns={customColumns}
           taxDetails={taxDetails}
           refreshTabs={refreshTabs}
+          userdetails={userdetails}
         />
       ),
     },
