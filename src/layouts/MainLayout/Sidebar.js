@@ -84,7 +84,7 @@ export default function Sidebar({ role, userPermissions }) {
     const menuItems = [
         userPermissions?.permissions?.find(item => Object.hasOwn(item, "dashboard"))?.dashboard?.allowed && getItem('Dashboard', '/dashboard', <AppstoreOutlined className={pathname === '/dashboard' && 'black-icon'} style={{ fontSize: "12px" }} />, 'dashboard'),
         userPermissions?.permissions?.find(item => Object.hasOwn(item, "reports"))?.reports?.allowed && getItem('Reports', '/reports', <BarChartOutlined className={pathname === '/reports' && 'black-icon'} style={{ fontSize: "12px" }} />, 'reports'),
-        userPermissions?.permissions?.find(item => Object.hasOwn(item, "creatives"))?.creatives?.allowed && getItem('Creatives', '/Creatives', <PictureOutlined className={pathname === '/creatives' && 'black-icon'} style={{ fontSize: "12px" }} />, 'creatives'),
+        userPermissions?.permissions?.find(item => Object.hasOwn(item, "creatives"))?.creatives?.allowed && getItem('Creatives', '/Creatives', <PictureOutlined className={pathname === '/Creatives' && 'black-icon'} style={{ fontSize: "12px" }} />, 'creatives'),
         userPermissions?.permissions?.find(item => Object.hasOwn(item, "campaigns"))?.campaigns?.allowed && getItem('Campaigns', '/Campaigns', <LineChartOutlined className={pathname === '/campaigns' && 'black-icon'} style={{ fontSize: "12px" }} />, 'campaigns'),
         // getItem('Users', '/Users', <ContainerOutlined />),
         userPermissions?.permissions?.find(item => Object.hasOwn(item, "userrole"))?.userrole?.allowed && getItem('User Role', '/NewUser', <UserOutlined className={pathname === '/newuser' && 'black-icon'} style={{ fontSize: "12px" }} />, 'newuser'),
