@@ -1,5 +1,5 @@
 export default function useMoveToBin({
-    userdetails,
+    username,
     getUserFiles,
     message,
 }) {
@@ -37,16 +37,12 @@ export default function useMoveToBin({
                                 },
                                 body: JSON.stringify({
                                     folderKey: item.uid,
-                                    username:
-                                        userdetails?.userName,
+                                    username:username,
                                 }),
                             }
                         );
                     }
 
-                    // =========================
-                    // FILE
-                    // =========================
                     else {
                         response = await fetch(
                             "/api/creatives/userfilesdelete",
@@ -58,8 +54,7 @@ export default function useMoveToBin({
                                 },
                                 body: JSON.stringify({
                                     fileKey: item.uid,
-                                    username:
-                                        userdetails?.userName,
+                                    username:username,
                                 }),
                             }
                         );

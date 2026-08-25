@@ -10,7 +10,13 @@ export async function DELETE(request) {
     const email = await getSessionEmailByAuth();
     const token = await client.get(`auth_token_${email}`);
 
-    const data = await DeleteUserFile(body, token);
+    const data = await DeleteUserFile(
+        {
+            username: body.username,
+            key: body.fileKey,
+        },
+        token
+    );
 
     return Response.json(data);
 }

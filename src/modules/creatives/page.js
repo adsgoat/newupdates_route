@@ -28,12 +28,13 @@ import useDuplicateFile from "@/modules/creatives/apicalls/duplicate";
 import useMoveToBin from "@/modules/creatives/apicalls/movetobin";
 import useCopyFile from "@/modules/creatives/apicalls/copyfile";
 import useAddToCampaign from "@/modules/creatives/apicalls/addtocampign";
+import usePasteFile from "@/modules/creatives/apicalls/pastefile";
 import "../../styles/creatives.css";
 import "../../styles/global.css";
 
 const { useBreakpoint } = Grid;
 
-export default function CreativesPage({ email, userData, userPermissions, auth }) {
+export default function CreativesPage({ email, userData, userPermissions, auth, username }) {
 
   // theme states
   const [theme] = useState("light");
@@ -95,7 +96,7 @@ export default function CreativesPage({ email, userData, userPermissions, auth }
   const [isHoveredRestore, setIsHoveredRestore] = useState(false);
   const [hoveredImage, setHoveredImage] = useState(null);
 
-  const [clipboardFile, setClipboardFile] = useState(null);
+  const [clipboardFile, setClipboardFile] = useState([]);
   const [editedFile, setEditedFile] = useState(null);
   const [urlPreviewFile, setUrlPreviewFile] = useState(null);
   const [urlPendingFiles, setUrlPendingFiles] = useState([]);
@@ -142,7 +143,7 @@ export default function CreativesPage({ email, userData, userPermissions, auth }
         `${firstSelectValues}/${selectedAccount}/`;
 
       const params = new URLSearchParams({
-        username: auth.userName,
+        username: username,
         folder,
       });
 
@@ -229,11 +230,20 @@ export default function CreativesPage({ email, userData, userPermissions, auth }
   } = useUpload({
     uploadPrefix,
     currentFolder,
-    userdetails: auth,
+    username: username,
     getUserFiles,
 
   });
-
+  const { pasteFile } = usePasteFile({
+    username: username,
+    currentFolder,
+    uploadPrefix,
+    images,
+    clipboardFile,
+    setClipboardFile,
+    getUserFiles,
+    message,
+  });
   const {
     isTrashView,
     trashItems,
@@ -246,7 +256,7 @@ export default function CreativesPage({ email, userData, userPermissions, auth }
     removeTrashItemsLocally,
   } = useTrash({
     // apiClient,
-    userName: auth.userName,
+    userName: username,
     selectedKey: firstSelectValues,
     selectedAccountNumber: selectedAccount,
 
@@ -311,16 +321,19 @@ export default function CreativesPage({ email, userData, userPermissions, auth }
     setFileInputName,
     setTotalFiles,
     setIsModalVisible,
+    username: username
   });
   const { moveToBin } = useMoveToBin({
     getUserFiles,
     message,
+    username: username
   });
   const { copyFile } = useCopyFile({
     currentFolder,
     uploadPrefix,
     getUserFiles,
     message,
+    username: username
   });
   // const displayItems = useMemo(() => {
   //   return [
@@ -470,7 +483,7 @@ export default function CreativesPage({ email, userData, userPermissions, auth }
       const folder = `${firstSelectValues}/${selectedAccount}/${folderName}`;
 
       const params = new URLSearchParams({
-        username: auth.userName,
+        username: username,
         folder,
       });
 
@@ -619,14 +632,14 @@ export default function CreativesPage({ email, userData, userPermissions, auth }
             gutter={3}
             justify="space-between"
             align="middle"
-          
+
           >
             {/* Left Side */}
             <Col>
               <Row gutter={3}>
                 <Col>
                   <SearchInput
-                    placeholder="Image URL"
+                    placeholder="Image URl"
                     theme={theme}
                     width={220}
                     height={24}
@@ -874,7 +887,7 @@ export default function CreativesPage({ email, userData, userPermissions, auth }
         contextMenu={contextMenu}
         setContextMenu={setContextMenu}
         menuRef={menuRef}
-
+        message={message}
         theme={theme}
 
         isTrashView={isTrashView}
@@ -916,6 +929,7 @@ export default function CreativesPage({ email, userData, userPermissions, auth }
 
         // handlePaste={handlePaste}
 
+        onPaste={pasteFile}
         isHoveredEdit={isHoveredEdit}
         setIsHoveredEdit={setIsHoveredEdit}
 

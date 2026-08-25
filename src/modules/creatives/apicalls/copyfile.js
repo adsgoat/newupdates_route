@@ -1,5 +1,5 @@
 export default function useCopyFile({
-    userdetails,
+    username,
     currentFolder,
     uploadPrefix,
     getUserFiles,
@@ -9,8 +9,7 @@ export default function useCopyFile({
         const dotIndex = name.lastIndexOf(".");
 
         const base =
-            dotIndex > -1
-                ? name.substring(0, dotIndex)
+            dotIndex > -1 ? name.substring(0, dotIndex)
                 : name;
 
         const extension =
@@ -73,8 +72,7 @@ export default function useCopyFile({
                         body: JSON.stringify({
                             sourceKey,
                             destinationKey,
-                            username:
-                                userdetails?.userName,
+                            username: username,
                         }),
                     }
                 );
@@ -137,10 +135,18 @@ export default function useCopyFile({
                 );
 
                 // Get original file through Next proxy
+                const normalizedUrl = file.url?.replace(
+                    "s3.us-east-1.amazonaws.com",
+                    "s3.ap-south-1.amazonaws.com"
+                );
+
+                console.log("Original URL:", file.url);
+                console.log("Normalized URL:", normalizedUrl);
+
                 const proxyResponse =
                     await fetch(
                         `/api/creatives/proxy?url=${encodeURIComponent(
-                            file.url
+                            normalizedUrl
                         )}`
                     );
 
@@ -189,7 +195,7 @@ export default function useCopyFile({
 
                 formData.append(
                     "username",
-                    userdetails?.userName || ""
+                    username
                 );
 
                 const uploadResponse =

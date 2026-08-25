@@ -1,12 +1,12 @@
 import { useState } from "react";
 import dayjs from "dayjs";
 import { message } from "antd";
-
+import axios from "axios";
 export default function useUpload({
     uploadPrefix,
     currentFolder,
-    userdetails,
     getUserFiles,
+    username
 }) {
     const [uploadKey, setUploadKey] = useState(Date.now());
     const [uploadFileList, setUploadFileList] = useState([]);
@@ -22,9 +22,7 @@ export default function useUpload({
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    // ==========================================
-    // FILE SELECT
-    // ==========================================
+
     const handleFileChange = ({ fileList }) => {
         if (!fileList.length) return;
 
@@ -62,9 +60,7 @@ export default function useUpload({
         setIsModalVisible(true);
     };
 
-    // ==========================================
-    // CANCEL
-    // ==========================================
+  
     const handleCancel = () => {
         setIsModalVisible(false);
 
@@ -80,17 +76,13 @@ export default function useUpload({
         setUploadKey(Date.now());
     };
 
-    // ==========================================
-    // UPLOAD
-    // ==========================================
+
     const handleConfirmUpload = async () => {
         try {
             const fileToUpload =
                 pendingFiles?.[uploadingIndex];
 
-            // ------------------------------------------
-            // VALIDATION
-            // ------------------------------------------
+       
             if (!fileToUpload) {
                 message.error("No file selected.");
                 return;
@@ -101,11 +93,9 @@ export default function useUpload({
                 return;
             }
 
-          
 
-            // ------------------------------------------
-            // FILE EXTENSION
-            // ------------------------------------------
+
+       
             const extension =
                 fileToUpload.name.includes(".")
                     ? fileToUpload.name
@@ -113,149 +103,51 @@ export default function useUpload({
                         .pop()
                     : "";
 
-            // ------------------------------------------
-            // FILE NAME
-            // ------------------------------------------
+           
+            const uploadDate =
+                dayjs().format("YYYY-MM-DD");
+
+         
             const filename = extension
                 ? `${fileInputName.trim()}.${extension}`
                 : fileInputName.trim();
 
-            // ------------------------------------------
-            // UPLOAD DATE
-            // ------------------------------------------
-            const uploadDate =
-                dayjs().format("YYYY-MM-DD");
-
-            // ------------------------------------------
-            // DESTINATION KEY
-            // ------------------------------------------
             const destinationKey =
                 `${uploadPrefix}${currentFolder || ""}${filename}`;
 
-            console.log(
-                "========== UPLOAD =========="
-            );
-
-            console.log(
-                "File:",
-                fileToUpload
-            );
-
-            console.log(
-                "Upload date:",
-                uploadDate
-            );
-
-            console.log(
-                "Filename:",
-                filename
-            );
-
-            console.log(
-                "Destination:",
-                destinationKey
-            );
-
-            console.log(
-                "Folder:",
-                currentFolder || ""
-            );
-
-          
-            // ------------------------------------------
-            // FORM DATA
-            // ------------------------------------------
             const formData = new FormData();
 
-            formData.append(
-                "file",
-                fileToUpload
-            );
+            formData.append("file", fileToUpload);
+            formData.append("uploadDate", uploadDate);
+            formData.append("filename", destinationKey);
+            formData.append("folder", currentFolder || "");
 
-            formData.append(
-                "uploadDate",
-                uploadDate
-            );
 
-            formData.append(
-                "filename",
-                destinationKey
-            );
-
-            formData.append(
-                "folder",
-                currentFolder || ""
-            );
-
-            // ------------------------------------------
-            // NEXT.JS API
-            // ------------------------------------------
-            const response = await fetch(
+            const response = await axios.post(
                 "/api/creatives/upload",
+                formData,
                 {
-                    method: "POST",
-
                     headers: {
-                        Authorization:
-                            localStorage.getItem(
-                                "token"
-                            ),
-
-                        username:
-                            "Bhavani",
+                        username: username,
                     },
-
-                    body: formData,
                 }
             );
 
-            // ------------------------------------------
-            // ERROR RESPONSE
-            // ------------------------------------------
-            if (!response.ok) {
-                const errorText =
-                    await response.text();
-
-                console.error(
-                    "Upload API Error:",
-                    response.status,
-                    errorText
-                );
-
-                let errorMessage =
-                    "Unable to upload the file. Please try again.";
-
-                try {
-                    const errorData =
-                        JSON.parse(errorText);
-
-                    if (errorData?.message) {
-                        errorMessage =
-                            errorData.message;
-                    }
-                } catch {
-                    // Response was not JSON
-                }
-
+            if (response.status < 200 || response.status >= 300) {
                 throw new Error(
-                    errorMessage
+                    response.data?.message ||
+                    "Unable to upload the file. Please try again."
                 );
             }
 
-            // ------------------------------------------
-            // RESPONSE DATA
-            // ------------------------------------------
-            const data =
-                await response.json();
+            const data = response.data;
 
             console.log(
                 "Upload response:",
                 data
             );
 
-            // ------------------------------------------
-            // FILE URL
-            // ------------------------------------------
+          
             const newFileUrl =
                 data?.imageUrl ||
                 data?.url;
@@ -278,9 +170,7 @@ export default function useUpload({
                 uploadDate,
             };
 
-            // ------------------------------------------
-            // NEXT FILE
-            // ------------------------------------------
+           
             const nextIndex =
                 uploadingIndex + 1;
 
@@ -290,16 +180,11 @@ export default function useUpload({
                 `${filename} uploaded successfully`
             );
 
-            // ------------------------------------------
-            // REFRESH USER FILES
-            // ------------------------------------------
             if (getUserFiles) {
                 await getUserFiles();
             }
 
-            // ------------------------------------------
-            // MORE FILES
-            // ------------------------------------------
+         
             if (
                 pendingFiles &&
                 nextIndex < pendingFiles.length
@@ -371,9 +256,7 @@ export default function useUpload({
         }
     };
 
-    // ==========================================
-    // EDIT UPLOADED FILE
-    // ==========================================
+   
     const handleEditUploadedFile = () => {
         if (!previewFile) return;
 
@@ -383,9 +266,7 @@ export default function useUpload({
         );
     };
 
-    // ==========================================
-    // RETURN
-    // ==========================================
+    
     return {
         uploadKey,
 

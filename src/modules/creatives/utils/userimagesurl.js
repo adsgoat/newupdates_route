@@ -5,7 +5,7 @@ import { message } from "antd";
 export default function useImageUrl({
     urlInput,
     setUrlInput,
-
+    username,
     setPreviewFile,
     setPendingFiles,
     setUploadingIndex,
@@ -20,11 +20,6 @@ export default function useImageUrl({
             message.error("Please enter a valid URL.");
             return;
         }
-
-        // =========================================
-        // RESET PREVIOUS UPLOAD STATE
-        // =========================================
-
         setPreviewFile(null);
         setPendingFiles([]);
         setUploadingIndex(0);
@@ -35,12 +30,6 @@ export default function useImageUrl({
             setLoading(true);
 
             let finalUrl = urlInput.trim();
-
-            console.log("Image URL entered:", finalUrl);
-
-            // =========================================
-            // BASE64 DATA URL
-            // =========================================
 
             if (finalUrl.startsWith("data:")) {
                 const matches = finalUrl.match(
@@ -125,9 +114,8 @@ export default function useImageUrl({
                 return;
             }
 
-            // =========================================
-            // GOOGLE IMAGE URL
-            // =========================================
+  
+         
 
             const urlObj = new URL(finalUrl);
 
@@ -146,33 +134,16 @@ export default function useImageUrl({
                     finalUrl
                 );
             }
-
-            // =========================================
-            // BACKEND PROXY
-            // =========================================
-
             const proxyUrl =
-                `https://app.vyaktimetrics.com/creatives/proxy?url=${encodeURIComponent(
+                `/api/creatives/proxy?url=${encodeURIComponent(
                     finalUrl
                 )}`;
 
-            console.log(
-                "Proxy URL:",
-                proxyUrl
-            );
+            console.log("Next.js Proxy URL:", proxyUrl);
 
-            const response = await fetch(
-                proxyUrl,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization:
-                            localStorage.getItem(
-                                "token"
-                            ),
-                    },
-                }
-            );
+            const response = await fetch(proxyUrl, {
+                method: "GET",
+            });
 
             if (!response.ok) {
                 throw new Error(
@@ -180,9 +151,7 @@ export default function useImageUrl({
                 );
             }
 
-            // =========================================
-            // CONTENT TYPE
-            // =========================================
+         
 
             const contentType =
                 response.headers.get(
@@ -203,9 +172,6 @@ export default function useImageUrl({
                 );
             }
 
-            // =========================================
-            // CREATE BLOB
-            // =========================================
 
             const blob =
                 await response.blob();
@@ -215,9 +181,7 @@ export default function useImageUrl({
                 blob
             );
 
-            // =========================================
-            // FILE EXTENSION
-            // =========================================
+         
 
             const extension =
                 contentType.split("/")[1] ||
@@ -226,9 +190,6 @@ export default function useImageUrl({
             const fileName =
                 `url_file_${Date.now()}.${extension}`;
 
-            // =========================================
-            // CREATE FILE
-            // =========================================
 
             const file = new File(
                 [blob],
@@ -238,9 +199,7 @@ export default function useImageUrl({
                 }
             );
 
-            // =========================================
-            // PREVIEW FILE
-            // =========================================
+    
 
             setPreviewFile({
                 url: URL.createObjectURL(blob),
@@ -302,7 +261,7 @@ export default function useImageUrl({
 
             message.error(
                 error.message ||
-                    "Failed to fetch or decode the file."
+                "Failed to fetch or decode the file."
             );
         } finally {
             setLoading(false);

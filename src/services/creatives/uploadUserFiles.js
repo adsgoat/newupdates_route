@@ -1,18 +1,28 @@
-import axios from "axios";
 
 export default async function UploadUserFiles(reqData, token) {
     const { formData, username } = reqData;
-
-    const apiCall = await axios.post(
+    const response = await fetch(
         "http://test.app.vyaktimetrics.com/creatives/userfiles/uploaduserfiles",
-        formData,
         {
+            method: "POST",
             headers: {
                 Authorization: token,
                 username,
             },
+            body: formData,
         }
     );
 
-    return apiCall.data;
+    const responseText = await response.text();
+    if (!response.ok) {
+        throw new Error(
+            `Upload API failed (${response.status}): ${responseText}`
+        );
+    }
+
+    try {
+        return JSON.parse(responseText);
+    } catch {
+        return responseText;
+    }
 }

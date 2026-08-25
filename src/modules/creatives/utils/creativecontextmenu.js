@@ -1,31 +1,23 @@
 "use client";
 
 import React from "react";
-import {
-    CopyOutlined,
-} from "@ant-design/icons";
-
+import { CopyOutlined } from "@ant-design/icons";
 import {
     MdEdit,
     MdDriveFileRenameOutline,
 } from "react-icons/md";
+import { HiOutlineDuplicate } from "react-icons/hi";
 
-import {
-    HiOutlineDuplicate,
-} from "react-icons/hi";
 import downloadFile from "@/modules/creatives/apicalls/downloadfile";
-import { message } from "antd";
+
 
 export default function CreativeContextMenu({
     contextMenu,
     setContextMenu,
-
     menuRef,
     theme,
-
+    message,
     isTrashView,
-
-    // Selection
     selectedImages,
     setSelectedImages,
     selectedImagesRef,
@@ -34,11 +26,11 @@ export default function CreativeContextMenu({
     clipboardFile,
     setClipboardFile,
 
-    // Main actions
+    // Actions
     startRename,
     handleInlineRename,
     handleCloneFile,
-
+    onPaste,
 
     // Rename
     setEditingUid,
@@ -65,10 +57,12 @@ export default function CreativeContextMenu({
     handleMultiCut,
     handleMultiDelete,
     handleMultiRename,
+
     duplicateFile,
-    // Paste
-    handlePaste,
     copyFile,
+    moveToBin,
+    addToCampaign,
+
     // Hover states
     isHoveredEdit,
     setIsHoveredEdit,
@@ -90,29 +84,148 @@ export default function CreativeContextMenu({
 
     isHoveredRestore,
     setIsHoveredRestore,
+
     handleEditFile,
     images,
-    moveToBin,
-    addToCampaign
 }) {
     if (!contextMenu?.visible) {
         return null;
     }
 
-    const target = contextMenu.target;
+    const target = contextMenu?.target || null;
 
     const selectedList =
-        contextMenu.selectedList || [];
+        contextMenu?.selectedList || [];
 
     const isMultiSelect =
         selectedList.length > 1;
 
+    /*
+     * IMPORTANT
+     * Always get folder status from target.
+     * Do not depend only on contextMenu.isFolder.
+     */
+    const isFolder =
+        !!target?.isFolder;
+
+    const hasClipboard =
+        Array.isArray(clipboardFile) &&
+        clipboardFile.length > 0;
+
     const closeMenu = () => {
-        setContextMenu({
-            ...contextMenu,
+        setContextMenu((prev) => ({
+            ...prev,
             visible: false,
-        });
+        }));
     };
+
+    /*
+     * Save file/folder into clipboard
+     */
+    const handleCopy = (item) => {
+        if (!item) {
+            return;
+        }
+
+        console.log("========== CONTEXT COPY ==========");
+        console.log("Item:", item);
+        console.log("Is folder:", !!item.isFolder);
+
+        setClipboardFile([
+            {
+                ...item,
+                action: "copy",
+                isFolder: !!item.isFolder,
+            },
+        ]);
+
+        setSelectedImages?.([]);
+        if (selectedImagesRef) {
+            selectedImagesRef.current = [];
+        }
+
+        closeMenu();
+    };
+
+    /*
+     * Save file/folder into clipboard as CUT
+     */
+    const handleCut = (item) => {
+        if (!item) {
+            return;
+        }
+
+        console.log("========== CONTEXT CUT ==========");
+        console.log("Item:", item);
+        console.log("Is folder:", !!item.isFolder);
+
+        setClipboardFile([
+            {
+                ...item,
+                action: "cut",
+                isFolder: !!item.isFolder,
+            },
+        ]);
+
+        setSelectedImages?.([]);
+        if (selectedImagesRef) {
+            selectedImagesRef.current = [];
+        }
+
+        closeMenu();
+    };
+
+    /*
+     * Paste
+     *
+     * If the user right-clicks a folder,
+     * pass that folder as the destination context.
+     *
+     * Your pasteFile hook can use currentFolder
+     * from page state.
+     */
+    const handlePasteClick = async () => {
+        if (!hasClipboard) {
+            return;
+        }
+
+        console.log("========== CONTEXT PASTE ==========");
+        console.log("Clipboard:", clipboardFile);
+        console.log("Target:", target);
+        console.log("Target is folder:", isFolder);
+
+        try {
+            const result = await onPaste?.({
+                targetFolder: isFolder
+                    ? target
+                    : null,
+            });
+
+            if (result?.ok) {
+                closeMenu();
+            }
+        } catch (error) {
+            console.error(
+                "Paste from context menu failed:",
+                error
+            );
+        }
+    };
+
+    /*
+     * Common hover style
+     */
+    const hoverStyle = (
+        hovered,
+        color = "inherit"
+    ) => ({
+        padding: "8px 12px",
+        backgroundColor: hovered
+            ? "#e6f7ff"
+            : "transparent",
+        color,
+        cursor: "pointer",
+    });
 
     return (
         <div
@@ -123,7 +236,7 @@ export default function CreativeContextMenu({
                 top: `${contextMenu.y}px`,
                 left: `${contextMenu.x}px`,
                 zIndex: 9999,
-                width: "180px",
+                width: "190px",
                 background:
                     theme === "dark"
                         ? "#2a2a2a"
@@ -141,7 +254,7 @@ export default function CreativeContextMenu({
         >
 
             {/* ================================================= */}
-            {/* BLANK SPACE */}
+            {/* BLANK AREA */}
             {/* ================================================= */}
 
             {!target && (
@@ -152,7 +265,7 @@ export default function CreativeContextMenu({
                             cursor: "pointer",
                         }}
                         onClick={() => {
-                            setNewFolderModal({
+                            setNewFolderModal?.({
                                 visible: true,
                                 name: "",
                                 mode: "create",
@@ -165,17 +278,13 @@ export default function CreativeContextMenu({
                         ➕ New Folder
                     </div>
 
-                    {clipboardFile?.length > 0 && (
+                    {hasClipboard && (
                         <div
                             style={{
                                 padding: "8px 12px",
                                 cursor: "pointer",
                             }}
-                            onClick={async () => {
-                                await handlePaste();
-
-                                closeMenu();
-                            }}
+                            onClick={handlePasteClick}
                         >
                             📄 Paste
                         </div>
@@ -184,77 +293,39 @@ export default function CreativeContextMenu({
             )}
 
             {/* ================================================= */}
-            {/* TRASH */}
+            {/* TRASH VIEW */}
             {/* ================================================= */}
 
             {isTrashView &&
-                (selectedList.length > 0 ||
-                    target) && (
+                (selectedList.length > 0 || target) && (
                     <>
-                        {/* <div
-                            style={{
-                                padding: "5px",
-                                fontWeight: "bold",
-
-                            }}
-                        >
-                            {selectedList.length > 0
-                                ? `${selectedList.length} selected`
-                                : target?.name}
-                        </div> */}
-
-                        {/* DELETE PERMANENTLY */}
-
                         <div
                             style={{
-                                padding: "5px",
+                                padding: "8px 12px",
                                 color: "red",
-                                backgroundColor:
-                                    isHoveredDelete
-                                        ? "#e6f7ff"
-                                        : "transparent",
                                 cursor: "pointer",
                             }}
                             onClick={async () => {
-                                await handlePermanentDelete();
-
+                                await handlePermanentDelete?.();
                                 closeMenu();
                             }}
-                            onMouseEnter={() =>
-                                setIsHoveredDelete(true)
-                            }
-                            onMouseLeave={() =>
-                                setIsHoveredDelete(false)
-                            }
                         >
                             ❌ Delete Permanently
                         </div>
 
-                        {/* RESTORE */}
-
                         <div
-                            style={{
-                                padding: "5px",
-                                backgroundColor:
-                                    isHoveredRestore
-                                        ? "#e6f7ff"
-                                        : "transparent",
-                                color:
-                                    isHoveredRestore
-                                        ? "#333"
-                                        : "inherit",
-                                cursor: "pointer",
-                            }}
+                            style={hoverStyle(
+                                isHoveredRestore
+                            )}
                             onClick={async () => {
-                                await handleRestore();
-
+                                await handleRestore?.();
                                 closeMenu();
                             }}
                             onMouseEnter={() =>
-                                setIsHoveredRestore(true)
+                                setIsHoveredRestore?.(true)
                             }
                             onMouseLeave={() =>
-                                setIsHoveredRestore(false)
+                                setIsHoveredRestore?.(false)
                             }
                         >
                             🔁 Restore
@@ -263,7 +334,7 @@ export default function CreativeContextMenu({
                 )}
 
             {/* ================================================= */}
-            {/* NORMAL MULTIPLE SELECTION */}
+            {/* MULTIPLE SELECTION */}
             {/* ================================================= */}
 
             {!isTrashView &&
@@ -286,14 +357,10 @@ export default function CreativeContextMenu({
                                 cursor: "pointer",
                             }}
                             onClick={async () => {
-                                await addToCampaign(
-                                    contextMenu.target
+                                await addToCampaign?.(
+                                    selectedList
                                 );
-
-                                setContextMenu({
-                                    ...contextMenu,
-                                    visible: false,
-                                });
+                                closeMenu();
                             }}
                         >
                             ➕ Add to Campaign
@@ -307,7 +374,20 @@ export default function CreativeContextMenu({
                                 cursor: "pointer",
                             }}
                             onClick={() => {
-                                handleMultiCopy();
+                                if (handleMultiCopy) {
+                                    handleMultiCopy();
+                                } else {
+                                    setClipboardFile?.(
+                                        selectedList.map(
+                                            (item) => ({
+                                                ...item,
+                                                action: "copy",
+                                                isFolder:
+                                                    !!item.isFolder,
+                                            })
+                                        )
+                                    );
+                                }
 
                                 closeMenu();
                             }}
@@ -328,21 +408,29 @@ export default function CreativeContextMenu({
                                 cursor: "pointer",
                             }}
                             onClick={() => {
-                                setClipboardFile([
-                                    {
-                                        ...target,
-                                        action: "cut",
-                                        isFolder: false,
-                                    },
-                                ]);
+                                if (handleMultiCut) {
+                                    handleMultiCut();
+                                } else {
+                                    setClipboardFile?.(
+                                        selectedList.map(
+                                            (item) => ({
+                                                ...item,
+                                                action: "cut",
+                                                isFolder:
+                                                    !!item.isFolder,
+                                            })
+                                        )
+                                    );
+                                }
 
-                                setSelectedImages([]);
-                                selectedImagesRef.current = [];
+                                setSelectedImages?.([]);
 
-                                setContextMenu({
-                                    ...contextMenu,
-                                    visible: false,
-                                });
+                                if (selectedImagesRef) {
+                                    selectedImagesRef.current =
+                                        [];
+                                }
+
+                                closeMenu();
                             }}
                         >
                             ✂️ Cut
@@ -357,15 +445,16 @@ export default function CreativeContextMenu({
                                 cursor: "pointer",
                             }}
                             onClick={async () => {
-                                await moveToBin([contextMenu.target]);
-
+                                await moveToBin?.(
+                                    selectedList
+                                );
                                 closeMenu();
                             }}
                         >
                             🗑️ Move to Bin
                         </div>
 
-                        {/* RENAME ALL */}
+                        {/* RENAME */}
 
                         <div
                             style={{
@@ -373,8 +462,7 @@ export default function CreativeContextMenu({
                                 cursor: "pointer",
                             }}
                             onClick={() => {
-                                handleMultiRename();
-
+                                handleMultiRename?.();
                                 closeMenu();
                             }}
                         >
@@ -384,33 +472,19 @@ export default function CreativeContextMenu({
                 )}
 
             {/* ================================================= */}
-            {/* NORMAL SINGLE ITEM */}
+            {/* SINGLE ITEM */}
             {/* ================================================= */}
 
             {!isTrashView &&
                 !isMultiSelect &&
                 target && (
                     <>
+                        {/* ========================================= */}
                         {/* FOLDER */}
+                        {/* ========================================= */}
 
-                        {contextMenu.isFolder ? (
+                        {isFolder ? (
                             <>
-                                {/* ADD TO CAMPAIGN */}
-
-                                <div
-                                    style={{
-                                        padding: "8px 12px",
-                                        cursor: "pointer",
-                                    }}
-                                    onClick={async () => {
-                                        await handleAddToCampaign();
-
-                                        closeMenu();
-                                    }}
-                                >
-                                    ➕ Add to Campaign
-                                </div>
-
                                 {/* OPEN */}
 
                                 <div
@@ -419,16 +493,18 @@ export default function CreativeContextMenu({
                                         cursor: "pointer",
                                     }}
                                     onClick={() => {
-                                        handleFolderClick(
+                                        handleFolderClick?.(
                                             target.name
                                         );
 
-                                        setSelectedImages(
-                                            []
-                                        );
+                                        setSelectedImages?.([]);
 
-                                        selectedImagesRef.current =
-                                            [];
+                                        if (
+                                            selectedImagesRef
+                                        ) {
+                                            selectedImagesRef.current =
+                                                [];
+                                        }
 
                                         closeMenu();
                                     }}
@@ -436,91 +512,120 @@ export default function CreativeContextMenu({
                                     📂 Open
                                 </div>
 
-                                {/* RENAME */}
+                                {/* PASTE INTO FOLDER */}
+
+                               
+
+                                {/* ADD TO CAMPAIGN */}
 
                                 <div
                                     style={{
-                                        padding: "8px 12px",
-                                        cursor: "pointer",
+                                        padding:
+                                            "8px 12px",
+                                        cursor:
+                                            "pointer",
                                     }}
+                                    onClick={async () => {
+                                        await handleAddToCampaign?.(
+                                            target
+                                        );
+
+                                        closeMenu();
+                                    }}
+                                >
+                                    ➕ Add to Campaign
+                                </div>
+
+                                {/* RENAME */}
+
+                                <div
+                                    style={hoverStyle(
+                                        isHoveredRename
+                                    )}
                                     onClick={() => {
-                                        setNewFolderModal({
+                                        setNewFolderModal?.({
                                             visible: true,
-                                            name: target.name,
+                                            name:
+                                                target.name,
                                             mode: "rename",
                                             folderToRename:
                                                 target,
                                         });
 
-                                        setSelectedImages(
-                                            []
-                                        );
+                                        setSelectedImages?.([]);
 
                                         closeMenu();
                                     }}
+                                    onMouseEnter={() =>
+                                        setIsHoveredRename?.(
+                                            true
+                                        )
+                                    }
+                                    onMouseLeave={() =>
+                                        setIsHoveredRename?.(
+                                            false
+                                        )
+                                    }
                                 >
                                     <MdDriveFileRenameOutline
                                         style={{
-                                            fontSize: "16px",
-                                            marginRight: "8px",
+                                            fontSize:
+                                                "16px",
+                                            marginRight:
+                                                "8px",
                                         }}
                                     />
                                     Rename
                                 </div>
 
-                                {/* COPY */}
+                                {/* COPY FOLDER */}
 
                                 <div
-                                    style={{
-                                        padding: "8px 12px",
-                                        cursor: "pointer",
-                                    }}
-                                    onClick={() => {
-                                        setClipboardFile([
-                                            {
-                                                ...target,
-                                                action: "copy",
-                                                isFolder: true,
-                                            },
-                                        ]);
-
-                                        setSelectedImages(
-                                            []
-                                        );
-
-                                        closeMenu();
-                                    }}
+                                    style={hoverStyle(
+                                        isHoveredCopy
+                                    )}
+                                    onClick={() =>
+                                        handleCopy(target)
+                                    }
+                                    onMouseEnter={() =>
+                                        setIsHoveredCopy?.(
+                                            true
+                                        )
+                                    }
+                                    onMouseLeave={() =>
+                                        setIsHoveredCopy?.(
+                                            false
+                                        )
+                                    }
                                 >
                                     <CopyOutlined
                                         style={{
-                                            marginRight: 8,
+                                            marginRight:
+                                                8,
                                         }}
                                     />
                                     Copy
                                 </div>
 
-                                {/* CUT */}
+                                {/* CUT FOLDER */}
 
                                 <div
-                                    style={{
-                                        padding: "8px 12px",
-                                        cursor: "pointer",
-                                    }}
-                                    onClick={() => {
-                                        setClipboardFile([
-                                            {
-                                                ...target,
-                                                action: "cut",
-                                                isFolder: true,
-                                            },
-                                        ]);
-
-                                        setSelectedImages(
-                                            []
-                                        );
-
-                                        closeMenu();
-                                    }}
+                                    style={hoverStyle(
+                                        isHoveredCut
+                                    )}
+                                    onClick={() =>
+                                        handleCut(target)
+                                    }
+                                    onMouseEnter={() =>
+                                        setIsHoveredCut?.(
+                                            true
+                                        )
+                                    }
+                                    onMouseLeave={() =>
+                                        setIsHoveredCut?.(
+                                            false
+                                        )
+                                    }
                                 >
                                     ✂️ Cut
                                 </div>
@@ -529,49 +634,113 @@ export default function CreativeContextMenu({
 
                                 <div
                                     style={{
-                                        padding: "8px 12px",
+                                        padding:
+                                            "8px 12px",
                                         color: "red",
-                                        cursor: "pointer",
+                                        backgroundColor:
+                                            isHoveredDelete
+                                                ? "#e6f7ff"
+                                                : "transparent",
+                                        cursor:
+                                            "pointer",
                                     }}
                                     onClick={async () => {
-                                        await moveToBin([target]);
+                                        await moveToBin?.([
+                                            target,
+                                        ]);
 
-                                        setSelectedImages([]);
-                                        selectedImagesRef.current = [];
+                                        setSelectedImages?.(
+                                            []
+                                        );
+
+                                        if (
+                                            selectedImagesRef
+                                        ) {
+                                            selectedImagesRef.current =
+                                                [];
+                                        }
 
                                         closeMenu();
                                     }}
+                                    onMouseEnter={() =>
+                                        setIsHoveredDelete?.(
+                                            true
+                                        )
+                                    }
+                                    onMouseLeave={() =>
+                                        setIsHoveredDelete?.(
+                                            false
+                                        )
+                                    }
                                 >
                                     🗑️ Move to Bin
                                 </div>
                             </>
                         ) : (
-                            /* ================================= */
+                            /* ========================================= */
                             /* FILE */
-                            /* ================================= */
+                            /* ========================================= */
 
                             <>
                                 {/* DOWNLOAD */}
 
                                 <div
-                                    style={{ padding: '8px 12px', cursor: 'pointer' }}
+                                    style={{
+                                        padding:
+                                            "8px 12px",
+                                        cursor:
+                                            "pointer",
+                                    }}
                                     onClick={async () => {
                                         try {
-                                            const target = contextMenu.target;
-                                            setContextMenu({ ...contextMenu, visible: false });
-                                            const url = target?.url;
-                                            const name = target?.name || (target?.uid?.split('/').pop() || 'file');
+                                            const url =
+                                                target?.url;
+
+                                            const name =
+                                                target?.name ||
+                                                target?.uid
+                                                    ?.split(
+                                                        "/"
+                                                    )
+                                                    .pop() ||
+                                                "file";
+
+                                            closeMenu();
+
                                             if (!url) {
-                                                message.error("File URL unavailable for download");
+                                                message.error(
+                                                    "File URL unavailable for download"
+                                                );
                                                 return;
                                             }
-                                            message.info(`Downloading ${name}...`);
-                                            const res = await downloadFile(url, name);
-                                            if (res.ok) message.success(`Downloaded ${name}`);
-                                            else message.error(`Failed to download ${name}`);
-                                        } catch (err) {
-                                            console.error(err);
-                                            message.error("Download failed");
+
+                                            message.info(
+                                                `Downloading ${name}...`
+                                            );
+
+                                            const res =
+                                                await downloadFile(
+                                                    url,
+                                                    name
+                                                );
+
+                                            if (res.ok) {
+                                                message.success(
+                                                    `Downloaded ${name}`
+                                                );
+                                            } else {
+                                                message.error(
+                                                    `Failed to download ${name}`
+                                                );
+                                            }
+                                        } catch (error) {
+                                            console.error(
+                                                error
+                                            );
+
+                                            message.error(
+                                                "Download failed"
+                                            );
                                         }
                                     }}
                                 >
@@ -581,44 +750,37 @@ export default function CreativeContextMenu({
                                 {/* EDIT */}
 
                                 <div
-                                    style={{
-                                        padding: "8px 12px",
-                                        backgroundColor:
-                                            isHoveredEdit
-                                                ? "#e6f7ff"
-                                                : "transparent",
-                                        color:
-                                            isHoveredEdit
-                                                ? "#333"
-                                                : "inherit",
-                                        cursor: "pointer",
-                                    }}
+                                    style={hoverStyle(
+                                        isHoveredEdit
+                                    )}
                                     onClick={() => {
+                                        handleEditFile?.(
+                                            target
+                                        );
 
-                                        handleEditFile(contextMenu.target)
-
-                                        setSelectedImages(
+                                        setSelectedImages?.(
                                             []
                                         );
 
                                         closeMenu();
                                     }}
                                     onMouseEnter={() =>
-                                        setIsHoveredEdit(
+                                        setIsHoveredEdit?.(
                                             true
                                         )
                                     }
                                     onMouseLeave={() =>
-                                        setIsHoveredEdit(
+                                        setIsHoveredEdit?.(
                                             false
                                         )
                                     }
-
                                 >
                                     <MdEdit
                                         style={{
-                                            fontSize: "16px",
-                                            marginRight: "8px",
+                                            fontSize:
+                                                "16px",
+                                            marginRight:
+                                                "8px",
                                         }}
                                     />
                                     Edit
@@ -627,30 +789,31 @@ export default function CreativeContextMenu({
                                 {/* RENAME */}
 
                                 <div
-                                    style={{
-                                        padding: "8px 12px",
-                                        backgroundColor: isHoveredRename
-                                            ? "#e6f7ff"
-                                            : "transparent",
-                                        color: isHoveredRename
-                                            ? "#333"
-                                            : "inherit",
-                                        cursor: "pointer",
-                                    }}
+                                    style={hoverStyle(
+                                        isHoveredRename
+                                    )}
                                     onClick={() => {
-                                        startRename(contextMenu.target);
+                                        startRename?.(
+                                            target
+                                        );
                                     }}
                                     onMouseEnter={() =>
-                                        setIsHoveredRename(true)
+                                        setIsHoveredRename?.(
+                                            true
+                                        )
                                     }
                                     onMouseLeave={() =>
-                                        setIsHoveredRename(false)
+                                        setIsHoveredRename?.(
+                                            false
+                                        )
                                     }
                                 >
                                     <MdDriveFileRenameOutline
                                         style={{
-                                            fontSize: "16px",
-                                            marginRight: "8px",
+                                            fontSize:
+                                                "16px",
+                                            marginRight:
+                                                "8px",
                                         }}
                                     />
                                     Rename
@@ -659,42 +822,34 @@ export default function CreativeContextMenu({
                                 {/* DUPLICATE */}
 
                                 <div
-                                    style={{
-                                        padding: "8px 12px",
-                                        backgroundColor:
-                                            isHoveredDuplicate
-                                                ? "#e6f7ff"
-                                                : "transparent",
-                                        color:
-                                            isHoveredDuplicate
-                                                ? "#333"
-                                                : "inherit",
-                                        cursor: "pointer",
-                                    }}
+                                    style={hoverStyle(
+                                        isHoveredDuplicate
+                                    )}
                                     onClick={async () => {
-                                        await duplicateFile(
-                                            contextMenu.target,
+                                        await duplicateFile?.(
+                                            target,
                                             images
                                         );
-                                        setContextMenu({
-                                            visible: false,
-                                        });
+
+                                        closeMenu();
                                     }}
                                     onMouseEnter={() =>
-                                        setIsHoveredDuplicate(
+                                        setIsHoveredDuplicate?.(
                                             true
                                         )
                                     }
                                     onMouseLeave={() =>
-                                        setIsHoveredDuplicate(
+                                        setIsHoveredDuplicate?.(
                                             false
                                         )
                                     }
                                 >
                                     <HiOutlineDuplicate
                                         style={{
-                                            fontSize: "16px",
-                                            marginRight: "8px",
+                                            fontSize:
+                                                "16px",
+                                            marginRight:
+                                                "8px",
                                         }}
                                     />
                                     Duplicate
@@ -704,29 +859,41 @@ export default function CreativeContextMenu({
 
                                 <div
                                     style={{
-                                        padding: "8px 12px",
+                                        padding:
+                                            "8px 12px",
                                         color: "red",
                                         backgroundColor:
                                             isHoveredDelete
                                                 ? "#e6f7ff"
                                                 : "transparent",
-                                        cursor: "pointer",
+                                        cursor:
+                                            "pointer",
                                     }}
                                     onClick={async () => {
-                                        await moveToBin([target]);
+                                        await moveToBin?.([
+                                            target,
+                                        ]);
 
-                                        setSelectedImages([]);
-                                        selectedImagesRef.current = [];
+                                        setSelectedImages?.(
+                                            []
+                                        );
+
+                                        if (
+                                            selectedImagesRef
+                                        ) {
+                                            selectedImagesRef.current =
+                                                [];
+                                        }
 
                                         closeMenu();
                                     }}
                                     onMouseEnter={() =>
-                                        setIsHoveredDelete(
+                                        setIsHoveredDelete?.(
                                             true
                                         )
                                     }
                                     onMouseLeave={() =>
-                                        setIsHoveredDelete(
+                                        setIsHoveredDelete?.(
                                             false
                                         )
                                     }
@@ -734,94 +901,51 @@ export default function CreativeContextMenu({
                                     🗑️ Move to Bin
                                 </div>
 
-                                {/* COPY */}
+                                {/* COPY FILE */}
 
                                 <div
-                                    style={{
-                                        padding: "8px 12px",
-                                        backgroundColor:
-                                            isHoveredCopy
-                                                ? "#e6f7ff"
-                                                : "transparent",
-                                        color:
-                                            isHoveredCopy
-                                                ? "#333"
-                                                : "inherit",
-                                        cursor: "pointer",
-                                    }}
-                                    onClick={() => {
-                                        setClipboardFile([
-                                            {
-                                                ...target,
-                                                action: "copy",
-                                                isFolder: false,
-                                            },
-                                        ]);
-
-                                        setSelectedImages(
-                                            []
-                                        );
-
-                                        closeMenu();
-                                    }}
+                                    style={hoverStyle(
+                                        isHoveredCopy
+                                    )}
+                                    onClick={() =>
+                                        handleCopy(target)
+                                    }
                                     onMouseEnter={() =>
-                                        setIsHoveredCopy(
+                                        setIsHoveredCopy?.(
                                             true
                                         )
                                     }
                                     onMouseLeave={() =>
-                                        setIsHoveredCopy(
+                                        setIsHoveredCopy?.(
                                             false
                                         )
                                     }
                                 >
                                     <CopyOutlined
                                         style={{
-                                            marginRight: 8,
+                                            marginRight:
+                                                8,
                                         }}
                                     />
                                     Copy
                                 </div>
 
-                                {/* CUT */}
+                                {/* CUT FILE */}
 
                                 <div
-                                    style={{
-                                        padding: "8px 12px",
-                                        backgroundColor:
-                                            isHoveredCut
-                                                ? "#e6f7ff"
-                                                : "transparent",
-                                        color:
-                                            isHoveredCut
-                                                ? "#333"
-                                                : "inherit",
-                                        cursor: "pointer",
-                                    }}
-                                    onClick={() => {
-                                        setClipboardFile([
-                                            {
-                                                ...target,
-                                                action: "cut",
-                                                isFolder: true,
-                                            },
-                                        ]);
-
-                                        setSelectedImages([]);
-                                        selectedImagesRef.current = [];
-
-                                        setContextMenu({
-                                            ...contextMenu,
-                                            visible: false,
-                                        });
-                                    }}
+                                    style={hoverStyle(
+                                        isHoveredCut
+                                    )}
+                                    onClick={() =>
+                                        handleCut(target)
+                                    }
                                     onMouseEnter={() =>
-                                        setIsHoveredCut(
+                                        setIsHoveredCut?.(
                                             true
                                         )
                                     }
                                     onMouseLeave={() =>
-                                        setIsHoveredCut(
+                                        setIsHoveredCut?.(
                                             false
                                         )
                                     }

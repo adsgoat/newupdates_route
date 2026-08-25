@@ -41,7 +41,7 @@ export default function useDuplicateFile({
 
         return number;
     };
-    const duplicateFile = async (file, images ) => {
+    const duplicateFile = async (file, images) => {
         if (!file) {
             message.error("No file selected.");
             return;
@@ -146,10 +146,17 @@ export default function useDuplicateFile({
                     destinationKey
                 );
 
-                // First get original file
+                const correctedFileUrl = file.url?.replace(
+                    "s3.us-east-1.amazonaws.com",
+                    "s3.ap-south-1.amazonaws.com"
+                );
+
+                console.log("Original URL:", file.url);
+                console.log("Corrected URL:", correctedFileUrl);
+
                 const proxyUrl =
                     `/api/creatives/proxy?url=${encodeURIComponent(
-                        file.url
+                        correctedFileUrl
                     )}`;
 
                 const proxyResponse =
