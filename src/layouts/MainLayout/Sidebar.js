@@ -87,7 +87,7 @@ export default function Sidebar({ role, userPermissions }) {
         userPermissions?.permissions?.find(item => Object.hasOwn(item, "creatives"))?.creatives?.allowed && getItem('Creatives', '/Creatives', <PictureOutlined className={pathname === '/Creatives' && 'black-icon'} style={{ fontSize: "12px" }} />, 'creatives'),
         userPermissions?.permissions?.find(item => Object.hasOwn(item, "campaigns"))?.campaigns?.allowed && getItem('Campaigns', '/Campaigns', <LineChartOutlined className={pathname === '/campaigns' && 'black-icon'} style={{ fontSize: "12px" }} />, 'campaigns'),
         // getItem('Users', '/Users', <ContainerOutlined />),
-        userPermissions?.permissions?.find(item => Object.hasOwn(item, "userrole"))?.userrole?.allowed && getItem('User Role', '/NewUser', <UserOutlined className={pathname === '/newuser' && 'black-icon'} style={{ fontSize: "12px" }} />, 'newuser'),
+        userPermissions?.permissions?.find(item => Object.hasOwn(item, "userrole"))?.userrole?.allowed && getItem('User Role', '/newuser', <UserOutlined className={pathname === '/newuser' && 'black-icon'} style={{ fontSize: "12px" }} />, 'newuser'),
         userPermissions?.permissions?.find(item => Object.hasOwn(item, "activities"))?.activities?.allowed && role === 'Admin' && getItem('User History', '/Activities', <LaptopOutlined className={pathname === '/activities' && 'black-icon'} style={{ fontSize: "12px" }} />, 'activities'),
     ].filter(Boolean);
 

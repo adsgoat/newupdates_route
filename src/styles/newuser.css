@@ -1,0 +1,523 @@
+/* ================================
+   New User Tabs
+================================ */
+
+.newuser-tabs .ant-tabs-nav {
+    margin-bottom: 5px;
+}
+
+.newuser-tabs .ant-tabs-nav::before {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Tab */
+.newuser-tabs .ant-tabs-tab {
+    padding: 7px 18px !important;
+    margin: 0 !important;
+    font-size: 10px;
+    /* font-weight: 500; */
+    color: #666;
+    transition: all 0.2s ease;
+}
+
+/* Tab hover */
+.newuser-tabs .ant-tabs-tab:hover {
+    color: #91c25f !important;
+}
+
+/* Active tab text */
+.newuser-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #91c25f !important;
+    /* font-weight: 600; */
+}
+
+/* Remove Ant Design default active ink color */
+.newuser-tabs .ant-tabs-ink-bar {
+    background: #91c25f !important;
+    height: 3px !important;
+    border-radius: 3px 3px 0 0;
+}
+
+/* Content */
+.newuser-tabs .ant-tabs-content-holder {
+    padding-top: 4px;
+}
+
+
+/* =================================
+   TABS - DARK THEME
+================================= */
+
+.newuser-tabs.dark-theme-1 .ant-tabs-tab {
+    color: #ffffff !important;
+}
+
+.newuser-tabs.dark-theme-1 .ant-tabs-tab .ant-tabs-tab-btn {
+    color: #ffffff !important;
+}
+
+/* Hover */
+.newuser-tabs.dark-theme-1 .ant-tabs-tab:hover .ant-tabs-tab-btn {
+    color: #91c25f !important;
+}
+
+/* Active tab */
+.newuser-tabs.dark-theme-1 .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #91c25f !important;
+}
+
+/* Dark theme bottom border */
+.newuser-tabs.dark-theme-1 .ant-tabs-nav::before {
+    border-bottom-color: #434343 !important;
+}
+
+/* =========================================
+   REUSABLE TABLE - DARK THEME
+========================================= */
+
+.reusable-table-dark .ant-table {
+    background: #141414 !important;
+    color: #ffffff !important;
+}
+
+/* Table container */
+.reusable-table-dark .ant-table-container {
+    background: #141414 !important;
+}
+
+/* Header */
+.reusable-table-dark .ant-table-thead>tr>th {
+    background: #1f1f1f !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid #434343 !important;
+}
+
+/* Body */
+.reusable-table-dark .ant-table-tbody>tr>td {
+    background: #141414 !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid #303030 !important;
+}
+
+/* Hover */
+.reusable-table-dark .ant-table-tbody>tr:hover>td {
+    background: #262626 !important;
+    color: #ffffff !important;
+}
+
+/* Empty */
+.reusable-table-dark .ant-empty-description {
+    color: #aaaaaa !important;
+}
+
+/* =========================================
+   PAGINATION
+========================================= */
+
+.reusable-table-dark .ant-pagination {
+    color: #ffffff !important;
+}
+
+.reusable-table-dark .ant-pagination-item {
+    background: #1f1f1f !important;
+    border-color: #434343 !important;
+}
+
+.reusable-table-dark .ant-pagination-item a {
+    color: #ffffff !important;
+}
+
+.reusable-table-dark .ant-pagination-item-active {
+    border-color: #91c25f !important;
+}
+
+.reusable-table-dark .ant-pagination-item-active a {
+    color: #91c25f !important;
+}
+
+.reusable-table-dark .ant-pagination-prev .ant-pagination-item-link,
+.reusable-table-dark .ant-pagination-next .ant-pagination-item-link {
+    background: #1f1f1f !important;
+    border-color: #434343 !important;
+    color: #ffffff !important;
+}
+
+/* =========================================
+   PAGINATION - DARK THEME
+========================================= */
+
+.reusable-table-dark .ant-pagination {
+    color: #ffffff !important;
+}
+
+/* Page numbers */
+.reusable-table-dark .ant-pagination-item {
+    background: #1f1f1f !important;
+    border: 1px solid #434343 !important;
+}
+
+.reusable-table-dark .ant-pagination-item a {
+    color: #ffffff !important;
+}
+
+/* Active page */
+.reusable-table-dark .ant-pagination-item-active {
+    background: #1f1f1f !important;
+    border-color: #91c25f !important;
+}
+
+.reusable-table-dark .ant-pagination-item-active a {
+    color: #91c25f !important;
+}
+
+/* Previous / Next */
+.reusable-table-dark .ant-pagination-prev .ant-pagination-item-link,
+.reusable-table-dark .ant-pagination-next .ant-pagination-item-link {
+    background: #1f1f1f !important;
+    border: 1px solid #434343 !important;
+    color: #ffffff !important;
+}
+
+/* Disabled Previous / Next */
+.reusable-table-dark .ant-pagination-disabled .ant-pagination-item-link {
+    background: #141414 !important;
+    border-color: #303030 !important;
+    color: #666666 !important;
+}
+
+/* Previous / Next hover */
+.reusable-table-dark .ant-pagination-prev:not(.ant-pagination-disabled):hover .ant-pagination-item-link,
+.reusable-table-dark .ant-pagination-next:not(.ant-pagination-disabled):hover .ant-pagination-item-link {
+    color: #91c25f !important;
+    border-color: #91c25f !important;
+}
+
+/* Jump dots (...) */
+.reusable-table-dark .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-ellipsis,
+.reusable-table-dark .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis {
+    color: #aaaaaa !important;
+}
+
+/* Total text, if shown */
+.reusable-table-dark .ant-pagination-total-text {
+    color: #ffffff !important;
+}
+
+/* Page size selector, if used */
+.reusable-table-dark .ant-select-selector {
+    background: #1f1f1f !important;
+    border-color: #434343 !important;
+    color: #ffffff !important;
+}
+
+.reusable-table-dark .ant-select-selection-item {
+    color: #ffffff !important;
+}
+
+/* =========================================
+   PAGINATION PAGE SIZE - DARK THEME
+========================================= */
+
+.reusable-table-dark .ant-pagination-options {
+    color: #ffffff !important;
+}
+
+/* "10 / page" select box */
+.reusable-table-dark .ant-pagination-options .ant-select-selector {
+    background-color: #1f1f1f !important;
+    border-color: #434343 !important;
+    color: #ffffff !important;
+}
+
+.reusable-table-dark .ant-pagination-options .ant-select-selection-item {
+    color: #ffffff !important;
+}
+
+.reusable-table-dark .ant-pagination-options .ant-select-arrow {
+    color: #ffffff !important;
+}
+
+/* =========================================
+   PAGINATION PAGE SIZE DROPDOWN - DARK
+========================================= */
+
+.reusable-pagination-dropdown-dark {
+    background-color: #1f1f1f !important;
+}
+
+/* Dropdown options */
+.reusable-pagination-dropdown-dark .ant-select-item {
+    background-color: #1f1f1f !important;
+    color: #ffffff !important;
+}
+
+/* Hover */
+.reusable-pagination-dropdown-dark .ant-select-item-option-active {
+    background-color: #333333 !important;
+    color: #91c25f !important;
+}
+
+/* Selected */
+.reusable-pagination-dropdown-dark .ant-select-item-option-selected {
+    background-color: #333333 !important;
+    color: #91c25f !important;
+}
+
+/* Text */
+.reusable-pagination-dropdown-dark .ant-select-item-option-content {
+    color: #ffffff !important;
+}
+
+.dark-mode-pagination .ant-select-dropdown {
+    background-color: #1e1e1e !important;
+    /* Dark background */
+    color: white !important;
+}
+
+/* Style dropdown items */
+.dark-mode-pagination .ant-select-item {
+    background-color: #1e1e1e !important;
+    color: white !important;
+}
+
+/* Active or hovered item */
+.dark-mode-pagination .ant-select-item-option-active,
+.dark-mode-pagination .ant-select-item-option-selected {
+    background-color: #333 !important;
+    color: #91c25f !important;
+    /* Optional highlight text color */
+}
+
+/* Search input inside dropdown (if any) */
+.dark-mode-pagination .ant-select-dropdown .ant-select-item-option-content {
+    color: white !important;
+}
+
+/* =========================================
+   REUSABLE DRAWER - DARK THEME
+========================================= */
+
+.reusable-drawer-dark .ant-drawer-content {
+    background: #141414 !important;
+    color: #ffffff !important;
+}
+
+.reusable-drawer-dark .ant-drawer-header {
+    background: #232323 !important;
+    border-bottom: 1px solid #434343 !important;
+}
+
+.reusable-drawer-dark .ant-drawer-title {
+    color: #ffffff !important;
+}
+
+.reusable-drawer-dark .ant-drawer-close {
+    color: #ffffff !important;
+}
+
+.reusable-drawer-dark .ant-drawer-close:hover {
+    color: #91c25f !important;
+}
+
+.reusable-drawer-dark .ant-drawer-body {
+    background: #232323 !important;
+    color: #ffffff !important;
+}
+
+.reusable-drawer-dark .ant-drawer-footer {
+    background: #232323 !important;
+    border-top: 1px solid #434343 !important;
+}
+
+/* Dark theme - Form labels */
+.reusable-drawer-dark .ant-form-item-label>label {
+    color: #ffffff !important;
+}
+
+.dark-theme-modal .ant-modal-header {
+    background-color: #333 !important;
+    /* border-bottom: 1px solid #333 !important; */
+}
+
+/* ant modal title color */
+.dark-theme-modal .ant-modal-title {
+    color: white !important;
+}
+
+/* Modal content background */
+.dark-theme-modal .ant-modal-content {
+    background-color: #333 !important;
+    color: white !important;
+}
+
+/* TextArea inside modal */
+.dark-theme-modal .ant-modal-content textarea {
+    background-color: #2a2a2a !important;
+    color: white !important;
+    border: 1px solid #444 !important;
+}
+
+/* Placeholder inside textarea */
+.dark-theme-modal .ant-modal-content textarea::placeholder {
+    color: #ccc !important;
+    opacity: 1;
+}
+
+
+
+.upload-form-wrapper {
+    --bg: #f9fafb;
+    --text: #111827;
+    --form-bg: #ffffff;
+    --border: #e5e7eb;
+    --input-bg: #ffffff;
+    --input-border: #d1d5db;
+    --placeholder: #9ca3af;
+    --button-bg: #91c25f;
+    --button-hover: #84cd3b;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background-color: var(--bg);
+    min-height: 100%;
+    box-sizing: border-box;
+    padding: 20px 0;
+}
+
+body.dark .upload-form-wrapper {
+    --bg: #262326;
+    --text: #191a1b;
+    --form-bg: #191919;
+    --border: #334155;
+    --input-bg: #0e1012;
+    --input-border: #475569;
+    --placeholder: #94a3b8;
+    --button-bg: #91c25f;
+    --button-hover: #84cd3b;
+}
+
+.upload-form-wrapper .form-container {
+    max-width: 450px;
+    width: 100%;
+    height: auto;
+    min-height: 650px;
+    background-color: var(--form-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+.upload-form-wrapper .form-title {
+    font-size: 24px;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    color: var(--text);
+}
+
+.upload-form-wrapper .form-group {
+    margin-bottom: 1.2rem;
+}
+
+.upload-form-wrapper label {
+    display: flex;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.upload-form-wrapper input[type="text"],
+.upload-form-wrapper textarea {
+    width: 100%;
+    padding: 6px 9px;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    background-color: var(--input-bg);
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.upload-form-wrapper input::placeholder,
+.upload-form-wrapper textarea::placeholder {
+    color: var(--placeholder);
+}
+
+.upload-form-wrapper textarea {
+    resize: vertical;
+    min-height: 50px;
+}
+
+.upload-form-wrapper .image-upload-box {
+    border: 2px dashed var(--input-border);
+    padding: 15px;
+    text-align: center;
+    border-radius: 6px;
+    background-color: var(--input-bg);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: var(--text);
+}
+
+.upload-form-wrapper .image-upload-box:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.upload-form-wrapper button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: var(--button-bg);
+    color: #111827;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.upload-form-wrapper button:hover {
+    background-color: var(--button-hover);
+}
+
+/* =========================================
+   SEARCH INPUT - DARK THEME
+========================================= */
+
+.search-input-dark input::placeholder {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+.search-input-dark input::-webkit-input-placeholder {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+.search-input-dark input::-moz-placeholder {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+.search-input-dark input:-ms-input-placeholder {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+.reusable-table-dark.dark-mode-pagination
+.ant-pagination-options-quick-jumper
+.ant-input {
+    background-color: #1f1f1f !important;
+    color: #ffffff !important;
+    border-color: #91c25f !important;
+}
+
+.reusable-table-dark.dark-mode-pagination
+.ant-pagination-options-quick-jumper
+.ant-input::placeholder {
+    color: #aaaaaa !important;
+    opacity: 1 !important;
+}

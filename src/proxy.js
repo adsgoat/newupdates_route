@@ -285,6 +285,9 @@ export const config = {
         "/reports/:path*",
         "/api/dashboard/:path*",
         "/creatives/:path*",
-        "/api/creatives/:path*"
+        "/api/creatives/:path*",
+         "/newuser/:path*",
+        "/api/newuser/:path*"
+        
     ],
 };
