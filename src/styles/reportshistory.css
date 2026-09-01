@@ -152,3 +152,12 @@
   background-color: deepskyblue;
   margin-top: 5px;
 }
+
+.ag-menu-option.custom-reset-columns-item-history .ag-menu-option-text {
+  background-color: rgb(105, 105, 164);
+  color: white;
+}
+
+.ag-menu-option.custom-reset-columns-item-history:hover .ag-menu-option-text {
+  background-color: darkblue;
+}
