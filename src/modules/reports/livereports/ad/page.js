@@ -3,7 +3,7 @@ import axios from "axios";
 import moment from 'moment-timezone';
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { App, Tooltip, Switch, Modal, Input, Button, Spin } from "antd";
-import { EditOutlined, MessageOutlined, CopyOutlined, PictureOutlined, GlobalOutlined, LikeOutlined, CommentOutlined, ShareAltOutlined, SyncOutlined } from "@ant-design/icons"
+import { EditOutlined, MessageOutlined, CopyOutlined, PictureOutlined, GlobalOutlined, LikeOutlined, CommentOutlined, ShareAltOutlined, SyncOutlined, LinkOutlined } from "@ant-design/icons"
 import GridLoading from "../../../../components/common/skeletonloading";
 import { newtworkCollections, selectTimezone } from "../networksandtimezones";
 import { columnDefsObjectForAd } from "../../columndefs/page"
@@ -1522,6 +1522,13 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                                         />
                                     </Tooltip>
                                 </Spin>
+                                <LinkOutlined
+                                    onClick={() => {
+                                        const url = `/live/adhistory?account=${rowAccount}&id=${adid}&time=${updatedTime}&collection=${newtworkCollections[updatedRevenuePartner]}`;
+                                        window.open(url, '_blank', 'noopener,noreferrer');
+                                    }}
+                                    style={{ marginRight: '5px', color: "#1e1e1f", cursor: 'pointer' }}
+                                />
                             </div>
                         )}
 

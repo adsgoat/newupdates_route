@@ -4,7 +4,7 @@ import moment from 'moment-timezone';
 import React, { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { App, Tooltip, Switch, Modal, Input, Button, Spin } from "antd";
-import { EditOutlined, MessageOutlined, CopyOutlined, PictureOutlined, GlobalOutlined, LikeOutlined, CommentOutlined, ShareAltOutlined, SyncOutlined } from "@ant-design/icons"
+import { EditOutlined, MessageOutlined, CopyOutlined, PictureOutlined, GlobalOutlined, LikeOutlined, CommentOutlined, ShareAltOutlined, SyncOutlined, LinkOutlined } from "@ant-design/icons"
 import GridLoading from "../../../../components/common/skeletonloading";
 import { newtworkCollectionsAdsets, selectTimezone } from "../networksandtimezones";
 import { columnDefsObjectForAdset } from "../../columndefs/page"
@@ -1353,6 +1353,13 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                                         />
                                     </Tooltip>
                                 </Spin>
+                                <LinkOutlined
+                                    onClick={() => {
+                                        const url = `/daily/adsethistory?account=${rowAccount}&id=${adsetid}&time=${updatedTime}&collection=${newtworkCollectionsAdsets[updatedRevenuePartner]}`;
+                                        window.open(url, '_blank', 'noopener,noreferrer');
+                                    }}
+                                    style={{ marginRight: '5px', color: "#1e1e1f", cursor: 'pointer' }}
+                                />
                             </div>
                         )}
 

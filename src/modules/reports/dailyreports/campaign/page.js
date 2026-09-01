@@ -3,7 +3,7 @@ import axios from "axios";
 import moment from 'moment-timezone';
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { App, Tooltip, Switch, Modal, Input, Button, Spin } from "antd";
-import { EditOutlined, MessageOutlined, CopyOutlined, PictureOutlined, GlobalOutlined, LikeOutlined, CommentOutlined, ShareAltOutlined } from "@ant-design/icons"
+import { EditOutlined, MessageOutlined, CopyOutlined, PictureOutlined, GlobalOutlined, LikeOutlined, CommentOutlined, ShareAltOutlined, LinkOutlined } from "@ant-design/icons"
 import GridLoading from "../../../../components/common/skeletonloading";
 import { newtworkCollections, selectTimezone } from "../networksandtimezones";
 import { columnDefsObjectForCampaign } from "../../columndefs/page";
@@ -1292,6 +1292,13 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                                         }}
                                     />
                                 </Tooltip>
+                                <LinkOutlined
+                                    onClick={() => {
+                                        const url = `/daily/campaignhistory?account=${rowAccount}&id=${campaignid}&time=${updatedTime}&collection=${newtworkCollections[updatedRevenuePartner]}`;
+                                        window.open(url, '_blank', 'noopener,noreferrer');
+                                    }}
+                                    style={{ marginRight: '5px', color: "#1e1e1f", cursor: 'pointer' }}
+                                />
                             </div>
                         )}
 
@@ -1952,7 +1959,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
         setDataLoader(false);
         functionCall1(creativesForCampaigns);
         setSelectedCampaigns([]);
-    }, [activeTab, activeTabForLiveReports, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime,refreshTabs, refresh]);
+    }, [activeTab, activeTabForLiveReports, updatedAccountsValue, updatedStartDate, updatedEndDate, updatedTime, refreshTabs, refresh]);
 
     // useEffect(() => {
     //     if (activeTab !== "1" || activeTabForLiveReports !== "1" || !campaignData?.length) {
