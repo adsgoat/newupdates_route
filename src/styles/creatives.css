@@ -1,0 +1,279 @@
+/* Desktop - keep existing position */
+.creative-checkbox {
+    position: absolute;
+    top: 10px;
+    left: 28px;
+    z-index: 10;
+}
+
+/* Mobile */
+@media (max-width: 575px) {
+    .creative-checkbox {
+        top: 7px !important;
+        left: 23px !important;
+        transform: scale(0.9);
+    }
+}
+
+/* =========================================
+   GREEN SELECTED CHECKBOX
+   ========================================= */
+
+/* Selected checkbox */
+.creative-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #52c41a !important;
+    border-color: #52c41a !important;
+}
+
+/* Check mark */
+.creative-checkbox .ant-checkbox-checked .ant-checkbox-inner::after {
+    border-color: #fff !important;
+}
+
+/* Hover selected */
+.creative-checkbox .ant-checkbox-checked:hover .ant-checkbox-inner {
+    background-color: #52c41a !important;
+    border-color: #52c41a !important;
+}
+
+/* Focus */
+.creative-checkbox .ant-checkbox-checked:focus .ant-checkbox-inner {
+    background-color: #52c41a !important;
+    border-color: #52c41a !important;
+}
+
+/* Wrapper hover */
+.creative-checkbox:hover .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #52c41a !important;
+    border-color: #52c41a !important;
+}
+
+/* Prevent Ant Design blue color */
+.creative-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+    box-shadow: none !important;
+}
+
+.creative-library {
+    background: #ffffff;
+    color: #000000;
+}
+
+/* Dark theme */
+.creative-library.dark-theme {
+    background: #141414;
+    color: #ffffff;
+}
+
+/* Search inputs */
+.creative-library.dark-theme .ant-input,
+.creative-library.dark-theme .ant-input-affix-wrapper {
+    background-color: #1f1f1f !important;
+    color: #ffffff !important;
+    border-color: #434343 !important;
+}
+
+.creative-library.dark-theme .ant-input::placeholder {
+    color: #999999 !important;
+}
+
+/* Select */
+.creative-library.dark-theme .ant-select-selector {
+    background-color: #1f1f1f !important;
+    color: #ffffff !important;
+    border-color: #434343 !important;
+}
+
+/* Buttons */
+.creative-library.dark-theme button {
+    background-color: #1f1f1f;
+    color: #ffffff;
+    border-color: #434343;
+}
+
+/* Checkbox */
+.creative-library.dark-theme .ant-checkbox-inner {
+    background-color: #1f1f1f !important;
+    border-color: #777 !important;
+}
+
+/* Selected checkbox */
+.creative-library.dark-theme .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #52c41a !important;
+    border-color: #52c41a !important;
+}
+
+/* Checkbox tick */
+.creative-library.dark-theme .ant-checkbox-checked .ant-checkbox-inner::after {
+    border-color: #ffffff !important;
+}
+
+/* Dropdown */
+.dark-theme-dropdown {
+    background: #1f1f1f !important;
+    color: #ffffff !important;
+}
+
+/* =========================================================
+   ACCOUNT SELECT - DARK
+   ========================================================= */
+
+.account-select-dark {
+    width: 100% !important;
+}
+
+/* Main select box */
+.account-select-dark .ant-select-selector {
+    background: #1f1f1f !important;
+    background-color: #1f1f1f !important;
+
+    border: 1px solid #91c25f !important;
+    border-color: #91c25f !important;
+
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+/* IMPORTANT: focused state */
+.account-select-dark.ant-select-focused .ant-select-selector {
+    background: #1f1f1f !important;
+    background-color: #1f1f1f !important;
+
+    border: 1px solid #91c25f !important;
+    border-color: #91c25f !important;
+
+    box-shadow: 0 0 0 2px rgba(145, 194, 95, 0.15) !important;
+}
+
+/* Hover */
+.account-select-dark:hover .ant-select-selector {
+    background: #1f1f1f !important;
+    background-color: #1f1f1f !important;
+
+    border-color: #91c25f !important;
+}
+
+/* =========================================================
+   SEARCH INPUT INSIDE SELECT
+   ========================================================= */
+
+.account-select-dark
+.ant-select-selection-search-input {
+    background: transparent !important;
+    background-color: transparent !important;
+
+    color: #ffffff !important;
+
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Search input focus */
+.account-select-dark
+.ant-select-selection-search-input:focus {
+    background: transparent !important;
+    color: #ffffff !important;
+
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* =========================================================
+   SELECTED VALUE
+   ========================================================= */
+
+.account-select-dark .ant-select-selection-item {
+    color: #ffffff !important;
+}
+
+/* Placeholder */
+.account-select-dark .ant-select-selection-placeholder {
+    color: #aaaaaa !important;
+}
+
+/* Arrow */
+.account-select-dark .ant-select-arrow {
+    color: #91c25f !important;
+}
+
+/* Clear icon */
+.account-select-dark .ant-select-clear {
+    background: #1f1f1f !important;
+    color: #aaaaaa !important;
+}
+
+
+/* =========================================================
+   DARK DROPDOWN
+   ========================================================= */
+
+.account-dropdown-dark {
+    background: #1f1f1f !important;
+    background-color: #1f1f1f !important;
+}
+
+.account-dropdown-dark .ant-select-dropdown {
+    background: #1f1f1f !important;
+}
+
+/* Options */
+.account-dropdown-dark .ant-select-item {
+    background: #1f1f1f !important;
+    color: #ffffff !important;
+}
+
+/* Hover */
+.account-dropdown-dark .ant-select-item-option-active {
+    background: #2d2d2d !important;
+}
+
+/* Selected */
+.account-dropdown-dark .ant-select-item-option-selected {
+    background: #333333 !important;
+    color: #ffffff !important;
+}
+
+/* Selected + hover */
+.account-dropdown-dark
+.ant-select-item-option-selected.ant-select-item-option-active {
+    background: #3a3a3a !important;
+}
+
+
+/* =========================================================
+   ACCOUNT TEXT
+   ========================================================= */
+
+.account-dropdown-dark .account-number {
+    color: #ffffff !important;
+}
+
+.account-dropdown-dark .account-name {
+    color: #aaaaaa !important;
+}
+
+
+/* =========================================================
+   DROPDOWN SEARCH
+   ========================================================= */
+
+.account-dropdown-dark
+.ant-select-selection-search-input {
+    background: #2a2a2a !important;
+    background-color: #2a2a2a !important;
+
+    color: #ffffff !important;
+
+    border: none !important;
+    outline: none !important;
+}
+
+.account-dropdown-dark
+.ant-select-selection-search-input:focus {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
