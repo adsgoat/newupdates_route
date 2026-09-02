@@ -289,6 +289,9 @@ export const config = {
         "/newuser/:path*",
         "/api/newuser/:path*",
         "/daily/:path",
-        "/live/:path"
+        "/live/:path",
+        "/newuser/:path*",
+        "/api/newuser/:path*"
+
     ],
 };
