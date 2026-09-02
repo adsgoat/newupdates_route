@@ -239,7 +239,7 @@ export default function AdTable({ account, ad_id, timezone, collection, userdeta
                         hour_f: eachData.hour,
                         hour_n: eachData.updatedHour,
                         filteration: parseInt(eachData.fbLeads) !== 0 ? Math.round((((parseInt(eachData.fbLeads) - parseInt(eachData.conversions)) / parseInt(eachData.fbLeads)) * 100) * 100) / 100 : 0,
-                        adname: "",
+                        adname: eachData.adName,
                         M_tq: "",
                         D_tq: "",
                     };

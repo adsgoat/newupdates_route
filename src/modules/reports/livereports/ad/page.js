@@ -1524,7 +1524,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                                 </Spin>
                                 <LinkOutlined
                                     onClick={() => {
-                                        const url = `/live/adhistory?account=${rowAccount}&id=${adid}&time=${updatedTime}&collection=${newtworkCollections[updatedRevenuePartner]}`;
+                                        const url = `/live/adhistory?account=${rowAccount}&id=${adid}&time=${updatedTime}&collection=Facebook_Mnet_AD`;
                                         window.open(url, '_blank', 'noopener,noreferrer');
                                     }}
                                     style={{ marginRight: '5px', color: "#1e1e1f", cursor: 'pointer' }}
