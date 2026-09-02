@@ -69,7 +69,7 @@ export default async function MainLayout({ children }) {
                         minHeight: 0,
                         margin: "8px 8px 0px 8px",
                         backgroundColor: "#ededed",
-                        overflow: "hidden",
+                        overflow: "auto",
                     }}
                 >
                     {children}
