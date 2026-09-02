@@ -97,11 +97,13 @@ export default function SelectAccountSingle({
                     : "account-select-light"
             }
 
-            popupClassName={
-                theme === "dark"
-                    ? "account-dropdown-dark"
-                    : "account-dropdown-light"
-            }
+            classNames={{
+                popup: {
+                    root: theme === "dark"
+                        ? "account-dropdown-dark"
+                        : "account-dropdown-light",
+                },
+            }}
 
             filterOption={(input, option) => {
                 const accountNumber =

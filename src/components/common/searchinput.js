@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "antd";
-import "../../styles/newuser.css"
+// import "../../styles/newuser.css"
 
 export default function SearchInput({
   value,
