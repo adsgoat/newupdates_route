@@ -1,6 +1,6 @@
 import getRedisClient from "@/lib/redis";
 import getSessionEmailByAuth from "@/lib/sessionemailbyauth";
-import GetBMNames from "@/services/accounts/getBMNames";
+import GetBMNames from "@/services/newuser/bmname";
 
 export async function GET() {
     const client = await getRedisClient();
