@@ -229,7 +229,15 @@ const CompadoUrlBuilder = ({ defaultValues, indexValueForAccount, onReturnMessag
                     <ReusableSelect
                         showSearch
                         required
-                        placeholder="Source"
+                        placeholder={
+                            <span
+                                style={{
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }}
+                            >
+                                Source
+                            </span>
+                        }
                         value={source}
                         onChange={onChangeSource}
                         width="100%"
@@ -246,7 +254,15 @@ const CompadoUrlBuilder = ({ defaultValues, indexValueForAccount, onReturnMessag
                     <label><span style={{ color: 'red', paddingRight: '2px', paddingTop: '2px' }}>*</span>Adid</label>
                     <ReusableSelect
                         showSearch
-                        placeholder="adid"
+                        placeholder={
+                            <span
+                                style={{
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }}
+                            >
+                                adid
+                            </span>
+                        }
                         value={channel}
                         required
                         onChange={onChangeChannel}
@@ -264,7 +280,15 @@ const CompadoUrlBuilder = ({ defaultValues, indexValueForAccount, onReturnMessag
                     <label><span style={{ color: 'red', paddingRight: '2px', paddingTop: '2px' }}>*</span>Include_year_in_title</label>
                     <ReusableSelect
                         showSearch
-                        placeholder="include_year_in_title"
+                        placeholder={
+                            <span
+                                style={{
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }}
+                            >
+                                include_year_in_title
+                            </span>
+                        }
                         value={pixelId}
                         required
                         onChange={onChangePixelId}
@@ -282,7 +306,15 @@ const CompadoUrlBuilder = ({ defaultValues, indexValueForAccount, onReturnMessag
                     <label><span style={{ color: 'red', paddingRight: '2px', paddingTop: '2px' }}>*</span>include_country_in_title</label>
                     <ReusableSelect
                         showSearch
-                        placeholder="include_country_in_title"
+                        placeholder={
+                            <span
+                                style={{
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }}
+                            >
+                                include_country_in_title
+                            </span>
+                        }
                         value={tmp}
                         required
                         onChange={onChangeTmpId}

@@ -286,15 +286,9 @@ export const config = {
         "/api/dashboard/:path*",
         "/creatives/:path*",
         "/api/creatives/:path*",
-<<<<<<< HEAD
-         "/newuser/:path*",
-        "/api/newuser/:path*"
-        
-=======
         "/newuser/:path*",
         "/api/newuser/:path*",
         "/daily/:path",
         "/live/:path"
->>>>>>> origin
     ],
 };

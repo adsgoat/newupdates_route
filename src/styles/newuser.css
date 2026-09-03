@@ -43,6 +43,105 @@
     padding-top: 4px;
 }
 
+/* =========================
+   New User Tabs - Responsive
+   ========================= */
+
+.newuser-tabs {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Tab header */
+.newuser-tabs .ant-tabs-nav {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+/* Allow tabs to scroll horizontally on small screens */
+.newuser-tabs .ant-tabs-nav-wrap {
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.newuser-tabs .ant-tabs-nav-wrap::-webkit-scrollbar {
+    display: none;
+}
+
+.newuser-tabs .ant-tabs-nav-list {
+    flex-shrink: 0;
+}
+
+/* Keep each tab readable */
+.newuser-tabs .ant-tabs-tab {
+    white-space: nowrap;
+}
+
+/* Tab content */
+.newuser-tabs .ant-tabs-content-holder {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.newuser-tabs .ant-tabs-content {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* =========================
+   Tablet
+   ========================= */
+
+@media (max-width: 768px) {
+    .newuser-tabs .ant-tabs-nav {
+        margin-bottom: 6px;
+    }
+
+    .newuser-tabs .ant-tabs-tab {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .newuser-tabs .ant-tabs-nav-list {
+        gap: 0;
+    }
+}
+
+/* =========================
+   Mobile
+   ========================= */
+
+@media (max-width: 576px) {
+    .newuser-tabs .ant-tabs-nav {
+        margin-bottom: 5px;
+    }
+
+    .newuser-tabs .ant-tabs-tab {
+        padding: 7px 10px;
+        font-size: 12px;
+    }
+
+    .newuser-tabs .ant-tabs-tab-btn {
+        white-space: nowrap;
+    }
+
+    .newuser-tabs .ant-tabs-content-holder {
+        overflow-x: hidden;
+    }
+}
+
+/* =========================
+   Very Small Mobile
+   ========================= */
+
+@media (max-width: 400px) {
+    .newuser-tabs .ant-tabs-tab {
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+}
 
 /* =================================
    TABS - DARK THEME
@@ -166,7 +265,15 @@
     border-color: #91c25f !important;
 }
 
+.reusable-table-light .ant-pagination-item-active {
+    border-color: #91c25f !important;
+}
+
 .reusable-table-dark .ant-pagination-item-active a {
+    color: #91c25f !important;
+}
+
+.reusable-table-light .ant-pagination-item-active a {
     color: #91c25f !important;
 }
 
@@ -188,6 +295,12 @@
 /* Previous / Next hover */
 .reusable-table-dark .ant-pagination-prev:not(.ant-pagination-disabled):hover .ant-pagination-item-link,
 .reusable-table-dark .ant-pagination-next:not(.ant-pagination-disabled):hover .ant-pagination-item-link {
+    color: #91c25f !important;
+    border-color: #91c25f !important;
+}
+
+.reusable-table-light .ant-pagination-prev:not(.ant-pagination-disabled):hover .ant-pagination-item-link,
+.reusable-table-light .ant-pagination-next:not(.ant-pagination-disabled):hover .ant-pagination-item-link {
     color: #91c25f !important;
     border-color: #91c25f !important;
 }
@@ -284,6 +397,12 @@
 .dark-mode-pagination .ant-select-item-option-active,
 .dark-mode-pagination .ant-select-item-option-selected {
     background-color: #333 !important;
+    color: #91c25f !important;
+    /* Optional highlight text color */
+}
+
+.dark-mode-pagination1 .ant-select-item-option-active,
+.dark-mode-pagination1 .ant-select-item-option-selected {
     color: #91c25f !important;
     /* Optional highlight text color */
 }
@@ -507,17 +626,232 @@ body.dark .upload-form-wrapper {
     color: #ffffff !important;
     opacity: 1 !important;
 }
-.reusable-table-dark.dark-mode-pagination
-.ant-pagination-options-quick-jumper
-.ant-input {
+
+.reusable-table-dark.dark-mode-pagination .ant-pagination-options-quick-jumper .ant-input {
     background-color: #1f1f1f !important;
     color: #ffffff !important;
     border-color: #91c25f !important;
 }
 
-.reusable-table-dark.dark-mode-pagination
-.ant-pagination-options-quick-jumper
-.ant-input::placeholder {
+.reusable-table-light.dark-mode-pagination1 .ant-pagination-options-quick-jumper .ant-input {
+    border-color: #91c25f !important;
+}
+
+.reusable-table-dark.dark-mode-pagination .ant-pagination-options-quick-jumper .ant-input::placeholder {
     color: #aaaaaa !important;
     opacity: 1 !important;
 }
+
+/* ================================
+   Pagination Page Size Selector
+   ================================ */
+
+/* Dark theme */
+.dark-mode-pagination .ant-pagination-options .ant-select .ant-select-selector {
+    background-color: #333 !important;
+    border: 1px solid #555 !important;
+    color: #fff !important;
+}
+
+.dark-mode-pagination .ant-pagination-options .ant-select .ant-select-selection-item {
+    color: #fff !important;
+}
+
+.dark-mode-pagination .ant-pagination-options .ant-select .ant-select-arrow {
+    color: #fff !important;
+}
+
+/* Light theme */
+.dark-mode-pagination1 .ant-pagination-options .ant-select .ant-select-selector {
+    background-color: #fff !important;
+    border: 1px solid #d9d9d9 !important;
+    color: #333 !important;
+}
+
+.dark-mode-pagination1 .ant-pagination-options .ant-select .ant-select-selection-item {
+    color: #333 !important;
+}
+
+.dark-mode-pagination1 .ant-pagination-options .ant-select .ant-select-arrow {
+    color: #999 !important;
+}
+
+
+/* =========================================
+   URL BUILDER DROPDOWN - RESPONSIVE
+   ========================================= */
+
+.urlbuilder-dropdown-menu {
+    width: 100%;
+    max-width: 360px;
+
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+}
+
+/* Menu item / submenu title */
+.urlbuilder-dropdown-menu .ant-menu-submenu-title {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 0 10px !important;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    box-sizing: border-box;
+}
+
+/* Name + arrow */
+.urlbuilder-dropdown-menu .columns-submenu {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    min-width: 0;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Keep arrow visible */
+.urlbuilder-dropdown-menu .columns-submenu .anticon {
+    flex-shrink: 0;
+    margin-left: 6px;
+}
+
+/* =========================================
+   SUBMENU
+   ========================================= */
+
+.urlbuilder-dropdown-menu .ant-menu-sub {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    max-height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+}
+
+/* Submenu content */
+.urlbuilder-dropdown-menu .urlbuilder-submenu-container {
+    width: 100%;
+    max-width: 100%;
+
+    padding: 6px 10px;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+}
+
+/* ID / Name / Code / Account */
+.urlbuilder-dropdown-menu
+.urlbuilder-submenu-container p {
+    margin: 3px 0;
+
+    line-height: 18px;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* URL / long values */
+.urlbuilder-dropdown-menu
+.urlbuilder-submenu-container-item {
+    width: 100%;
+    max-width: 100%;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+
+    line-height: 18px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   LARGE DESKTOP
+   ========================================= */
+
+@media (min-width: 1200px) {
+    .urlbuilder-dropdown-menu {
+        max-width: 400px;
+    }
+
+    .urlbuilder-dropdown-menu
+    .urlbuilder-submenu-container {
+        font-size: 13px;
+    }
+}
+
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (min-width: 577px) and (max-width: 1199px) {
+    .urlbuilder-dropdown-menu {
+        max-width: 320px;
+    }
+
+    .urlbuilder-dropdown-menu
+    .urlbuilder-submenu-container {
+        font-size: 12px;
+    }
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 576px) {
+    .urlbuilder-dropdown-menu {
+        width: calc(100vw - 32px) !important;
+        max-width: calc(100vw - 32px) !important;
+
+        max-height: 280px;
+    }
+
+    .urlbuilder-dropdown-menu .ant-menu-submenu-title {
+        height: 32px !important;
+        line-height: 32px !important;
+
+        padding: 0 8px !important;
+
+        font-size: 12px !important;
+    }
+
+    .urlbuilder-dropdown-menu
+    .urlbuilder-submenu-container {
+        padding: 5px 8px;
+
+        font-size: 11px;
+    }
+
+    .urlbuilder-dropdown-menu
+    .urlbuilder-submenu-container p {
+        margin: 2px 0;
+        line-height: 16px;
+    }
+
+    .urlbuilder-dropdown-menu
+    .urlbuilder-submenu-container-item {
+        line-height: 16px;
+    }
+}
+

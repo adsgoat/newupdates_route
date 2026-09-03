@@ -8,11 +8,9 @@ const UpdatesComponent = dynamic(
     () => import("./updateui"),
     {
         ssr: false,
-        loading: () => <p>I am fetching</p>,
+        loading: () => <p></p>,
     }
 );
-
-
 const UpdatesTab = ({ theme,uploadRef ,email}) => {
     return (
 

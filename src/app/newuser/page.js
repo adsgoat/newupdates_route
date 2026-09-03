@@ -12,11 +12,13 @@ export default async function CreativesPageLayout() {
     const getTheAuthInfo = JSON.parse(await client.get(`auth_${email}`));
     const userPermissionsInfo = JSON.parse(await client.get(`permissions_${email}`));
     const userData = JSON.parse(stringuserData);
-    const theme ="light"
+    const themeRaw = await client.get(`theme_${email}`);
+    const theme = themeRaw === "dark" ? "dark" : "light";
+    console.log("User details in NewuserPageLayout:", userData);
 
     return (
         <MainLayout>
-            <NewuserPage email={email} userData={userData} userPermissions={userPermissionsInfo} auth={getTheAuthInfo} username={username} userdetails={userdetails} theme={theme}/>
+            <NewuserPage email={email} userData={userData} userPermissions={userPermissionsInfo} auth={getTheAuthInfo} username={username} userdetails={userdetails} theme={theme} />
         </MainLayout>
     );
 }

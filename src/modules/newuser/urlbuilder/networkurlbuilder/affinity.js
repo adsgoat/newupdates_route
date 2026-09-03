@@ -372,7 +372,15 @@ const AffinityUrlBuilder = ({ defaultValues, indexValueForAccount, onReturnMessa
                     <ReusableSelect
                         showSearch
                         required
-                        placeholder="Source"
+                        placeholder={
+                            <span
+                                style={{
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }}
+                            >
+                                Source
+                            </span>
+                        }
                         value={source}
                         onChange={onChangeSource}
                         options={NetworkData?.Source?.map((item) => ({
@@ -388,7 +396,7 @@ const AffinityUrlBuilder = ({ defaultValues, indexValueForAccount, onReturnMessa
 
                 {/* Sltid */}
                 <Col
-                    span={5}
+                   
                     style={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -401,7 +409,15 @@ const AffinityUrlBuilder = ({ defaultValues, indexValueForAccount, onReturnMessa
 
                     <ReusableSelect
                         showSearch
-                        placeholder="sltid"
+                        placeholder={
+                            <span
+                                style={{
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }}
+                            >
+                                Sltid
+                            </span>
+                        }
                         value={channel}
                         required
                         theme={theme}
@@ -433,7 +449,15 @@ const AffinityUrlBuilder = ({ defaultValues, indexValueForAccount, onReturnMessa
 
                     <ReusableSelect
                         showSearch
-                        placeholder="pixelId"
+                        placeholder={
+                            <span
+                                style={{
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }}
+                            >
+                                pixelId
+                            </span>
+                        }
                         value={pixelId}
                         required
                         onChange={onChangePixelId}
@@ -463,7 +487,15 @@ const AffinityUrlBuilder = ({ defaultValues, indexValueForAccount, onReturnMessa
 
                     <ReusableSelect
                         showSearch
-                        placeholder="tmp"
+                        placeholder={
+                            <span
+                                style={{
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }}
+                            >
+                                tmp
+                            </span>
+                        }
                         value={tmp}
                         required
                         onChange={onChangeTmpId}

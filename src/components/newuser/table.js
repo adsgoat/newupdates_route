@@ -36,7 +36,7 @@ const ReusableTable = ({
             className={
                 theme === "dark"
                     ? "reusable-table-dark dark-mode-pagination"
-                    : "reusable-table-light"
+                    : "reusable-table-light dark-mode-pagination1"
             }
             
             pagination={

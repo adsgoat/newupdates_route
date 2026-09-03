@@ -160,7 +160,15 @@ const DActiveUrlBuilder = ({ onReturnMessage, showSubmitButton, theme }) => {
           <ReusableSelect
             showSearch
             required
-            placeholder="Source"
+            placeholder={
+              <span
+                style={{
+                  color: theme === "dark" ? "#fff" : "#333",
+                }}
+              >
+                Source
+              </span>
+            }
             value={source}
             onChange={onChangeSource}
             options={NetworkData?.Source?.map((item) => ({
@@ -177,7 +185,15 @@ const DActiveUrlBuilder = ({ onReturnMessage, showSubmitButton, theme }) => {
           <label><span style={{ color: 'red', paddingRight: '2px', paddingTop: '2px' }}>*</span>CT</label>
           <ReusableSelect
             showSearch
-            placeholder="Channel"
+            placeholder={
+              <span
+                style={{
+                  color: theme === "dark" ? "#fff" : "#333",
+                }}
+              >
+                Channel
+              </span>
+            }
             value={channel}
             required
             onChange={onChangeChannel}

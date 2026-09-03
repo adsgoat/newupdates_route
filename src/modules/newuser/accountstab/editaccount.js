@@ -1100,13 +1100,22 @@ const EditAccount = ({
                         open={
                             bmModalOpen
                         }
-                        title="Add new value"
+                        title={
+                            <span
+                                style={{
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }}
+                            >
+                                Add New Value
+                            </span>
+                        }
                         onCancel={() => {
                             setBmModalOpen(
                                 false
                             );
                             setNewValue("");
                         }}
+                        theme={theme}
                         onOk={
                             handleAddNewValue
                         }
@@ -1377,7 +1386,15 @@ const EditAccount = ({
 
             <ReusableModal
                 open={confirmOpen}
-                title="Confirm Update"
+                title={
+                    <span
+                        style={{
+                            color: theme === "dark" ? "#fff" : "#333",
+                        }}
+                    >
+                        Confirm Update
+                    </span>
+                }
                 onCancel={() =>
                     setConfirmOpen(
                         false
@@ -1386,6 +1403,7 @@ const EditAccount = ({
                 onOk={
                     handleConfirmUpdate
                 }
+                theme={theme}
                 confirmLoading={
                     saving
                 }
