@@ -1,10 +1,47 @@
-export default function Header({stickyNotes, profileImage}) {
-    // console.log(profileImage)
-    // console.log(stickyNotes, "stickyNotes");
+
+"use client";
+
+import React from "react";
+import Image from "next/image";
+
+import TopbarActions from "../MainLayout/componnetsoftopbar/topbaractions";
+
+
+export default function Header({
+    onComplete,
+    usersDataForLogin,
+    profileImage,
+    stickyNotes,
+    userdetails,
+    theme,
+    isAuthenticated,
+    email,
+    userdata
+}) {
+    const darkMode = theme === "dark";
+
     return (
-        <header className="topbar">
-            <h4>Ad Operations</h4>
-            <span>Performance Dashboard</span>
-        </header>
+        <div
+            className="topbar"
+            style={{
+                backgroundColor: darkMode
+                    ? "#333"
+                    : "#fff",
+            }}
+        >
+            {isAuthenticated && (
+                <TopbarActions
+                    usersDataForLogin={usersDataForLogin}
+                    onComplete={onComplete}
+                    profileImage={profileImage}
+                    stickyNotes={stickyNotes}
+                    userdetails={userdetails}
+                    theme={theme}
+                    email={email}
+                    userdata={userdata}
+                />
+            )}
+        </div>
     );
 }
+
