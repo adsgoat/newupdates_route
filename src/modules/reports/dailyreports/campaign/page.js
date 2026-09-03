@@ -1725,7 +1725,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                 dateStart: updatedStartDate,
                 dateEnd: updatedEndDate,
                 timezone: updatedTime,
-                status: "Live",
+                status: "Daily",
                 network: collectionName,
             });
             accountsParam.forEach(acc => params.append("accountNumbers", acc));
@@ -2136,17 +2136,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                     <GridLoading theme={theme} />
                 </div>
             )}
-            <div
-                className={theme === "dark" ? "ag-theme-quartz-dark" : "ag-theme-quartz"}
-                style={{
-                    height: 375,
-                    // flex: 1,
-                    // minHeight: 0,
-                    // height: "calc(100% - 60px)",
-                    width: "100%",
-                    display: loading ? "none" : "block"
-                }}
-            >
+            <div style={{ display: loading ? "none" : "block" }}>
                 <TableConfig
                     userData={userData}
                     theme={theme}
@@ -2188,31 +2178,42 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
                     handleSmartCommentSubmit={handleSmartCommentSubmit}
                     tabLevel="campaigns"
                 />
-                <ReusableAgGrid
-                    rowData={memorizedCampaignData}
-                    dataLoader={dataLoader}
-                    columnDefs={columnDefsObject}
-                    defaultColDef={defaultColDef}
-                    autoGroupColumnDef={autoGroupColumnDef}
-                    pagination={true}
-                    paginationPageSize={200}
-                    paginationPageSizeSelector={[20, 40, 60, 80, 100, 150, 200]}
-                    processCellForClipboard={(params) => {
-                        // Only customize the Campaign Name (group) column
-                        if (params.node.group && params.column.getColId() === "ag-Grid-AutoColumn") {
-                            return (params.node.childrenAfterGroup?.[0]?.data?.campaignname ?? params.node.key);
-                        }
-                        return params.value;
+                <div
+                    className={theme === "dark" ? "ag-theme-quartz-dark" : "ag-theme-quartz"}
+                    style={{
+                        height: 365,
+                        // flex: 1,
+                        // minHeight: 0,
+                        // height: "calc(100% - 60px)",
+                        width: "100%",
                     }}
-                    gridOptions={gridOptions}
-                    setLoading={setLoading}
-                    updatePinnedBottomRow={updatePinnedBottomRow}
-                    onSelectionChanged={onSelectionChanged}
-                    ref={gridRef}
-                    onGridReady={onGridReady}
-                    onColumnMoved={onColumnMoved}
-                    getMainMenuItems={getMainMenuItems}
-                />
+                >
+                    <ReusableAgGrid
+                        rowData={memorizedCampaignData}
+                        dataLoader={dataLoader}
+                        columnDefs={columnDefsObject}
+                        defaultColDef={defaultColDef}
+                        autoGroupColumnDef={autoGroupColumnDef}
+                        pagination={true}
+                        paginationPageSize={200}
+                        paginationPageSizeSelector={[20, 40, 60, 80, 100, 150, 200]}
+                        processCellForClipboard={(params) => {
+                            // Only customize the Campaign Name (group) column
+                            if (params.node.group && params.column.getColId() === "ag-Grid-AutoColumn") {
+                                return (params.node.childrenAfterGroup?.[0]?.data?.campaignname ?? params.node.key);
+                            }
+                            return params.value;
+                        }}
+                        gridOptions={gridOptions}
+                        setLoading={setLoading}
+                        updatePinnedBottomRow={updatePinnedBottomRow}
+                        onSelectionChanged={onSelectionChanged}
+                        ref={gridRef}
+                        onGridReady={onGridReady}
+                        onColumnMoved={onColumnMoved}
+                        getMainMenuItems={getMainMenuItems}
+                    />
+                </div>
             </div>
             <CampaignHistoryModal
                 open={historyOpen}

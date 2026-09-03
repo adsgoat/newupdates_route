@@ -378,19 +378,21 @@ export default function HourlyTable({ theme, userData, updatedRevenuePartner, up
     const getLatestHour = async (functionCall1) => {
 
         const collectionName = updatedRevenuePartner === "FB_DomainActive" ? "Facebook_DActive_Names" : newtworkCollections[updatedRevenuePartner];
+        let hour = 0;
         try {
 
             const resp = await apiClient.post('api/reports/latesthour',
                 { dateStart: updatedStartDate, dateEnd: updatedEndDate, timezone: updatedTime, network: collectionName, }
             );
+            hour = resp?.data?.latestHour ?? 0;
             setLatestHour(resp?.data?.latestHour ?? 0);
         } catch (error) {
             console.log(error);
         }
-        functionCall1()
+        functionCall1(hour)
     };
 
-    const functionCall1 = async () => {
+    const functionCall1 = async (latestHour) => {
         try {
             setDataLoader(false);
             const collectionName = updatedRevenuePartner === "FB_DomainActive" ? "Facebook_DActive_Names" : newtworkCollections[updatedRevenuePartner];
@@ -511,7 +513,7 @@ export default function HourlyTable({ theme, userData, updatedRevenuePartner, up
                 revenueCron.current = getLatestValue(mainData, 'revenueCron');
             }
             let newFilterData = filteredData;
-            if (showAllHours) {
+            if (!showAllHours) {
                 newFilterData = newFilterData.filter((item) => {
                     const fbHour = Number(item["fb-hour"]);
 
