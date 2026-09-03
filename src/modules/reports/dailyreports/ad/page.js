@@ -1936,7 +1936,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                 dateStart: updatedStartDate,
                 dateEnd: updatedEndDate,
                 timezone: updatedTime,
-                status: "Live",
+                status: "Daily",
                 network: collectionName,
                 accountNumbers: accountsParam,   // <= ['111', '222'] or ['111'] for single
                 revenuePartner: updatedRevenuePartner,
@@ -2337,17 +2337,7 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                     <GridLoading theme={theme} />
                 </div>
             )}
-            <div
-                className={theme === "dark" ? "ag-theme-quartz-dark" : "ag-theme-quartz"}
-                style={{
-                    height: 400,
-                    // flex: 1,
-                    // minHeight: 0,
-                    // height: "calc(100% - 60px)",
-                    width: "100%",
-                    display: loading ? "none" : "block"
-                }}
-            >
+            <div style={{ display: loading ? "none" : "block" }}>
                 <TableConfig
                     userData={userData}
                     theme={theme}
@@ -2389,31 +2379,42 @@ export default function AdsetTable({ theme, userData, updatedRevenuePartner, upd
                     handleSmartCommentSubmit={handleSmartCommentSubmit}
                     tabLevel="ads"
                 />
-                <ReusableAgGrid
-                    rowData={memorizedAdData}
-                    columnDefs={columnDefsObject}
-                    defaultColDef={defaultColDef}
-                    autoGroupColumnDef={autoGroupColumnDef}
-                    pagination={true}
-                    paginationPageSize={200}
-                    paginationPageSizeSelector={[20, 40, 60, 80, 100, 150, 200]}
-                    processCellForClipboard={(params) => {
-                        // Only customize the Campaign Name (group) column
-                        if (params.node.group && params.column.getColId() === "ag-Grid-AutoColumn") {
-                            return (params.node.childrenAfterGroup?.[0]?.data?.adname ?? params.node.key);
-                        }
-                        return params.value;
+                <div
+                    className={theme === "dark" ? "ag-theme-quartz-dark" : "ag-theme-quartz"}
+                    style={{
+                        height: 365,
+                        // flex: 1,
+                        // minHeight: 0,
+                        // height: "calc(100% - 60px)",
+                        width: "100%",
                     }}
-                    gridOptions={gridOptions}
-                    setLoading={setLoading}
-                    dataLoader={dataLoader}
-                    updatePinnedBottomRow={updatePinnedBottomRow}
-                    onSelectionChanged={onSelectionChanged}
-                    ref={gridRef}
-                    onGridReady={onGridReady}
-                    onColumnMoved={onColumnMoved}
-                    getMainMenuItems={getMainMenuItems}
-                />
+                >
+                    <ReusableAgGrid
+                        rowData={memorizedAdData}
+                        columnDefs={columnDefsObject}
+                        defaultColDef={defaultColDef}
+                        autoGroupColumnDef={autoGroupColumnDef}
+                        pagination={true}
+                        paginationPageSize={200}
+                        paginationPageSizeSelector={[20, 40, 60, 80, 100, 150, 200]}
+                        processCellForClipboard={(params) => {
+                            // Only customize the Campaign Name (group) column
+                            if (params.node.group && params.column.getColId() === "ag-Grid-AutoColumn") {
+                                return (params.node.childrenAfterGroup?.[0]?.data?.adname ?? params.node.key);
+                            }
+                            return params.value;
+                        }}
+                        gridOptions={gridOptions}
+                        setLoading={setLoading}
+                        dataLoader={dataLoader}
+                        updatePinnedBottomRow={updatePinnedBottomRow}
+                        onSelectionChanged={onSelectionChanged}
+                        ref={gridRef}
+                        onGridReady={onGridReady}
+                        onColumnMoved={onColumnMoved}
+                        getMainMenuItems={getMainMenuItems}
+                    />
+                </div>
             </div>
         </div>
 
