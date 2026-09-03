@@ -14,7 +14,7 @@ export default async function CreativesPageLayout() {
     const userData = JSON.parse(stringuserData);
     const themeRaw = await client.get(`theme_${email}`);
     const theme = themeRaw === "dark" ? "dark" : "light";
-    console.log("User details in NewuserPageLayout:", userData);
+    // console.log("User details in NewuserPageLayout:", userData);
 
     return (
         <MainLayout>
