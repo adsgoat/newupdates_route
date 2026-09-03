@@ -1736,7 +1736,7 @@ export default function CampaignTable({ theme, userData, updatedRevenuePartner, 
 
             const mainData = resp.data.data;
             const filteredData = mainData && mainData.length > 0 ?
-                mainData.map((eachData) => {
+                mainData?.filter(item => item?.hour || item?.estimated_revenue > 0)?.map((eachData) => {
                     let revenueData;
                     if (eachData.estimated_revenue === 0 || isNaN(eachData.estimated_revenue)) {
                         revenueData = 0;
