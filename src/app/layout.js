@@ -1,6 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 // import "./globals.css";
 import "../styles/global.css";
+import "../styles/reports.css";
+import "../styles/reportshistory.css"
 // import "@/lib/agGridSetup";
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 

@@ -183,6 +183,11 @@ export const authOptions = {
             // console.log(account, "account");
             if (account) {
                 const email = profile?.email || token.email;
+                const existingTheme = await client.get(`theme_${email}`);
+
+                if (!existingTheme) {
+                    await client.set(`theme_${email}`, "light");
+                }
                 const payload = decodeJwt(account.access_token);
                 const userData = {
                     ...(payload?.FB_Mnet ? { FB_Mnet: payload?.FB_Mnet } : {}),

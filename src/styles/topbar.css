@@ -1,0 +1,1038 @@
+/* =========================================
+   DESKTOP TOPBAR
+========================================= */
+
+.topbar {
+    width: 100%;
+    height: 60px;
+    min-height: 60px;
+    box-sizing: border-box;
+}
+
+.topbar-actions {
+    height: 60px;
+    padding: 0 12px;
+    box-sizing: border-box;
+}
+
+.navbar-2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* =========================================
+   MOBILE TOPBAR
+========================================= */
+
+@media (max-width: 768px) {
+
+    .topbar {
+        height: 50px;
+        min-height: 50px;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .topbar-actions {
+        height: 50px !important;
+        min-height: 50px !important;
+        width: 100% !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+
+        gap: 0 !important;
+        padding: 0 8px !important;
+
+        box-sizing: border-box;
+    }
+
+    /* Hide logo area on mobile */
+    .topbar-left {
+        display: none !important;
+    }
+
+    /* Right side icons */
+    .navbar-2 {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+
+        gap: 14px !important;
+        height: 100%;
+        margin-left: auto;
+    }
+
+    /* All clickable icons */
+    .navbar-2 svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    /* Profile avatar */
+    .navbar-2 .ant-avatar {
+        width: 32px !important;
+        height: 32px !important;
+        line-height: 32px !important;
+    }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 480px) {
+
+    .topbar {
+        height: 48px;
+        min-height: 48px;
+    }
+
+    .topbar-actions {
+        height: 48px !important;
+        min-height: 48px !important;
+        padding: 0 7px !important;
+    }
+
+    .navbar-2 {
+        gap: 11px !important;
+    }
+
+    .navbar-2 svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    .navbar-2 .ant-avatar {
+        width: 30px !important;
+        height: 30px !important;
+        line-height: 30px !important;
+    }
+}
+
+
+/* =========================================
+   VERY SMALL MOBILE
+========================================= */
+
+@media (max-width: 360px) {
+
+    .topbar-actions {
+        padding: 0 6px !important;
+    }
+
+    .navbar-2 {
+        gap: 9px !important;
+    }
+
+    .navbar-2 svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .navbar-2 .ant-avatar {
+        width: 28px !important;
+        height: 28px !important;
+        line-height: 28px !important;
+    }
+}
+
+/* Hide arrows on desktop */
+.anticon.mobile-double-left,
+.anticon.mobile-double-right {
+    display: none !important;
+}
+
+/* Show arrows only on mobile */
+@media screen and (max-width: 768px) {
+
+    .anticon.mobile-double-left,
+    .anticon.mobile-double-right {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px !important;
+        cursor: pointer;
+    }
+}
+
+/* =========================
+   TIMEZONE SELECT
+   ========================= */
+
+.timezone-select-light .ant-select-selector {
+    background-color: #fff !important;
+    color: #000 !important;
+    border-color: #d9d9d9 !important;
+}
+
+.timezone-select-light .ant-select-selection-placeholder {
+    color: #999 !important;
+}
+
+.timezone-select-light .ant-select-selection-item {
+    color: #000 !important;
+}
+
+
+/* =========================
+   DARK MODE SELECT
+   ========================= */
+
+.timezone-select-dark .ant-select-selector {
+    background-color: #555 !important;
+    color: #fff !important;
+    border-color: #777 !important;
+}
+
+.timezone-select-dark .ant-select-selection-placeholder {
+    color: #ccc !important;
+}
+
+.timezone-select-dark .ant-select-selection-item {
+    color: #fff !important;
+}
+
+
+/* Search input text */
+.timezone-select-dark .ant-select-selection-search-input {
+    color: #fff !important;
+}
+
+.timezone-select-light .ant-select-selection-search-input {
+    color: #000 !important;
+}
+
+
+/* Arrow */
+.timezone-select-dark .ant-select-arrow {
+    color: #fff !important;
+}
+
+.timezone-select-light .ant-select-arrow {
+    color: #666 !important;
+}
+
+
+/* =========================
+   DROPDOWN
+   ========================= */
+
+.timezone-select-dropdown-dark {
+    background-color: #555 !important;
+}
+
+.timezone-select-dropdown-dark .ant-select-item {
+    color: #fff !important;
+}
+
+.timezone-select-dropdown-dark .ant-select-item-option-active {
+    background-color: #666 !important;
+}
+
+.timezone-select-dropdown-dark .ant-select-item-option-selected {
+    background-color: #777 !important;
+    color: #fff !important;
+}
+
+
+.timezone-select-dropdown-light {
+    background-color: #fff !important;
+}
+
+.timezone-select-dropdown-light .ant-select-item {
+    color: #000 !important;
+}
+
+.global-clockwise-page {
+    font-size: 12px;
+}
+
+.global-clockwise-page input,
+.global-clockwise-page button,
+.global-clockwise-page select,
+.global-clockwise-page textarea {
+    font-size: 12px !important;
+}
+
+.global-clockwise-page .ant-select,
+.global-clockwise-page .ant-select-item,
+.global-clockwise-page .ant-input {
+    font-size: 12px !important;
+}
+
+.global-clockwise-page h1 {
+    font-size: 18px;
+}
+
+.global-clockwise-page h2 {
+    font-size: 16px;
+}
+
+.global-clockwise-page h3 {
+    font-size: 14px;
+}
+
+
+/* ================================
+           PROFILE DROPDOWN - DARK
+        ================================= */
+
+.profile-dropdown-dark .ant-dropdown-menu {
+    background-color: #333 !important;
+    border: 1px solid #444 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.profile-dropdown-dark .ant-dropdown-menu-item {
+    background-color: #333 !important;
+    color: #fff !important;
+}
+
+.profile-dropdown-dark .ant-dropdown-menu-item:hover {
+    background-color: #444 !important;
+    color: #fff !important;
+}
+
+.profile-dropdown-dark .ant-dropdown-menu-item-active {
+    background-color: #444 !important;
+    color: #fff !important;
+}
+
+.profile-dropdown-dark .ant-dropdown-menu-item-divider {
+    background-color: #555 !important;
+}
+
+
+/* ================================
+           PROFILE DROPDOWN - LIGHT
+        ================================= */
+
+.profile-dropdown-light .ant-dropdown-menu {
+    background-color: #fff !important;
+    border: 1px solid #e5e5e5 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.profile-dropdown-light .ant-dropdown-menu-item {
+    background-color: #fff !important;
+    color: #333 !important;
+}
+
+.profile-dropdown-light .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5 !important;
+    color: #333 !important;
+}
+
+.profile-dropdown-light .ant-dropdown-menu-item-active {
+    background-color: #f5f5f5 !important;
+    color: #333 !important;
+}
+
+.profile-dropdown-light .ant-dropdown-menu-item-divider {
+    background-color: #e5e5e5 !important;
+}
+
+/* =========================================
+   DESKTOP
+========================================= */
+
+.notification-dropdown .notification-menu {
+    width: 280px !important;
+    max-width: 280px !important;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media screen and (max-width: 768px) {
+
+    /* .notification-dropdown {
+        position: fixed !important;
+        top: 55px !important;
+        right: 8px !important;
+        left: 8px !important;
+        width: auto !important;
+        max-width: none !important;
+    } */
+
+    .notification-dropdown .notification-menu {
+        /* width: 100% !important; */
+        max-width: none !important;
+        min-width: 0 !important;
+        border-radius: 8px !important;
+        padding: 0 !important;
+    }
+
+    /* Header */
+    .notification-dropdown .ant-menu-item {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    /* Notification list */
+    .notification-dropdown .ant-menu-item>div {
+        max-width: 100%;
+    }
+
+    /* Category */
+    .notification-dropdown .notification-category {
+        padding: 8px 10px !important;
+        font-size: 13px !important;
+    }
+
+    /* Notification content */
+    .notification-dropdown .notification-title {
+        font-size: 14px !important;
+        line-height: 20px !important;
+    }
+
+    .notification-dropdown .notification-message {
+        font-size: 13px !important;
+        line-height: 19px !important;
+    }
+
+    /* Images / videos */
+    .notification-dropdown img,
+    .notification-dropdown video {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 180px !important;
+        object-fit: contain !important;
+    }
+
+    /* Footer button */
+    .notification-dropdown button {
+        font-size: 11px !important;
+        height: 28px !important;
+    }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media screen and (max-width: 480px) {
+
+    .notification-dropdown {
+        top: 52px !important;
+        left: 5px !important;
+        right: 5px !important;
+    }
+
+    .notification-dropdown .notification-menu {
+        /* width: 100% !important; */
+        border-radius: 6px !important;
+    }
+
+    .notification-dropdown .ant-menu-item {
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+    }
+
+    .notification-dropdown .notification-title {
+        font-size: 13px !important;
+    }
+
+    .notification-dropdown .notification-message {
+        font-size: 12px !important;
+    }
+
+    .notification-dropdown img,
+    .notification-dropdown video {
+        max-height: 150px !important;
+    }
+}
+
+/* Calculator overall */
+.calculator-modal {
+    width: 340px !important;
+    max-width: calc(100vw - 24px) !important;
+}
+
+.calculator-modal .ant-modal-content {
+    padding: 8px !important;
+}
+
+.calculator-modal .ant-card {
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+}
+
+.calculator-modal .ant-card-body {
+    padding: 7px !important;
+}
+
+/* Display */
+.calculator-display {
+    padding: 7px !important;
+    margin-bottom: 6px !important;
+}
+
+.calculator-display .ant-typography {
+    font-size: 21px !important;
+}
+
+/* Button rows */
+.calculator-row {
+    width: 100% !important;
+    display: flex !important;
+    gap: 5px !important;
+    margin-bottom: 5px !important;
+}
+
+.calculator-row .ant-space-item {
+    flex: 1 !important;
+    min-width: 0 !important;
+    display: flex !important;
+}
+
+/* Buttons */
+.calculator-button {
+    width: 100% !important;
+    height: 45px !important;
+    min-height: 45px !important;
+    padding: 0 !important;
+    font-size: 16px !important;
+    border-radius: 5px !important;
+}
+
+.calculator-equal-button {
+    flex: 2 !important;
+    height: 45px !important;
+    min-height: 45px !important;
+    font-size: 17px !important;
+}
+
+
+/* Mobile */
+@media (max-width: 480px) {
+
+    .calculator-modal {
+        width: 310px !important;
+        max-width: calc(100vw - 20px) !important;
+        margin: 5px auto !important;
+    }
+
+    .calculator-modal .ant-modal-content {
+        padding: 6px !important;
+    }
+
+    .calculator-modal .ant-card {
+        max-width: 294px !important;
+    }
+
+    .calculator-modal .ant-card-body {
+        padding: 6px !important;
+    }
+
+    .calculator-row {
+        gap: 4px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .calculator-button {
+        height: 42px !important;
+        min-height: 42px !important;
+        font-size: 15px !important;
+    }
+
+    .calculator-equal-button {
+        height: 42px !important;
+        min-height: 42px !important;
+        font-size: 16px !important;
+    }
+}
+
+
+.sticky-notes-sidebar {
+    width: 350px;
+}
+
+.sticky-note-window {
+    width: 350px;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    .sticky-notes-sidebar {
+        right: 20px !important;
+        left: auto !important;
+        top: 70px !important;
+        width: 320px !important;
+        max-width: 320px !important;
+        min-height: 280px !important;
+        max-height: calc(100vh - 85px) !important;
+        padding: 8px !important;
+    }
+
+    .sticky-note-window {
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        top: 70px !important;
+        width: 320px !important;
+        max-width: 320px !important;
+        min-height: 220px !important;
+        max-height: calc(100vh - 85px) !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .sticky-notes-sidebar {
+        right: 8px !important;
+        left: 8px !important;
+        top: 60px !important;
+        width: calc(100vw - 16px) !important;
+        min-height: 250px !important;
+        max-height: calc(100vh - 70px) !important;
+        padding: 7px !important;
+        border-radius: 7px !important;
+    }
+
+    .sticky-notes-sidebar h3 {
+        font-size: 15px !important;
+        margin-bottom: 7px !important;
+    }
+
+    .sticky-notes-sidebar input {
+        padding: 5px !important;
+        font-size: 13px !important;
+        margin-bottom: 7px !important;
+    }
+
+    @media (max-width: 480px) {
+        .sticky-note-window {
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%) !important;
+
+            top: 60px !important;
+
+            width: calc(100vw - 30px) !important;
+            max-width: 320px !important;
+
+            min-height: 200px !important;
+            max-height: calc(100vh - 75px) !important;
+
+            border-radius: 7px !important;
+        }
+
+        .sticky-note-window textarea {
+            font-size: 13px !important;
+        }
+    }
+
+    .sticky-note-window textarea {
+        font-size: 13px !important;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 320px) {
+    .sticky-notes-sidebar {
+        left: 5px !important;
+        right: 5px !important;
+        width: calc(100vw - 10px) !important;
+        top: 55px !important;
+    }
+
+    .sticky-note-window {
+        /* left: 5px !important;
+        right: 5px !important; */
+        width: calc(100vw - 10px) !important;
+        top: 55px !important;
+    }
+}
+
+/* =========================================
+   GLOBAL CLOCK - DESKTOP
+========================================= */
+
+.global-clock-drawer .ant-drawer-body {
+    overflow: hidden !important;
+}
+
+.global-clock-container {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.global-clock-search {
+    width: 60% !important;
+}
+
+.global-clock-timezones {
+    width: 280px;
+    min-width: 280px;
+}
+
+.global-clock-hours {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1024px) {
+
+    .global-clock-drawer {
+        width: 80% !important;
+    }
+
+    .global-clock-container {
+        padding: 7px !important;
+    }
+
+    .global-clock-search {
+        width: 220px !important;
+    }
+
+    .global-clock-timezones {
+        width: 220px !important;
+        min-width: 220px !important;
+    }
+
+    .global-clock-timezones .ant-typography {
+        font-size: 11px !important;
+    }
+
+    .global-clock-hours {
+        overflow: hidden !important;
+    }
+
+    .global-clock-hours>div {
+        height: 44px !important;
+    }
+
+    .global-clock-hours>div>div {
+        font-size: 10px !important;
+        padding: 1px 0 !important;
+    }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+    .global-clock-drawer {
+        width: 100% !important;
+    }
+
+    .global-clock-drawer .ant-drawer-header {
+        padding: 10px 12px !important;
+        min-height: 44px !important;
+    }
+
+    .global-clock-drawer .ant-drawer-title {
+        font-size: 14px !important;
+    }
+
+    .global-clock-drawer .ant-drawer-body {
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .global-clock-container {
+        padding: 6px !important;
+        overflow: hidden !important;
+    }
+
+    /* Top controls */
+    .global-clock-controls {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 5px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .global-clock-controls>.ant-col {
+        margin: 0 !important;
+    }
+
+    .global-clock-search {
+        width: 180px !important;
+    }
+
+    .global-clock-controls .ant-select {
+        height: 30px !important;
+    }
+
+    .global-clock-controls .ant-btn {
+        height: 30px !important;
+        min-width: 30px !important;
+        padding: 0 7px !important;
+        font-size: 11px !important;
+    }
+
+    .global-clock-controls .ant-space {
+        gap: 4px !important;
+    }
+
+    /* Timezone section */
+    .global-clock-timezones {
+        width: 150px !important;
+        min-width: 150px !important;
+    }
+
+    /* Timezone rows */
+    .global-clock-timezones>div>div {
+        height: 44px !important;
+        min-height: 44px !important;
+        padding-left: 3px !important;
+        margin-bottom: 1px !important;
+        font-size: 10px !important;
+    }
+
+    .global-clock-timezones .ant-typography {
+        font-size: 10px !important;
+        line-height: 12px !important;
+    }
+
+    .global-clock-timezones .ant-btn {
+        width: 20px !important;
+        height: 20px !important;
+        padding: 0 !important;
+        font-size: 10px !important;
+    }
+
+    /* Offset */
+    .global-clock-timezones>div>div>div:first-child {
+        width: 32px !important;
+        padding-right: 3px !important;
+    }
+
+    /* Hours */
+    .global-clock-hours {
+        width: calc(100% - 150px) !important;
+        overflow: hidden !important;
+    }
+
+    .global-clock-hours>div {
+        height: 44px !important;
+        min-height: 44px !important;
+        margin-bottom: 1px !important;
+    }
+
+    .global-clock-hours>div>div {
+        min-width: 0 !important;
+        padding: 1px 0 !important;
+        font-size: 9px !important;
+        line-height: 11px !important;
+    }
+
+    .global-clock-hours>div>div>div {
+        font-size: 9px !important;
+    }
+
+    .global-clock-hours>div>div>div:nth-child(2) {
+        font-size: 8px !important;
+    }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+@media (max-width: 480px) {
+
+    /* LEFT TIMEZONE PANEL */
+    .global-clock-timezones {
+        width: 150px !important;
+        min-width: 150px !important;
+        padding: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+
+    /* TIMEZONE ROW */
+    .global-clock-timezones > div > div {
+        width: 100% !important;
+        height: 48px !important;
+        min-height: 48px !important;
+
+        display: flex !important;
+        align-items: center !important;
+
+        padding: 2px 4px !important;
+        margin: 0 !important;
+        gap: 3px !important;
+
+        box-sizing: border-box !important;
+    }
+
+    /* FIRST COLUMN - FLAG / ICON */
+    .global-clock-timezones > div > div > div:first-child {
+        width: 24px !important;
+        min-width: 24px !important;
+        max-width: 24px !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        padding: 0 !important;
+    }
+
+    /* MIDDLE - TIMEZONE DETAILS */
+    .global-clock-timezones > div > div > div:nth-child(2) {
+        flex: 1 !important;
+        min-width: 0 !important;
+        width: auto !important;
+
+        overflow: hidden !important;
+    }
+
+    /* TIMEZONE NAME */
+    .global-clock-timezones .ant-typography {
+        font-size: 10px !important;
+        line-height: 12px !important;
+
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+
+        display: block !important;
+        max-width: 100% !important;
+    }
+
+    /* TIME / OFFSET TEXT */
+    .global-clock-timezones > div > div > div:nth-child(2) > div {
+        font-size: 9px !important;
+        line-height: 11px !important;
+
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    /* RIGHT SIDE ACTIONS */
+    .global-clock-timezones > div > div > div:last-child {
+        width: 38px !important;
+        min-width: 38px !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        gap: 1px !important;
+    }
+
+    /* STAR / DELETE BUTTONS */
+    .global-clock-timezones .ant-btn {
+        width: 18px !important;
+        min-width: 18px !important;
+        height: 18px !important;
+
+        padding: 0 !important;
+        margin: 0 !important;
+
+        font-size: 9px !important;
+    }
+
+
+    /* HOURS SECTION */
+    .global-clock-hours {
+        width: calc(100% - 150px) !important;
+        min-width: 0 !important;
+
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* HOURS ROW */
+    .global-clock-hours > div {
+        min-width: 888px !important;
+        height: 48px !important;
+        margin: 0 !important;
+    }
+
+    /* EACH HOUR */
+    .global-clock-hours > div > div {
+        width: 37px !important;
+        min-width: 37px !important;
+        height: 48px !important;
+
+        padding: 1px !important;
+
+        font-size: 9px !important;
+        line-height: 11px !important;
+    }
+
+    .global-clock-hours > div > div > div {
+        font-size: 9px !important;
+        line-height: 11px !important;
+    }
+
+    .global-clock-hours > div > div > div:nth-child(2) {
+        font-size: 8px !important;
+    }
+}
+
+/* Dark theme - new notification popup */
+.ant-notification-notice.custom-dark-notification {
+    background-color: #333 !important;
+    border: 1px solid #555 !important;
+    color: #fff !important;
+}
+
+/* Notification title */
+.ant-notification-notice.custom-dark-notification
+.ant-notification-notice-message {
+    color: #fff !important;
+}
+
+/* Notification description */
+.ant-notification-notice.custom-dark-notification
+.ant-notification-notice-description {
+    color: #ddd !important;
+}
+
+/* Close button */
+.ant-notification-notice.custom-dark-notification
+.ant-notification-notice-close {
+    color: #fff !important;
+}
+
+/* Progress bar if Ant Design renders it */
+.ant-notification-notice.custom-dark-notification
+.ant-notification-notice-progress {
+    background-color: #91C25F !important;
+}
+.green-checkbox {
+    --ant-color-primary: #91C25F !important;
+    --ant-color-primary-hover: #62a839 !important;
+    --ant-checkbox-color: #91C25F !important;
+}
+
+.green-checkbox .ant-checkbox-inner {
+    border-color: #91C25F !important;
+}
+
+.green-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #91C25F !important;
+    border-color: #91C25F !important;
+}
+
+.green-checkbox .ant-checkbox-checked:hover .ant-checkbox-inner {
+    background-color: #91C25F !important;
+    border-color: #91C25F !important;
+}
