@@ -301,7 +301,7 @@ const NetworksTab = ({
                 align="bottom"
                 justify="space-between"
                 style={{
-                    marginTop: "-5px",
+                    marginTop: "-15px",
                     width: "100%",
                     padding: "10px",
                     fontSize: "12px"

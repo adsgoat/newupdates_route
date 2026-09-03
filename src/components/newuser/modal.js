@@ -31,11 +31,41 @@ const ReusableModal = ({
             centered={centered}
             destroyOnHidden
             footer={footer}
-            className={`custom-modal ${theme === "dark" ? "dark-theme-modal" : ""}`}
+            okButtonProps={{
+                style: {
+                    backgroundColor: theme === "dark" ? "#91c25f" : "#91c25f",
+                    borderColor: theme === "dark" ? "#91c25f" : "#91c25f",
+                    color: "#fff",
+                },
+            }}
+            // className={`custom-modal ${theme === "dark" ? "dark-theme-modal" : ""}`}
+            // styles={{
+            //     body: {
+            //         padding: 10,
+            //         backgroundColor: theme === 'dark' ? '#333' : '#fff',
+            //         color: theme === 'dark' ? '#fff' : '#000',
+            //     },
+            // }}
             styles={{
-                body: {
-                    padding: 10,
+                container: {
                     backgroundColor: theme === 'dark' ? '#333' : '#fff',
+                },
+                content: {
+                    backgroundColor: theme === 'dark' ? '#333' : '#fff',
+                    color: theme === 'dark' ? '#fff' : '#000',
+                },
+                header: {
+                    backgroundColor: theme === 'dark' ? '#333' : '#fff',
+                    color: theme === 'dark' ? '#fff' : '#000',
+                },
+                body: {
+                    backgroundColor: theme === 'dark' ? '#333' : '#fff',
+                    color: theme === 'dark' ? '#fff' : '#000',
+                },
+                footer: {
+                    backgroundColor: theme === 'dark' ? '#333' : '#fff',
+                },
+                close: {
                     color: theme === 'dark' ? '#fff' : '#000',
                 },
             }}

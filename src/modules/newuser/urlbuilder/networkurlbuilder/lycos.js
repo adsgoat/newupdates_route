@@ -135,7 +135,15 @@ const LycosUrlBuilder = ({ defaultValues, indexValueForAccount, onReturnMessage,
                 <Col style={{ display: 'flex', flexDirection: 'column' }} span={6}>
                     <label><span style={{ color: 'red', paddingRight: '2px', paddingTop: '2px' }}>*</span>Type</label>
                     <ReusableSelect
-                        placeholder="Select Channel"
+                        placeholder={
+                            <span
+                                style={{
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }}
+                            >
+                                Select Channel
+                            </span>
+                        }
                         options={sub_ids} value={sub_id_value}
                         onChange={(value) => setSub_id_value(value)}
                         width="100%"
@@ -147,7 +155,15 @@ const LycosUrlBuilder = ({ defaultValues, indexValueForAccount, onReturnMessage,
                 <Col style={{ display: 'flex', flexDirection: 'column' }} span={6}>
                     <label><span style={{ color: 'red', paddingRight: '2px', paddingTop: '2px' }}>*</span>Click_id</label>
                     <ReusableSelect
-                        placeholder="Select Channel"
+                        placeholder={
+                            <span
+                                style={{
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }}
+                            >
+                                Select Channel
+                            </span>
+                        }
                         options={Click_ids} value={click_id}
                         onChange={(value) => setClick_id_value(value)}
                         width="100%"

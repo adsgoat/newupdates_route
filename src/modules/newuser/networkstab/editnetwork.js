@@ -216,7 +216,15 @@ const EditNetworkAccess = ({
 
                                 <ReusableSelect
                                     showSearch
-                                    placeholder="Select Timezone"
+                                    placeholder={
+                                        <span
+                                            style={{
+                                                color: theme === "dark" ? "#fff" : "#333",
+                                            }}
+                                        >
+                                            Select TimeZones
+                                        </span>
+                                    }
                                     options={TIMEZONES.map(
                                         (timezone) => ({
                                             value: timezone,
@@ -475,7 +483,15 @@ const EditNetworkAccess = ({
                             >
 
                                 <ReusableSelect
-                                    placeholder="Select a status"
+                                    placeholder={
+                                        <span
+                                            style={{
+                                                color: theme === "dark" ? "#fff" : "#333",
+                                            }}
+                                        >
+                                            Select a Status
+                                        </span>
+                                    }
                                     theme={
                                         theme
                                     }
@@ -523,7 +539,15 @@ const EditNetworkAccess = ({
                                     width="100%"
                                     height={27}
                                     size="small"
-                                    placeholder="Select Revenue Partner"
+                                    placeholder={
+                                        <span
+                                            style={{
+                                                color: theme === "dark" ? "#fff" : "#333",
+                                            }}
+                                        >
+                                            Select a RevenuePartner
+                                        </span>
+                                    }
                                     options={availableNetworks.map(
                                         (item) => ({
                                             value: item,
@@ -556,13 +580,22 @@ const EditNetworkAccess = ({
 
             <ReusableModal
                 open={isModalVisible}
-                title="Confirmation"
+                title={
+                    <span
+                        style={{
+                            color: theme === "dark" ? "#fff" : "#333",
+                        }}
+                    >
+                        Confirmation
+                    </span>
+                }
                 onOk={() => {
                     form.submit();
                 }}
                 onCancel={handleCancel}
                 okText="Yes"
                 cancelText="No"
+                theme={theme}
             >
 
                 <p>

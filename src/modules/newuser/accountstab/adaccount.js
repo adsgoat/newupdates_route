@@ -1312,7 +1312,15 @@ export default function AddAccount({
 
             <ReusableModal
                 open={bmModalOpen}
-                title="Add New BM Name"
+                title={
+                    <span
+                        style={{
+                            color: theme === "dark" ? "#fff" : "#333",
+                        }}
+                    >
+                        Add New BM Name
+                    </span>
+                }
                 onCancel={() =>
                     setBmModalOpen(
                         false
@@ -1321,6 +1329,7 @@ export default function AddAccount({
                 onOk={
                     handleAddBM
                 }
+                theme={theme}
                 okText="Add"
                 cancelText="Cancel"
             >
@@ -1349,7 +1358,15 @@ export default function AddAccount({
 
             <ReusableModal
                 open={confirmOpen}
-                title="Confirmation"
+                title={
+                    <span
+                        style={{
+                            color: theme === "dark" ? "#fff" : "#333",
+                        }}
+                    >
+                        Confirmation
+                    </span>
+                }
                 theme={theme}
                 onCancel={() =>
                     setConfirmOpen(

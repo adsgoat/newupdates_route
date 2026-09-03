@@ -83,8 +83,8 @@ const UploadComponent = forwardRef(({ onSubmit, isLoading = false, theme, email 
       icon: null,
       className:
         theme === "dark"
-            ? "notification-confirm-modal-dark"
-            : "notification-confirm-modal-light",
+          ? "notification-confirm-modal-dark"
+          : "notification-confirm-modal-light",
       onOk: async () => {
         console.log("YES CLICKED - API STARTING");
         try {
@@ -197,6 +197,7 @@ const UploadComponent = forwardRef(({ onSubmit, isLoading = false, theme, email 
         backgroundColor: theme === "dark" ? "#232323" : "#fff",
         color: theme === "dark" ? "#fff" : "#333",
         boxSizing: "border-box",
+        marginTop:"-10px"
       }}
     >
       <div className="form-container" style={{
@@ -248,7 +249,15 @@ const UploadComponent = forwardRef(({ onSubmit, isLoading = false, theme, email 
               id="network"
               value={selectedNetwork}
               onChange={handleNetworkChange}
-              placeholder="Select network"
+              placeholder={
+                <span
+                  style={{
+                    color: theme === "dark" ? "#fff" : "#333",
+                  }}
+                >
+                  Select networ
+                </span>
+              }
               mode="multiple"
               width="100%"
               size="small"

@@ -211,7 +211,15 @@ const MediaUrlBuilder = ({ defaultValues, indexValueForAccount, theme, onReturnM
           <ReusableSelect
             showSearch
             required
-            placeholder="Select Domain"
+            placeholder={
+              <span
+                style={{
+                  color: theme === "dark" ? "#fff" : "#333",
+                }}
+              >
+                Select Domain
+              </span>
+            }
             value={domain}
             onChange={onChangeDomian}
             options={NetworkData?.Domains?.map((item) => ({
@@ -229,7 +237,15 @@ const MediaUrlBuilder = ({ defaultValues, indexValueForAccount, theme, onReturnM
           <ReusableSelect
             showSearch
             required
-            placeholder="Source"
+            placeholder={
+              <span
+                style={{
+                  color: theme === "dark" ? "#fff" : "#333",
+                }}
+              >
+                Source
+              </span>
+            }
             value={source}
             onChange={onChangeSource}
             options={NetworkData?.Source?.map((item) => ({
@@ -246,7 +262,15 @@ const MediaUrlBuilder = ({ defaultValues, indexValueForAccount, theme, onReturnM
           <label><span style={{ color: 'red', paddingRight: '2px', paddingTop: '2px' }}>*</span>Channels</label>
           <ReusableSelect
             showSearch
-            placeholder="Channel"
+            placeholder={
+              <span
+                style={{
+                  color: theme === "dark" ? "#fff" : "#333",
+                }}
+              >
+                Channel
+              </span>
+            }
             value={channel}
             required
             onChange={onChangeChannel}
@@ -267,7 +291,15 @@ const MediaUrlBuilder = ({ defaultValues, indexValueForAccount, theme, onReturnM
           <label><span style={{ color: 'red', paddingRight: '2px', paddingTop: '2px' }}>*</span>PixelId</label>
           <ReusableSelect
             showSearch
-            placeholder="pixelId"
+            placeholder={
+              <span
+                style={{
+                  color: theme === "dark" ? "#fff" : "#333",
+                }}
+              >
+                PixelId
+              </span>
+            }
             value={pixelId}
             required
             onChange={onChangePixelId}

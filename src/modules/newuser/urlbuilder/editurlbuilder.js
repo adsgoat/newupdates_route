@@ -7,15 +7,18 @@ import SearchInput from '@/components/common/searchinput';
 import SubmitButton from '@/components/common/submitbutton';
 import ReusableModal from '@/components/newuser/modal';
 import ReusableSelect from '@/components/newuser/select';
+
 import "../../../styles/newuser.css"
 
 
 const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
+    const [form] = Form.useForm();
 
     const [channelList, setChannelList] = useState([]);
     const [isChannelModalOpen, setIsChannelModalOpen] = useState(false);
     const [selectedChannelIndex, setSelectedChannelIndex] = useState(null);
     const [objects, setObjects] = useState([]);
+    const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
 
     const [dataList, setDataList] = useState([]);
 
@@ -254,64 +257,54 @@ const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
 
         return dynamicObject;
     };
+    const handleSubmitConfirm = async () => {
+        try {
+            const result = createDynamicObject(
+                editeddata?.Network,
+                channelList,
+                dataList,
+                campaigns,
+                objects
+            );
 
+            console.log("API PAYLOAD:", result);
+
+            const response = await fetch(
+                "/api/newuser/updateurlbuilder",
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        updatedData: result,
+                    }),
+                }
+            );
+
+            console.log("API RESPONSE STATUS:", response.status);
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data?.message || "Failed to update URL builder"
+                );
+            }
+
+            console.log("API SUCCESS:", data);
+
+            setIsSubmitModalOpen(false);
+            onClose(result);
+
+        } catch (error) {
+            console.error("Error updating user:", error);
+        }
+    };
 
     const submitForm = async (values) => {
-        Modal.confirm({
-            title: "Confirmation",
-            content: "Are you sure you want to submit?",
-            className:
-                theme === "dark"
-                    ? "custom-confirm-dark"
-                    : "custom-confirm-light",
-
-            onOk: async () => {
-                try {
-                    const result = createDynamicObject(
-                        editeddata?.Network,
-                        channelList,
-                        dataList,
-                        campaigns,
-                        objects
-                    );
-
-                    const response = await fetch(
-                        "/api/newuser/updateurlbuilder",
-                        {
-                            method: "PUT",
-                            headers: {
-                                "Content-Type":
-                                    "application/json",
-                            },
-                            body: JSON.stringify({
-                                updatedData: result,
-                            }),
-                        }
-                    );
-
-                    const data =
-                        await response.json();
-
-                    if (!response.ok) {
-                        throw new Error(
-                            data?.message ||
-                            "Failed to update URL builder"
-                        );
-                    }
-
-                    onClose(result);
-                } catch (error) {
-                    console.error(
-                        "Error updating user:",
-                        error
-                    );
-                }
-            },
-
-            onCancel: () => {
-                console.log("Cancel");
-            },
-        });
+        console.log("FORM SUBMITTED:", values);
+        setIsSubmitModalOpen(true);
     };
 
     const initialValues = editeddata ? {
@@ -327,6 +320,7 @@ const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
             theme={theme}
         >
             <Form
+                form={form}
                 layout="vertical"
                 onFinish={submitForm}
                 initialValues={initialValues}
@@ -354,7 +348,7 @@ const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
                 {editeddata?.Source && (
                     <Form.Item
                         label="Source"
-                        name="Network"
+                        className="mobile-url-source"
                         rules={[
                             {
                                 required: true,
@@ -470,13 +464,22 @@ const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
 
                         {/* Delete Confirmation Modal */}
                         <ReusableModal
-                            title="Delete Confirmation"
+                            title={
+                                <span
+                                    style={{
+                                        color: theme === "dark" ? "#fff" : "#333",
+                                    }}
+                                >
+                                    Delete Confirmation
+                                </span>
+                            }
                             className={`custom-modal ${theme === 'dark' ? 'dark-theme-modal' : ''}`}
                             open={modalVisible}
                             onOk={deleteCampaign}
                             onCancel={cancelDelete1}
                             okText="OK"
                             cancelText="Cancel"
+                            theme={theme}
                             footer={[
                                 <div>
                                     <SubmitButton
@@ -501,7 +504,7 @@ const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
                 {editeddata?.channels && (
                     <Form.Item
                         label="channels"
-                        name="Network"
+                        className="mobile-url-channels"
                         rules={[
                             {
                                 required: true,
@@ -604,7 +607,16 @@ const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
 
                         {/* Delete Confirmation Modal */}
                         <ReusableModal
-                            title="Delete Confirmation"
+                            title={
+                                <span
+                                    style={{
+                                        color: theme === "dark" ? "#fff" : "#333",
+                                    }}
+                                >
+                                    Delete Confirmation
+                                </span>
+                            }
+                            theme={theme}
                             className={`custom-modal ${theme === 'dark' ? 'dark-theme-modal' : ''}`}
                             open={isChannelModalOpen}
                             onOk={confirmChannelDeletion}
@@ -637,7 +649,8 @@ const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
                 {editeddata?.Domains && (
                     <Form.Item
                         label="Domains"
-                        name="Network"
+                        className="mobile-url-domains"
+
                         rules={[
                             {
                                 required: true,
@@ -752,7 +765,16 @@ const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
 
                         {/* Delete Confirmation Modal */}
                         <ReusableModal
-                            title="Delete Confirmation"
+                            title={
+                                <span
+                                    style={{
+                                        color: theme === "dark" ? "#fff" : "#333",
+                                    }}
+                                >
+                                    Delete Confirmation
+                                </span>
+                            }
+                            theme={theme}
                             className={`custom-modal ${theme === 'dark' ? 'dark-theme-modal' : ''}`}
                             open={isModalOpen}
                             onOk={confirmDelete}
@@ -781,7 +803,7 @@ const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
                 {editeddata?.businessData && (
                     <Form.Item
                         label="Business Data"
-                        name="Network"
+                        className="mobile-url-business"
                         rules={[
                             {
                                 required: true,
@@ -880,7 +902,16 @@ const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
 
                         {/* Delete Confirmation Modal */}
                         <ReusableModal
-                            title="Delete Confirmation"
+                            title={
+                                <span
+                                    style={{
+                                        color: theme === "dark" ? "#fff" : "#333",
+                                    }}
+                                >
+                                    Delete Confirmation
+                                </span>
+                            }
+                            theme={theme}
                             className={`custom-modal ${theme === 'dark' ? 'dark-theme-modal' : ''}`}
                             open={isModalVisible}
                             onOk={handleConfirmDelete}
@@ -905,10 +936,64 @@ const EditUrlBuilder = ({ editeddata, visible, onClose, theme }) => {
                 )}
 
                 <Form.Item>
-                    <SubmitButton text="Submit" style={{ backgroundColor: "#91C25F", color: 'black', fontWeight: '600' }} htmlType="submit">
-                    </SubmitButton>
+                    <SubmitButton
+                        text="Submit"
+                        onClick={() => {
+                            console.log("SUBMIT BUTTON CLICKED");
+                            form.submit();
+                        }}
+                        style={{
+                            backgroundColor: "#91C25F",
+                            color: "black",
+                            fontWeight: "600"
+                        }}
+                    />
                 </Form.Item>
             </Form>
+            <ReusableModal
+                title={
+                    <span
+                        style={{
+                            color: theme === "dark" ? "#fff" : "#333",
+                        }}
+                    >
+                        Confirmation
+                    </span>
+                }
+                open={isSubmitModalOpen}
+                onCancel={() => setIsSubmitModalOpen(false)}
+                theme={theme}
+                className={`custom-modal ${theme === "dark" ? "dark-theme-modal" : ""
+                    }`}
+                footer={[
+                    <div key="footer" style={{
+                        display: "flex",
+                        gap: "10px",
+                    }}>
+                        <SubmitButton
+                            width={60}
+                            height={27}
+                            text="Cancel"
+                            onClick={() => setIsSubmitModalOpen(false)}
+                            style={{ marginRight: "4px" }}
+                        />
+
+                        <SubmitButton
+                            width={50}
+                            height={27}
+                            text="OK"
+                            onClick={handleSubmitConfirm}
+                            style={{
+                                marginLeft: "4px",
+                                backgroundColor: "#91C25F",
+                                color: "black",
+                            }}
+                        />
+                    </div>
+                ]}
+            >
+                <p>Are you sure you want to submit?</p>
+            </ReusableModal>
         </ReusableDrawer>
     )
 };

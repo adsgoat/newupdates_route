@@ -87,16 +87,15 @@ const UrlBuilderTab = ({
                     theme={theme}
                     popupRender={() => (
                         <Menu
+                            className={`custom-dropdown-menu urlbuilder-dropdown-menu ${theme === "dark" ? "dark-menu" : ""
+                                }`}
                             style={{
-                                width: 256,
-                                maxHeight: 300,
+
+                                maxHeight: "none",
                                 overflowY: "auto",
                             }}
                             mode="inline"
-                            className={`custom-dropdown-menu ${theme === "dark"
-                                ? "dark-menu"
-                                : ""
-                                }`}
+
                         >
                             {newDomains.map(
                                 (item, index) => (
@@ -110,6 +109,7 @@ const UrlBuilderTab = ({
                                             <span className="columns-submenu">
                                                 {item.name ||
                                                     "Domain"}{" "}
+                                              
                                                 <DownOutlined />
                                             </span>
                                         }
@@ -212,16 +212,15 @@ const UrlBuilderTab = ({
                     theme={theme}
                     popupRender={() => (
                         <Menu
+                            className={`custom-dropdown-menu urlbuilder-dropdown-menu ${theme === "dark" ? "dark-menu" : ""
+                                }`}
                             style={{
-                                width: 256,
-                                maxHeight: 300,
+
+                                maxHeight: "none",
                                 overflowY: "auto",
                             }}
                             mode="inline"
-                            className={`custom-dropdown-menu ${theme === "dark"
-                                ? "dark-menu"
-                                : ""
-                                }`}
+
                         >
                             {newSource.map(
                                 (item, index) => (
@@ -235,6 +234,7 @@ const UrlBuilderTab = ({
                                             <span className="columns-submenu">
                                                 {item.name ||
                                                     "Source"}{" "}
+                                               
                                                 <DownOutlined />
                                             </span>
                                         }
@@ -359,16 +359,15 @@ const UrlBuilderTab = ({
                     theme={theme}
                     popupRender={() => (
                         <Menu
+                            className={`custom-dropdown-menu urlbuilder-dropdown-menu ${theme === "dark" ? "dark-menu" : ""
+                                }`}
                             style={{
-                                width: 256,
-                                maxHeight: 300,
+
+                                maxHeight: "300",
                                 overflowY: "auto",
                             }}
                             mode="inline"
-                            className={`custom-dropdown-menu ${theme === "dark"
-                                ? "dark-menu"
-                                : ""
-                                }`}
+
                         >
                             {newChannels.map(
                                 (item, index) => (
@@ -382,6 +381,7 @@ const UrlBuilderTab = ({
                                             <span className="columns-submenu">
                                                 {item.name ||
                                                     "Channel"}{" "}
+                                               
                                                 <DownOutlined />
                                             </span>
                                         }
@@ -458,16 +458,15 @@ const UrlBuilderTab = ({
                     theme={theme}
                     popupRender={() => (
                         <Menu
+                            className={`custom-dropdown-menu urlbuilder-dropdown-menu ${theme === "dark" ? "dark-menu" : ""
+                                }`}
                             style={{
-                                width: 256,
-                                maxHeight: 300,
+
+                                maxHeight: "none",
                                 overflowY: "auto",
                             }}
                             mode="inline"
-                            className={`custom-dropdown-menu ${theme === "dark"
-                                ? "dark-menu"
-                                : ""
-                                }`}
+
                         >
                             {newBusinessData.map(
                                 (item, index) => (
@@ -481,6 +480,7 @@ const UrlBuilderTab = ({
                                             <span className="columns-submenu">
                                                 {item.name ||
                                                     "Business Data"}{" "}
+                                               
                                                 <DownOutlined />
                                             </span>
                                         }
@@ -824,7 +824,7 @@ const UrlBuilderTab = ({
                 align="bottom"
                 justify="space-between"
                 style={{
-                    marginTop: "-5px",
+                    marginTop: "-15px",
                     width: "100%",
                     padding: "10px",
                     fontSize: "12px"
@@ -991,7 +991,15 @@ const UrlBuilderTab = ({
                 )}
 
                 <ReusableModal
-                    title="URL Builder"
+                    title={
+                        <span
+                            style={{
+                                color: theme === "dark" ? "#fff" : "#333",
+                            }}
+                        >
+                            UrlBuilder
+                        </span>
+                    }
                     open={isModalVisibleForURLBuilder}
                     onCancel={handleCancelForURLBuilder}
                     footer={null}
