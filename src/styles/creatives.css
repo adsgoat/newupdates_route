@@ -1,4 +1,4 @@
-/* Desktop - keep existing position */
+/* Desktop - keep existing positi */
 .creative-checkbox {
     position: absolute;
     top: 10px;
@@ -15,42 +15,24 @@
     }
 }
 
-/* =========================================
-   GREEN SELECTED CHECKBOX
-   ========================================= */
-
-/* Selected checkbox */
-.creative-checkbox .ant-checkbox-checked .ant-checkbox-inner {
-    background-color: #52c41a !important;
-    border-color: #52c41a !important;
+.green-checkbox {
+    --ant-color-primary: #91C25F !important;
+    --ant-color-primary-hover: #62a839 !important;
+    --ant-checkbox-color: #91C25F !important;
 }
 
-/* Check mark */
-.creative-checkbox .ant-checkbox-checked .ant-checkbox-inner::after {
-    border-color: #fff !important;
+.green-checkbox .ant-checkbox-inner {
+    border-color: #91C25F !important;
 }
 
-/* Hover selected */
-.creative-checkbox .ant-checkbox-checked:hover .ant-checkbox-inner {
-    background-color: #52c41a !important;
-    border-color: #52c41a !important;
+.green-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #91C25F !important;
+    border-color: #91C25F !important;
 }
 
-/* Focus */
-.creative-checkbox .ant-checkbox-checked:focus .ant-checkbox-inner {
-    background-color: #52c41a !important;
-    border-color: #52c41a !important;
-}
-
-/* Wrapper hover */
-.creative-checkbox:hover .ant-checkbox-checked .ant-checkbox-inner {
-    background-color: #52c41a !important;
-    border-color: #52c41a !important;
-}
-
-/* Prevent Ant Design blue color */
-.creative-checkbox .ant-checkbox-checked .ant-checkbox-inner {
-    box-shadow: none !important;
+.green-checkbox .ant-checkbox-checked:hover .ant-checkbox-inner {
+    background-color: #91C25F !important;
+    border-color: #91C25F !important;
 }
 
 .creative-library {
@@ -156,8 +138,7 @@
    SEARCH INPUT INSIDE SELECT
    ========================================================= */
 
-.account-select-dark
-.ant-select-selection-search-input {
+.account-select-dark .ant-select-selection-search-input {
     background: transparent !important;
     background-color: transparent !important;
 
@@ -171,8 +152,7 @@
 }
 
 /* Search input focus */
-.account-select-dark
-.ant-select-selection-search-input:focus {
+.account-select-dark .ant-select-selection-search-input:focus {
     background: transparent !important;
     color: #ffffff !important;
 
@@ -204,6 +184,11 @@
     background: #1f1f1f !important;
     color: #aaaaaa !important;
 }
+
+.account-select-light .ant-select-selector {
+    border: 1px solid #91c25f !important;
+}
+
 
 
 /* =========================================================
@@ -237,8 +222,7 @@
 }
 
 /* Selected + hover */
-.account-dropdown-dark
-.ant-select-item-option-selected.ant-select-item-option-active {
+.account-dropdown-dark .ant-select-item-option-selected.ant-select-item-option-active {
     background: #3a3a3a !important;
 }
 
@@ -260,8 +244,7 @@
    DROPDOWN SEARCH
    ========================================================= */
 
-.account-dropdown-dark
-.ant-select-selection-search-input {
+.account-dropdown-dark .ant-select-selection-search-input {
     background: #2a2a2a !important;
     background-color: #2a2a2a !important;
 
@@ -271,9 +254,55 @@
     outline: none !important;
 }
 
-.account-dropdown-dark
-.ant-select-selection-search-input:focus {
+.account-dropdown-dark .ant-select-selection-search-input:focus {
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
+}
+
+.creative-editor-wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.creative-editor-dark {
+    background: #0f121a;
+}
+
+.creative-editor-light {
+    background: #f4f6fa;
+}
+
+.creative-editor-container {
+    width: 96vw;
+    height: 94vh;
+
+    max-width: 1800px;
+
+    overflow: hidden;
+
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 768px) {
+    .creative-editor-container {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+    }
 }
