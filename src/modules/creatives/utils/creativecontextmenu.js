@@ -306,7 +306,24 @@ export default function CreativeContextMenu({
                                 cursor: "pointer",
                             }}
                             onClick={async () => {
-                                await handlePermanentDelete?.();
+                                const items =
+                                    selectedList.length > 0
+                                        ? selectedList
+                                        : target
+                                            ? [target]
+                                            : [];
+
+                                const result =
+                                    await handlePermanentDelete?.(items);
+
+                                if (result?.ok) {
+                                    setSelectedImages?.([]);
+
+                                    if (selectedImagesRef) {
+                                        selectedImagesRef.current = [];
+                                    }
+                                }
+
                                 closeMenu();
                             }}
                         >
@@ -318,7 +335,24 @@ export default function CreativeContextMenu({
                                 isHoveredRestore
                             )}
                             onClick={async () => {
-                                await handleRestore?.();
+                                const items =
+                                    selectedList.length > 0
+                                        ? selectedList
+                                        : target
+                                            ? [target]
+                                            : [];
+
+                                const result =
+                                    await handleRestore?.(items);
+
+                                if (result?.ok) {
+                                    setSelectedImages?.([]);
+
+                                    if (selectedImagesRef) {
+                                        selectedImagesRef.current = [];
+                                    }
+                                }
+
                                 closeMenu();
                             }}
                             onMouseEnter={() =>
@@ -514,7 +548,7 @@ export default function CreativeContextMenu({
 
                                 {/* PASTE INTO FOLDER */}
 
-                               
+
 
                                 {/* ADD TO CAMPAIGN */}
 

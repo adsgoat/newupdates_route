@@ -1,10 +1,10 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import axios from "axios";
 import { Grid, Row, Col, Upload, message } from "antd";
 import { useState, useEffect, useRef, useMemo } from "react";
-
-
-import { DeleteOutlined, UploadOutlined, FolderFilled, EditOutlined } from "@ant-design/icons";
+import { DeleteOutlined, UploadOutlined, EditOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import RouteDescription from "@/components/common/routedescription";
 import SelectProjects from "@/components/common/selectprojects";
@@ -29,15 +29,22 @@ import useMoveToBin from "@/modules/creatives/apicalls/movetobin";
 import useCopyFile from "@/modules/creatives/apicalls/copyfile";
 import useAddToCampaign from "@/modules/creatives/apicalls/addtocampign";
 import usePasteFile from "@/modules/creatives/apicalls/pastefile";
+import usePermanentDelete from "@/modules/creatives/apicalls/permanetlydelete";
+import useRestore from "@/modules/creatives/apicalls/restore";
 import "../../styles/creatives.css";
 import "../../styles/global.css";
-
+import { TheaterComedyRounded } from "@mui/icons-material";
+const FabricCanvas = dynamic(
+  () => import("@/modules/creatives/utils/fbcanvas"),
+  {
+    ssr: false,
+  }
+);
 const { useBreakpoint } = Grid;
-
-export default function CreativesPage({ email, userData, userPermissions, auth, username }) {
+export default function CreativesPage({ email, userData, userPermissions, auth, username ,theme}) {
 
   // theme states
-  const [theme] = useState("light");
+
   const screens = useBreakpoint();
 
   // Project & Account Selection
@@ -60,21 +67,12 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
   const [urlInput, setUrlInput] = useState("");
   const [images, setImages] = useState([]);
   const [filteredImages, setFilteredImages] = useState([]);
-
   const [selectedImages, setSelectedImages] = useState([]);
-  const [selectedImage, setSelectedImage] =
-    useState(null);
-
-  const [isEditorVisible, setIsEditorVisible] =
-    useState(false);
-  const [editingUid, setEditingUid] =
-    useState(null);
-  const [
-    highlightedFolders,
-    setHighlightedFolders
-  ] = useState([]);
-  const [inlineName, setInlineName] =
-    useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isEditorVisible, setIsEditorVisible] = useState(false);
+  const [editingUid, setEditingUid] = useState(null);
+  const [highlightedFolders, setHighlightedFolders] = useState([]);
+  const [inlineName, setInlineName] = useState("");
   const selectedImagesRef = useRef([]);
   const [contextMenu, setContextMenu] = useState({
     visible: false,
@@ -108,11 +106,20 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
   const [urlLoading, setUrlLoading] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewItem, setPreviewItem] = useState(null);
+  const [newFolderModal, setNewFolderModal] = useState({
+    visible: false,
+    name: "",
+    mode: "create",
+    folderToRename: null,
+  });
+
   const handleViewImage = (item) => {
     setPreviewItem(item);
     setPreviewOpen(true);
   };
+
   const uploadPrefix = `${firstSelectValues}/${selectedAccount}/`;
+
   const handleContextMenu = (e, image) => {
     e.preventDefault();
     e.stopPropagation();
@@ -137,6 +144,47 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
   };
 
   // get user files 
+  // const getUserFiles = async () => {
+  //   try {
+  //     const folder =
+  //       `${firstSelectValues}/${selectedAccount}/`;
+
+  //     const params = new URLSearchParams({
+  //       username: username,
+  //       folder,
+  //     });
+
+  //     const response = await fetch(
+  //       `/api/creatives/userfiles?${params.toString()}`
+  //     );
+
+  //     const data = await response.json();
+
+  //     console.log(data, "userfiles");
+
+  //     setUserFiles(data.images || []);
+  //     setImages(data.images || []);
+  //     setFilteredImages(data.images || []);
+  //     // Important:
+  //     // Apply current date filter after new files arrive
+  //     if (startDate && endDate) {
+  //       const filtered = (data.images || []).filter(
+  //         (img) =>
+  //           img.uploadDate >= startDate &&
+  //           img.uploadDate <= endDate
+  //       );
+
+  //       setFilteredImages(filtered);
+  //     } else {
+  //       setFilteredImages(data.images || []);
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       "Error fetching user files:",
+  //       error
+  //     );
+  //   }
+  // };
   const getUserFiles = async () => {
     try {
       const folder =
@@ -155,27 +203,66 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
 
       console.log(data, "userfiles");
 
-      setUserFiles(data.images || []);
-      setImages(data.images || []);
-      setFilteredImages(data.images || []);
-      // Important:
-      // Apply current date filter after new files arrive
-      if (startDate && endDate) {
-        const filtered = (data.images || []).filter(
-          (img) =>
-            img.uploadDate >= startDate &&
-            img.uploadDate <= endDate
-        );
+      const allFiles = data.images || [];
 
-        setFilteredImages(filtered);
-      } else {
-        setFilteredImages(data.images || []);
-      }
+      const filteredData =
+        startDate && endDate
+          ? allFiles.filter(
+            (img) =>
+              img.uploadDate >= startDate &&
+              img.uploadDate <= endDate
+          )
+          : allFiles;
+
+      // Keep complete API response
+      setImages(allFiles);
+
+      // Set DATE FILTERED data for display
+      setUserFiles(filteredData);
+
+      setFilteredImages(filteredData);
     } catch (error) {
-      console.error(
-        "Error fetching user files:",
-        error
+      console.error("Error fetching user files:", error);
+    }
+  };
+  // get folder files
+  const getFolderFiles = async (folderName) => {
+    try {
+      const folder = `${firstSelectValues}/${selectedAccount}/${folderName}`;
+
+      const params = new URLSearchParams({
+        username: username,
+        folder,
+      });
+
+      const response = await fetch(
+        `/api/creatives/userfiles?${params.toString()}`
       );
+
+      // const data = await response.json();
+
+      // setUserFiles(data.images);
+      // setImages(data.images || []);
+      // setFilteredImages(data.images || []);
+      const data = await response.json();
+
+      const allFiles = data.images || [];
+
+      const filteredData =
+        startDate && endDate
+          ? allFiles.filter(
+            (img) =>
+              img.uploadDate >= startDate &&
+              img.uploadDate <= endDate
+          )
+          : allFiles;
+
+      setImages(allFiles);
+      setUserFiles(filteredData);
+      setFilteredImages(filteredData);
+
+    } catch (error) {
+      console.error("Error fetching folder files:", error);
     }
   };
   const handleChange = (dates) => {
@@ -232,6 +319,10 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
     currentFolder,
     username: username,
     getUserFiles,
+    setSelectedImage,
+    setIsEditorVisible,
+    editedFile,
+    setEditedFile,
 
   });
   const { pasteFile } = usePasteFile({
@@ -255,14 +346,11 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
     restoreItems,
     removeTrashItemsLocally,
   } = useTrash({
-    // apiClient,
     userName: username,
     selectedKey: firstSelectValues,
     selectedAccountNumber: selectedAccount,
-
     setSelectedImages,
     selectedImagesRef,
-
     fetchUserImages: getUserFiles,
   });
   const {
@@ -270,23 +358,25 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
   } = useEditFile({
     setSelectedImage,
     setIsEditorVisible,
+    message,
   });
   const {
     startRename,
     handleInlineRename,
+    renameItem,
   } = useRenameFile({
     inlineName,
     setInlineName,
     setEditingUid,
-
+    username: username,
     setContextMenu,
     setSelectedImages,
     selectedImagesRef,
-
     images,
     message,
-
     getUserFiles,
+    getFolderFiles,
+    currentFolder,
 
   });
   const {
@@ -302,7 +392,6 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
   const {
     duplicateFile,
   } = useDuplicateFile({
-    // userdetails,
     currentFolder,
     uploadPrefix,
     images,
@@ -334,6 +423,24 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
     getUserFiles,
     message,
     username: username
+  });
+  const {
+    handlePermanentDelete,
+  } = usePermanentDelete({
+    username,
+    message,
+    fetchTrashFiles
+
+  });
+
+  const {
+    handleRestore,
+  } = useRestore({
+    username,
+    message,
+    selectedKey: firstSelectValues,
+    selectedAccountNumber: selectedAccount,
+    fetchTrashFiles,
   });
   // const displayItems = useMemo(() => {
   //   return [
@@ -400,23 +507,61 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
   };
 
   //date selection handlers
+  // const handleChangeDates = (dates) => {
+  //   setSelectedDates(dates);
+
+  //   if (!dates || dates.length === 0) {
+  //     setStartDate(null);
+  //     setEndDate(null);
+  //     setFilteredImages(images);
+  //     return;
+  //   }
+
+  //   const [start, end] = dates;
+
+  //   const formattedStart =
+  //     start.format("YYYY-MM-DD");
+
+  //   const formattedEnd =
+  //     end.format("YYYY-MM-DD");
+
+  //   setStartDate(formattedStart);
+  //   setEndDate(formattedEnd);
+
+  //   const filtered = (images || []).filter(
+  //     (img) =>
+  //       img.uploadDate >= formattedStart &&
+  //       img.uploadDate <= formattedEnd
+  //   );
+
+  //   console.log("Date filter:", {
+  //     start: formattedStart,
+  //     end: formattedEnd,
+  //     total: images.length,
+  //     filtered: filtered.length,
+  //   });
+
+  //   setFilteredImages(filtered);
+  // };
   const handleChangeDates = (dates) => {
     setSelectedDates(dates);
 
+    // If date is cleared
     if (!dates || dates.length === 0) {
       setStartDate(null);
       setEndDate(null);
+
+      // Show all files
+      setUserFiles(images);
       setFilteredImages(images);
+
       return;
     }
 
     const [start, end] = dates;
 
-    const formattedStart =
-      start.format("YYYY-MM-DD");
-
-    const formattedEnd =
-      end.format("YYYY-MM-DD");
+    const formattedStart = start.format("YYYY-MM-DD");
+    const formattedEnd = end.format("YYYY-MM-DD");
 
     setStartDate(formattedStart);
     setEndDate(formattedEnd);
@@ -434,9 +579,12 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
       filtered: filtered.length,
     });
 
+    // IMPORTANT: UI is using userFiles
+    setUserFiles(filtered);
+
+    // Keep filteredImages also updated
     setFilteredImages(filtered);
   };
-
   const handleOpenChange = (open) => {
     setIsPickerOpen(open);
   };
@@ -466,39 +614,41 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
   }
 
   // Fetch networks data on component mount
+  // useEffect(() => {
+  //   const networksData = async () => {
+  //     const data = await getNetworks();
+  //     console.log(data, "networksData");
+  //     setNetworksWithStatus(data);
+  //   }
+  //   networksData();
+  // }, [])
+
   useEffect(() => {
     const networksData = async () => {
       const data = await getNetworks();
+
       console.log(data, "networksData");
+
       setNetworksWithStatus(data);
-    }
+
+      // Select first network by default
+      const firstNetwork = Object.keys(transformedData)[0];
+
+      if (firstNetwork) {
+        setFirstSelectValues(firstNetwork);
+
+        const accounts = transformedData[firstNetwork] || [];
+        setFilteredAccounts(accounts);
+
+        // Select first account by default
+        if (accounts.length > 0) {
+          setSelectedAccount(accounts[0].accountNumber);
+        }
+      }
+    };
+
     networksData();
-  }, [])
-
-
-
-  // get folder files
-  const getFolderFiles = async (folderName) => {
-    try {
-      const folder = `${firstSelectValues}/${selectedAccount}/${folderName}`;
-
-      const params = new URLSearchParams({
-        username: username,
-        folder,
-      });
-
-      const response = await fetch(
-        `/api/creatives/userfiles?${params.toString()}`
-      );
-
-      const data = await response.json();
-
-      setUserFiles(data.images);
-
-    } catch (error) {
-      console.error("Error fetching folder files:", error);
-    }
-  };
+  }, []);
 
   useEffect(() => {
     if (!firstSelectValues) return;
@@ -550,6 +700,69 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
     }
   };
 
+  const base64ToFile = async (base64, filename) => {
+    const response = await fetch(base64);
+    const blob = await response.blob();
+
+    return new File(
+      [blob],
+      filename,
+      {
+        type: blob.type,
+      }
+    );
+  };
+
+  const handleSaveEditedImage = async (
+    fileId,
+    editedImage
+  ) => {
+    if (
+      !editedImage ||
+      !editedImage.imageBase64
+    ) {
+      message.error("Edited image is not valid.");
+      return;
+    }
+
+    try {
+      const filename =
+        `edited-${crypto.randomUUID()}.png`;
+
+      const file =
+        await base64ToFile(
+          editedImage.imageBase64,
+          filename
+        );
+
+      // This is the important part:
+      // replace the current pending file
+      setEditedFile(file);
+
+      setPreviewFile({
+        uid: fileId,
+        name: filename,
+        url: editedImage.imageBase64,
+        file,
+      });
+
+      // Close editor
+      setIsEditorVisible(false);
+
+      // Go back to upload confirmation
+      setIsModalVisible(true);
+
+    } catch (error) {
+      console.error(
+        "Error saving edited image:",
+        error
+      );
+
+      message.error(
+        "Failed to save edited image."
+      );
+    }
+  };
 
   return (
     <div
@@ -714,7 +927,15 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
                         : "Trash"
                     }
 
-                    onClick={toggleTrashView}
+                    onClick={() => {
+                      if (isTrashView) {
+                        toggleTrashView();
+
+                      } else {
+                        toggleTrashView();
+                        getUserFiles();
+                      }
+                    }}
 
                   />
                 </Col>
@@ -849,7 +1070,14 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
                 padding="2px"
                 icon={<DeleteOutlined />}
                 text={isTrashView ? "Back to files" : "Trash"}
-                onClick={toggleTrashView}
+                onClick={() => {
+                  if (isTrashView) {
+                    toggleTrashView();
+                  } else {
+                    toggleTrashView();
+                    getUserFiles();
+                  }
+                }}
               />
             </div>
 
@@ -904,12 +1132,13 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
         // downloadFile={downloadFile}
         moveToBin={moveToBin}
         // setEditingUid={setEditingUid}
-        // setInlineName={setInlineName}
+        setInlineName={setInlineName}
         // extractDisplayName={extractDisplayName}
-
+        handlePermanentDelete={handlePermanentDelete}
+        handleRestore={handleRestore}
         // showDeleteModal={showDeleteModal}
         // setDeleteFolderModal={setDeleteFolderModal}
-        // setNewFolderModal={setNewFolderModal}
+        setNewFolderModal={setNewFolderModal}
 
         handleFolderClick={handleFolderClick}
         startRename={startRename}
@@ -918,9 +1147,6 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
         images={images}
 
         // handleAddToCampaign={handleAddToCampaign}
-
-        // handlePermanentDelete={handlePermanentDelete}
-        // handleRestore={handleRestore}
 
         // handleMultiCopy={handleMultiCopy}
         // handleMultiCut={handleMultiCut}
@@ -952,11 +1178,20 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
         setIsHoveredRestore={setIsHoveredRestore}
       />
       <CreativeModal
-        title={`Confirm Upload (${uploadingIndex + 1}/${totalFiles})`}
+        title={
+          <span
+            style={{
+              color: theme === "dark" ? "#fff" : "#333",
+            }}
+          >
+            {`Confirm Upload (${uploadingIndex + 1}/${totalFiles})`}
+          </span>
+        }
         open={isModalVisible}
         onCancel={handleCancel}
         width={400}
         centered={true}
+        theme={theme}
         footer={[
           <SubmitButton
             key="edit"
@@ -1027,6 +1262,7 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
                 onChange={(e) =>
                   setFileInputName(e.target.value)
                 }
+                theme={theme}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     handleConfirmUpload();
@@ -1039,12 +1275,22 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
       </CreativeModal>
       <CreativeModal
         open={previewOpen}
-        title={previewItem?.name}
+
+        title={
+          <span
+            style={{
+              color: theme === "dark" ? "#fff" : "#333",
+            }}
+          >
+            {previewItem?.name}
+          </span>
+        }
         onCancel={() => {
           setPreviewOpen(false);
           setPreviewItem(null);
         }}
         width={500}
+        theme={theme}
       >
         {previewItem?.url && (
           /\.(mp4|webm|mov|m4v|avi)$/i.test(previewItem.name) ? (
@@ -1077,6 +1323,197 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
           )
         )}
       </CreativeModal>
+      <CreativeModal
+        title={
+          <span
+            style={{
+              color: theme === "dark" ? "#fff" : "#333",
+            }}
+          >
+            {newFolderModal.mode === "rename"
+              ? "Rename Folder"
+              : "Create New Folder"}
+          </span>
+        }
+        open={newFolderModal.visible}
+        theme={theme}
+        onCancel={() =>
+          setNewFolderModal({
+            visible: false,
+            name: "",
+            mode: "create",
+            folderToRename: null,
+          })
+        }
+        width={400}
+        centered={true}
+        footer={[
+          <SubmitButton
+            key="cancel"
+            text="Cancel"
+            onClick={() =>
+              setNewFolderModal({
+                visible: false,
+                name: "",
+                mode: "create",
+                folderToRename: null,
+              })
+            }
+          />,
+
+          <SubmitButton
+            key="submit"
+            type="primary"
+            text={
+              newFolderModal.mode === "rename"
+                ? "Rename"
+                : "Create"
+            }
+            onClick={async () => {
+              const {
+                name,
+                mode,
+                folderToRename,
+              } = newFolderModal;
+
+              if (!name.trim()) {
+                message.error(
+                  "Folder name is required!"
+                );
+                return;
+              }
+
+              if (mode === "rename") {
+                const success = await renameItem(
+                  folderToRename,
+                  name
+                );
+
+                if (!success) return;
+
+                setNewFolderModal({
+                  visible: false,
+                  name: "",
+                  mode: "create",
+                  folderToRename: null,
+                });
+
+                return;
+              }
+
+              // CREATE FOLDER
+              const baseKey = `${uploadPrefix}${currentFolder}${name.trim()}/`;
+
+              const folderExists = images.some(
+                (img) => img.uid === baseKey && img.isFolder
+              );
+
+              if (folderExists) {
+                message.error("Folder already exists!");
+                return;
+              }
+
+              try {
+                const response = await fetch(
+                  "/api/creatives/upload",
+                  {
+                    method: "POST",
+                    headers: {
+                      username: username,
+                      "x-folder": baseKey,
+                      "x-action": "create-folder",
+                    },
+                    body: new FormData(),
+                  }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                  throw new Error(
+                    data?.error ||
+                    data?.message ||
+                    "Failed to create folder"
+                  );
+                }
+
+                message.success("Folder created");
+
+                await getUserFiles();
+
+                setNewFolderModal({
+                  visible: false,
+                  name: "",
+                  mode: "create",
+                  folderToRename: null,
+                });
+              } catch (error) {
+                console.error("Folder creation failed:", error);
+
+                message.error(
+                  error?.message ||
+                  "Failed to create folder"
+                );
+              }
+            }}
+          />,
+        ]}
+      >
+        <SearchInput
+          placeholder="Enter folder name"
+          value={newFolderModal.name}
+          onChange={(e) =>
+            setNewFolderModal((prev) => ({
+              ...prev,
+              name: e.target.value,
+            }))
+          }
+          theme={theme}
+          onPressEnter={async () => {
+            const {
+              name,
+              mode,
+              folderToRename,
+            } = newFolderModal;
+
+            if (!name.trim()) {
+              message.error(
+                "Folder name is required!"
+              );
+              return;
+            }
+
+            if (mode === "rename") {
+              const success = await renameItem(
+                folderToRename,
+                name.trim()
+              );
+
+              if (!success) return;
+
+              setNewFolderModal({
+                visible: false,
+                name: "",
+                mode: "create",
+                folderToRename: null,
+              });
+
+              return;
+            }
+          }}
+        />
+      </CreativeModal>
+      {isEditorVisible && selectedImage && (
+        <FabricCanvas
+          fileId={selectedImage.uid}
+          initialImage={selectedImage.url}
+          closeCanvasModal={() =>
+            setIsEditorVisible(false)
+          }
+          theme={theme}
+          onSaveEditedImage={handleSaveEditedImage}
+        />
+      )}
     </div>
   );
 }

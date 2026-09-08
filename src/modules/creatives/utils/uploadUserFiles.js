@@ -6,7 +6,11 @@ export default function useUpload({
     uploadPrefix,
     currentFolder,
     getUserFiles,
-    username
+    username,
+    setSelectedImage,
+    setIsEditorVisible,
+    editedFile,
+    setEditedFile,
 }) {
     const [uploadKey, setUploadKey] = useState(Date.now());
     const [uploadFileList, setUploadFileList] = useState([]);
@@ -60,7 +64,7 @@ export default function useUpload({
         setIsModalVisible(true);
     };
 
-  
+
     const handleCancel = () => {
         setIsModalVisible(false);
 
@@ -80,9 +84,9 @@ export default function useUpload({
     const handleConfirmUpload = async () => {
         try {
             const fileToUpload =
-                pendingFiles?.[uploadingIndex];
+                editedFile || pendingFiles?.[uploadingIndex];
 
-       
+
             if (!fileToUpload) {
                 message.error("No file selected.");
                 return;
@@ -95,7 +99,7 @@ export default function useUpload({
 
 
 
-       
+
             const extension =
                 fileToUpload.name.includes(".")
                     ? fileToUpload.name
@@ -103,11 +107,11 @@ export default function useUpload({
                         .pop()
                     : "";
 
-           
+
             const uploadDate =
                 dayjs().format("YYYY-MM-DD");
 
-         
+
             const filename = extension
                 ? `${fileInputName.trim()}.${extension}`
                 : fileInputName.trim();
@@ -147,7 +151,7 @@ export default function useUpload({
                 data
             );
 
-          
+
             const newFileUrl =
                 data?.imageUrl ||
                 data?.url;
@@ -170,7 +174,7 @@ export default function useUpload({
                 uploadDate,
             };
 
-           
+
             const nextIndex =
                 uploadingIndex + 1;
 
@@ -184,7 +188,7 @@ export default function useUpload({
                 await getUserFiles();
             }
 
-         
+
             if (
                 pendingFiles &&
                 nextIndex < pendingFiles.length
@@ -256,17 +260,30 @@ export default function useUpload({
         }
     };
 
-   
     const handleEditUploadedFile = () => {
-        if (!previewFile) return;
+        if (!previewFile) {
+            message.error("No file selected for editing.");
+            return;
+        }
 
         console.log(
             "Edit uploaded file:",
             previewFile
         );
+
+        setSelectedImage({
+            ...previewFile,
+            file: previewFile.file,
+        });
+
+        // Close upload confirmation modal
+        setIsModalVisible(false);
+
+        // Open Filerobot editor
+        setIsEditorVisible(true);
     };
 
-    
+
     return {
         uploadKey,
 

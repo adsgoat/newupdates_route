@@ -64,14 +64,8 @@ export default function usePasteFile({
         return newName;
     };
 
-    // =========================================
-    // PASTE
-    // =========================================
     const pasteFile = async () => {
-        if (
-            !clipboardFile ||
-            clipboardFile.length === 0
-        ) {
+        if (!clipboardFile || clipboardFile.length === 0) {
             message.error("Nothing to paste.");
 
             return {
@@ -80,28 +74,129 @@ export default function usePasteFile({
         }
 
         try {
-            console.log("========== PASTE FILE ==========");
+            console.log("========== PASTE ==========");
             console.log("Clipboard:", clipboardFile);
             console.log("Username:", username);
             console.log("Current folder:", currentFolder);
 
             for (const file of clipboardFile) {
-                // Currently handling files only
-                if (file.isFolder) {
-                    console.warn(
-                        "Folder paste skipped:",
-                        file.name
-                    );
-
-                    continue;
-                }
-
                 const action = file.action;
                 const sourceKey = file.uid;
 
-                const newName = getNewFileName(
-                    file.name
-                );
+                // =========================================
+                // FOLDER PASTE
+                // =========================================
+                if (file.isFolder) {
+                    console.log("========== FOLDER PASTE ==========");
+                    console.log("Folder:", file.name);
+                    console.log("Source Key:", sourceKey);
+                    console.log("Action:", action);
+
+                    const destinationKey =
+                        `${uploadPrefix}${currentFolder}${file.name}/`;
+
+                    console.log(
+                        "Destination Key:",
+                        destinationKey
+                    );
+
+                    // -----------------------------------------
+                    // FOLDER COPY
+                    // -----------------------------------------
+                    if (file.isFolder) {
+                        const destinationKey =
+                            `${uploadPrefix}${currentFolder}${name}/`;
+
+                        console.log("========== FOLDER PASTE ==========");
+                        console.log("Folder:", name);
+                        console.log("Source Key:", sourceKey);
+                        console.log("Destination Key:", destinationKey);
+
+                        const response = await fetch(
+                            "/api/creatives/foldercopy",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    sourceKey,
+                                    destinationKey,
+                                    username,
+                                }),
+                            }
+                        );
+
+                        const data = await response.json().catch(() => ({}));
+
+                        if (!response.ok) {
+                            console.error("Folder copy response:", data);
+
+                            throw new Error(
+                                data?.details ||
+                                data?.message ||
+                                data?.error ||
+                                `Copy folder failed: ${response.status}`
+                            );
+                        }
+
+                        return data;
+                    }
+
+                    // -----------------------------------------
+                    // FOLDER CUT
+                    // -----------------------------------------
+                    else if (action === "cut") {
+                        const response = await fetch(
+                            "/api/creatives/fileorfolder",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    sourceKey,
+                                    destinationKey,
+                                    username,
+                                }),
+                            }
+                        );
+
+                        if (!response.ok) {
+                            const error =
+                                await response
+                                    .json()
+                                    .catch(() => ({}));
+
+                            throw new Error(
+                                error?.message ||
+                                `Folder cut paste failed: ${response.status}`
+                            );
+                        }
+
+                        await response.json().catch(() => ({}));
+
+                        console.log(
+                            "Folder cut paste successful"
+                        );
+                    }
+
+                    else {
+                        console.warn(
+                            "Unknown folder clipboard action:",
+                            action
+                        );
+                    }
+
+                    // Don't run the file-paste logic
+                    continue;
+                }
+
+                // =========================================
+                // FILE
+                // =========================================
+
+                const newName = getNewFileName(file.name);
 
                 const destinationKey =
                     `${uploadPrefix}${currentFolder}${newName}`;
@@ -109,16 +204,19 @@ export default function usePasteFile({
                 console.log("Action:", action);
                 console.log("File:", file.name);
                 console.log("Source Key:", sourceKey);
-                console.log("Destination Key:", destinationKey);
-                console.log("Username:", username);
+                console.log(
+                    "Destination Key:",
+                    destinationKey
+                );
 
                 // =========================================
-                // COPY
+                // FILE COPY
                 // =========================================
                 if (action === "copy") {
-                    console.log("========== COPY PASTE ==========");
+                    console.log(
+                        "========== COPY PASTE =========="
+                    );
 
-                    // Fix S3 region
                     const normalizedUrl =
                         file.url?.replace(
                             "s3.us-east-1.amazonaws.com",
@@ -141,7 +239,6 @@ export default function usePasteFile({
                         );
                     }
 
-                    // Get original file through proxy
                     const proxyResponse =
                         await fetch(
                             `/api/creatives/proxy?url=${encodeURIComponent(
@@ -169,7 +266,6 @@ export default function usePasteFile({
                         blob.size
                     );
 
-                    // Create new file
                     const copiedFile =
                         new File(
                             [blob],
@@ -181,7 +277,6 @@ export default function usePasteFile({
                             }
                         );
 
-                    // Create FormData
                     const formData =
                         new FormData();
 
@@ -205,17 +300,6 @@ export default function usePasteFile({
                         username || ""
                     );
 
-                    console.log(
-                        "Uploading copied file:",
-                        newName
-                    );
-
-                    console.log(
-                        "Upload destination:",
-                        destinationKey
-                    );
-
-                    // Upload
                     const uploadResponse =
                         await fetch(
                             "/api/creatives/upload",
@@ -243,10 +327,12 @@ export default function usePasteFile({
                 }
 
                 // =========================================
-                // CUT
+                // FILE CUT
                 // =========================================
                 else if (action === "cut") {
-                    console.log("========== CUT PASTE ==========");
+                    console.log(
+                        "========== CUT PASTE =========="
+                    );
 
                     const response =
                         await fetch(
@@ -293,14 +379,15 @@ export default function usePasteFile({
             // =========================================
             // SUCCESS
             // =========================================
+
             message.success(
-                "File pasted successfully"
+                "Pasted successfully"
             );
 
             // Clear clipboard
             setClipboardFile([]);
 
-            // Refresh files
+            // Refresh
             if (getUserFiles) {
                 await getUserFiles();
             }
@@ -311,13 +398,13 @@ export default function usePasteFile({
 
         } catch (error) {
             console.error(
-                "Paste file failed:",
+                "Paste failed:",
                 error
             );
 
             message.error(
                 error?.message ||
-                "Failed to paste file."
+                "Failed to paste."
             );
 
             return {

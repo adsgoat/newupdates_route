@@ -1,6 +1,6 @@
 import getRedisClient from "@/lib/redis";
 import getSessionEmailByAuth from "@/lib/sessionemailbyauth";
-import MoveFileOrFolder from "@/services/creatives/moveFileOrFolder";
+import MoveFileOrFolder from "@/services/creatives/moveFilreOrFolder";
 
 export async function POST(request) {
     const client = await getRedisClient();

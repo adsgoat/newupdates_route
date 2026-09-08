@@ -14,12 +14,13 @@ export default async function CreativesPageLayout() {
     const userdetails = await client.get(`userdetails_${email}`);
     const parsedUserDetails = JSON.parse(userdetails);
     const username = parsedUserDetails.username;
+    const themeRaw = await client.get(`theme_${email}`);
+    const theme = themeRaw === "dark" ? "dark" : "light";
 
-    console.log("username:", username);
 
     return (
         <MainLayout>
-            <CreativesPage email={email} userData={userData} userPermissions={userPermissionsInfo} auth={getTheAuthInfo} username={username} />
+            <CreativesPage email={email} userData={userData} userPermissions={userPermissionsInfo} auth={getTheAuthInfo} username={username} theme={theme} />
         </MainLayout>
     );
 }
