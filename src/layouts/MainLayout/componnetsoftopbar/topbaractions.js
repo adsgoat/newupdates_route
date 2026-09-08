@@ -32,7 +32,9 @@ export default function TopbarActions({
     userdetails,
     theme,
     email,
-    userdata
+    userdata,
+    mobileMenuOpen,
+    setMobileMenuOpen,
 }) {
     const darkMode = theme === "dark";
 
@@ -86,14 +88,14 @@ export default function TopbarActions({
                 {/* LOGO */}
 
                 <div
-                    className="topbar-left"
+                    className="topbar-left mobile-only-logo"
                     style={{
                         marginRight: "auto",
                         display: "flex",
                         alignItems: "center",
                     }}
                 >
-                    {/* <Image
+                    <Image
                         src={
                             darkMode
                                 ? "/ssk2.png"
@@ -104,13 +106,15 @@ export default function TopbarActions({
                         priority
                         alt="Logo"
                         className="logo"
+                        // onClick={() => setMobileMenuOpen(true)}
+                        onClick={() => setMobileMenuOpen((prev) => !prev)}
                         style={{
                             margin: "0px 12px",
-                            width: "60%",
+                            width: "45%",
                             height: "revert-layer",
                             objectFit: "contain",
                         }}
-                    /> */}
+                    />
                 </div>
 
                 {/* RIGHT ICONS */}
