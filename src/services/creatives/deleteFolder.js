@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export default async function DeleteFolder(reqData, token) {
-    const { username, folder } = reqData;
+    const { username, folderKey } = reqData;
 
     const apiCall = await axios.delete(
         "http://test.app.vyaktimetrics.com/creatives/folders/deletefolder",
@@ -9,7 +9,7 @@ export default async function DeleteFolder(reqData, token) {
             headers: {
                 Authorization: token,
                 username,
-                "x-folder": folder,
+                "x-folder": folderKey,
             },
         }
     );

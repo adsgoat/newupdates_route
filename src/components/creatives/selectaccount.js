@@ -85,16 +85,17 @@ export default function SelectAccountSingle({
             disabled={disabled}
             placeholder="Select Account"
             optionLabelProp="value"
-            style={{
-                width: "100%",
-                height: "75%",
-            }}
             options={options}
-
+            style={{
+                 width: "100%",
+                height: "75%",
+                background: theme === "dark" ? "#333" : "#fff",
+                color: theme === "dark" ? "#fff" : "#333",
+            }}
             className={
                 theme === "dark"
-                    ? "account-select-dark"
-                    : "account-select-light"
+                    ? `account-select-dark green-border-select `
+                    : `account-select-light green-border-select `
             }
 
             classNames={{

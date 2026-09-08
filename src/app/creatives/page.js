@@ -8,14 +8,19 @@ export default async function CreativesPageLayout() {
     const email = await getSessionEmailByAuth();
     // const token = (await cookies()).get("auth_token")?.value;
     const stringuserData = await client.get(`userData_${email}`);
-    const username = await client.get(`username_${email}`);
     const getTheAuthInfo = JSON.parse(await client.get(`auth_${email}`));
     const userPermissionsInfo = JSON.parse(await client.get(`permissions_${email}`));
     const userData = JSON.parse(stringuserData);
+    const userdetails = await client.get(`userdetails_${email}`);
+    const parsedUserDetails = JSON.parse(userdetails);
+    const username = parsedUserDetails.username;
+    const themeRaw = await client.get(`theme_${email}`);
+    const theme = themeRaw === "dark" ? "dark" : "light";
+
 
     return (
         <MainLayout>
-            <CreativesPage email={email} userData={userData} userPermissions={userPermissionsInfo} auth={getTheAuthInfo} username={username}/>
+            <CreativesPage email={email} userData={userData} userPermissions={userPermissionsInfo} auth={getTheAuthInfo} username={username} theme={theme} />
         </MainLayout>
     );
 }

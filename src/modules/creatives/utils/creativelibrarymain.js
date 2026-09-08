@@ -176,7 +176,7 @@ export default function CreativeLibrary({
                                     {/* Checkbox */}
                                     {!item.isFolder && (
                                         <Checkbox
-                                            className="creative-checkbox"
+                                            className="creative-checkbox green-checkbox"
                                             checked={isSelected}
                                             onChange={(e) => {
                                                 e.stopPropagation();

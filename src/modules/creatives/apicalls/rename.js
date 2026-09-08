@@ -7,78 +7,44 @@ export default function useRenameFile({
     selectedImagesRef,
     images,
     userdetails,
+    username,
     getUserFiles,
+    getFolderFiles,
+    currentFolder,
     message,
 }) {
+
     // ==========================================
-    // START RENAME
+    // ACTUAL RENAME API
     // ==========================================
-    const startRename = (image) => {
+    const renameItem = async (image, renameName) => {
         if (!image) {
             message.error("No file selected.");
-            return;
+            return false;
         }
 
-        console.log("========== RENAME START ==========");
-        console.log("Selected item:", image);
+        const newName = renameName?.trim();
 
-        setEditingUid(image.uid);
-
-        // Remove extension while editing
-        setInlineName(
-            image.name?.includes(".")
-                ? image.name.substring(
-                      0,
-                      image.name.lastIndexOf(".")
-                  )
-                : image.name || ""
-        );
-
-        // Clear selection
-        setSelectedImages([]);
-        selectedImagesRef.current = [];
-
-        // Close context menu
-        setContextMenu((prev) => ({
-            ...prev,
-            visible: false,
-        }));
-    };
-
-    // ==========================================
-    // INLINE RENAME
-    // ==========================================
-    const handleInlineRename = async (image) => {
-        if (!inlineName.trim()) {
+        if (!newName) {
             message.error("Name cannot be empty");
-            return;
-        }
-
-        if (!image) {
-            message.error("No file selected.");
-            return;
+            return false;
         }
 
         const oldKey = image.uid;
 
-        // Find folder path
         const lastSlashIndex = oldKey.lastIndexOf("/");
 
         const basePath =
             oldKey.substring(0, lastSlashIndex + 1);
 
-        // Get original extension
         const extension = image.isFolder
             ? ""
             : image.name?.includes(".")
-            ? image.name.substring(
-                  image.name.lastIndexOf(".")
-              )
-            : "";
+                ? image.name.substring(
+                    image.name.lastIndexOf(".")
+                )
+                : "";
 
-        const newName = inlineName.trim();
-
-        // Build new S3 key
         const newKey = image.isFolder
             ? `${basePath}${newName}/`
             : `${basePath}${newName}${extension}`;
@@ -86,15 +52,12 @@ export default function useRenameFile({
         console.log("========== RENAME ==========");
         console.log("Old key:", oldKey);
         console.log("New name:", newName);
-        console.log("Extension:", extension);
         console.log("New key:", newKey);
         console.log("Is folder:", image.isFolder);
 
         // Nothing changed
         if (newKey === oldKey) {
-            setEditingUid(null);
-            setInlineName("");
-            return;
+            return true;
         }
 
         try {
@@ -103,18 +66,16 @@ export default function useRenameFile({
             // ==========================================
             if (image.isFolder) {
                 const response = await fetch(
-                    "/api/creatives/folders/renamefolder",
+                    "/api/creatives/folderrename",
                     {
                         method: "POST",
                         headers: {
-                            "Content-Type":
-                                "application/json",
+                            "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
                             oldFolderKey: oldKey,
                             newFolderKey: newKey,
-                            username:
-                                userdetails?.userName,
+                            username: username,
                         }),
                     }
                 );
@@ -127,17 +88,11 @@ export default function useRenameFile({
 
                     throw new Error(
                         errorData?.message ||
-                            `Folder rename failed: ${response.status}`
+                        `Folder rename failed: ${response.status}`
                     );
                 }
 
-                const data =
-                    await response.json();
-
-                console.log(
-                    "Folder rename response:",
-                    data
-                );
+                await response.json();
             }
 
             // ==========================================
@@ -149,14 +104,12 @@ export default function useRenameFile({
                     {
                         method: "POST",
                         headers: {
-                            "Content-Type":
-                                "application/json",
+                            "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
                             key: oldKey,
                             newFilename: newKey,
-                            username:
-                                userdetails?.userName,
+                            username: username,
                         }),
                     }
                 );
@@ -169,35 +122,34 @@ export default function useRenameFile({
 
                     throw new Error(
                         errorData?.message ||
-                            `File rename failed: ${response.status}`
+                        `File rename failed: ${response.status}`
                     );
                 }
 
-                const data =
-                    await response.json();
-
-                console.log(
-                    "File rename response:",
-                    data
-                );
+                await response.json();
             }
 
-            // ==========================================
-            // SUCCESS
-            // ==========================================
             message.success(
                 image.isFolder
                     ? "Folder renamed successfully"
                     : "File renamed successfully"
             );
 
-            setEditingUid(null);
-            setInlineName("");
-
-            // Refresh existing user files
-            if (getUserFiles) {
-                await getUserFiles();
+            if (image.isFolder) {
+                if (currentFolder) {
+                    await getFolderFiles(currentFolder);
+                } else {
+                    await getUserFiles();
+                }
+            } else {
+                if (currentFolder) {
+                    await getFolderFiles(currentFolder);
+                } else {
+                    await getUserFiles();
+                }
             }
+
+            return true;
         } catch (error) {
             console.error(
                 "Rename failed:",
@@ -206,13 +158,60 @@ export default function useRenameFile({
 
             message.error(
                 error?.message ||
-                    "Failed to rename file."
+                "Failed to rename file."
             );
+
+            return false;
         }
+    };
+
+    // ==========================================
+    // START INLINE RENAME
+    // ==========================================
+    const startRename = (image) => {
+        if (!image) {
+            message.error("No file selected.");
+            return;
+        }
+
+        setEditingUid(image.uid);
+
+        setInlineName(
+            image.name?.includes(".")
+                ? image.name.substring(
+                    0,
+                    image.name.lastIndexOf(".")
+                )
+                : image.name || ""
+        );
+
+        setSelectedImages([]);
+        selectedImagesRef.current = [];
+
+        setContextMenu((prev) => ({
+            ...prev,
+            visible: false,
+        }));
+    };
+
+    // ==========================================
+    // INLINE RENAME
+    // ==========================================
+    const handleInlineRename = async (image) => {
+        const success = await renameItem(
+            image,
+            inlineName
+        );
+
+        if (!success) return;
+
+        setEditingUid(null);
+        setInlineName("");
     };
 
     return {
         startRename,
         handleInlineRename,
+        renameItem,
     };
 }

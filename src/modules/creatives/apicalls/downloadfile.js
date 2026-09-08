@@ -21,18 +21,22 @@ export default async function downloadFile(
         fileUrl.split("/").pop() ||
         "download";
 
+    // Fix S3 region
+    const correctedFileUrl = fileUrl?.replace(
+        "s3.us-east-1.amazonaws.com",
+        "s3.ap-south-1.amazonaws.com"
+    );
+
+   
+
     try {
         const proxyUrl =
-            `https://app.vyaktimetrics.com/creatives/proxy?url=${encodeURIComponent(
-                fileUrl
+            `/api/creatives/proxy?url=${encodeURIComponent(
+                correctedFileUrl
             )}`;
 
         const res = await fetch(proxyUrl, {
             method: "GET",
-            headers: {
-                Authorization:
-                    localStorage.getItem("token"),
-            },
         });
 
         if (res.ok) {
@@ -63,7 +67,7 @@ export default async function downloadFile(
     // Direct fallback
     try {
         const res2 =
-            await fetch(fileUrl);
+            await fetch(correctedFileUrl);
 
         if (!res2.ok) {
             throw new Error(

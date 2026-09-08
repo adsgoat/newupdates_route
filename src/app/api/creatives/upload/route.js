@@ -3,26 +3,35 @@
 // import UploadUserFiles from "@/services/creatives/uploadUserFiles";
 
 // export async function POST(request) {
-//     const client = await getRedisClient();
+//     try {
+//         const client = await getRedisClient();
+//         const email = await getSessionEmailByAuth();
+//         const token = await client.get(`auth_token_${email}`);
+//         const formData = await request.formData();
+//         const username = request.headers.get("username");
+//         const data = await UploadUserFiles(
+//             {
+//                 formData,
+//                 username,
+//             },
+//             token
+//         );
 
-//     const email = await getSessionEmailByAuth();
-//     const token = await client.get(`auth_token_${email}`);
+//         return Response.json(data);
+//     } catch (error) {
+//         console.error("CREATIVE UPLOAD ERROR:", error);
 
-//     const formData = await request.formData();
-//     const username = formData.get("username");
-
-//     formData.delete("username");
-
-//     const data = await UploadUserFiles(
-//         {
-//             formData,
-//             username,
-//         },
-//         token
-//     );
-
-//     return Response.json(data);
+//         return Response.json(
+//             {
+//                 error: error.message,
+//             },
+//             {
+//                 status: 500,
+//             }
+//         );
+//     }
 // }
+
 import getRedisClient from "@/lib/redis";
 import getSessionEmailByAuth from "@/lib/sessionemailbyauth";
 import UploadUserFiles from "@/services/creatives/uploadUserFiles";
@@ -40,58 +49,34 @@ export async function POST(request) {
         const formData = await request.formData();
 
         const username =
-            formData.get("username");
+            request.headers.get("username");
 
-        formData.delete("username");
+        const folder =
+            request.headers.get("x-folder");
 
-        console.log(
-            "========== UPLOAD API =========="
-        );
-
-        console.log("Email:", email);
-        console.log("Username:", username);
-        console.log("Token exists:", !!token);
-
-        for (const [key, value] of formData.entries()) {
-            console.log(
-                key,
-                value instanceof File
-                    ? {
-                        name: value.name,
-                        size: value.size,
-                        type: value.type,
-                    }
-                    : value
-            );
-        }
+        const action =
+            request.headers.get("x-action");
 
         const data = await UploadUserFiles(
             {
                 formData,
                 username,
+                folder,
+                action,
             },
             token
-        );
-
-        console.log(
-            "Upload service response:",
-            data
         );
 
         return Response.json(data);
     } catch (error) {
         console.error(
-            "========== UPLOAD API ERROR =========="
+            "CREATIVE UPLOAD ERROR:",
+            error
         );
-
-        console.error(error);
 
         return Response.json(
             {
-                success: false,
-                message:
-                    error?.message ||
-                    "Upload failed",
+                error: error.message,
             },
             {
                 status: 500,
