@@ -16,7 +16,9 @@ export default function Header({
     theme,
     isAuthenticated,
     email,
-    userdata
+    userdata,
+    mobileMenuOpen,
+    setMobileMenuOpen,
 }) {
     const darkMode = theme === "dark";
 
@@ -25,7 +27,7 @@ export default function Header({
             className="topbar"
             style={{
                 backgroundColor: darkMode
-                    ? "#333"
+                    ? "#3f3e3e"
                     : "#fff",
             }}
         >
@@ -39,6 +41,8 @@ export default function Header({
                     theme={theme}
                     email={email}
                     userdata={userdata}
+                    mobileMenuOpen={mobileMenuOpen}
+                    setMobileMenuOpen={setMobileMenuOpen}
                 />
             )}
         </div>

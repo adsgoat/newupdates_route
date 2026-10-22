@@ -862,7 +862,7 @@
     }
 
     /* TIMEZONE ROW */
-    .global-clock-timezones > div > div {
+    .global-clock-timezones>div>div {
         width: 100% !important;
         height: 48px !important;
         min-height: 48px !important;
@@ -878,7 +878,7 @@
     }
 
     /* FIRST COLUMN - FLAG / ICON */
-    .global-clock-timezones > div > div > div:first-child {
+    .global-clock-timezones>div>div>div:first-child {
         width: 24px !important;
         min-width: 24px !important;
         max-width: 24px !important;
@@ -891,7 +891,7 @@
     }
 
     /* MIDDLE - TIMEZONE DETAILS */
-    .global-clock-timezones > div > div > div:nth-child(2) {
+    .global-clock-timezones>div>div>div:nth-child(2) {
         flex: 1 !important;
         min-width: 0 !important;
         width: auto !important;
@@ -913,7 +913,7 @@
     }
 
     /* TIME / OFFSET TEXT */
-    .global-clock-timezones > div > div > div:nth-child(2) > div {
+    .global-clock-timezones>div>div>div:nth-child(2)>div {
         font-size: 9px !important;
         line-height: 11px !important;
 
@@ -923,7 +923,7 @@
     }
 
     /* RIGHT SIDE ACTIONS */
-    .global-clock-timezones > div > div > div:last-child {
+    .global-clock-timezones>div>div>div:last-child {
         width: 38px !important;
         min-width: 38px !important;
 
@@ -959,14 +959,14 @@
     }
 
     /* HOURS ROW */
-    .global-clock-hours > div {
+    .global-clock-hours>div {
         min-width: 888px !important;
         height: 48px !important;
         margin: 0 !important;
     }
 
     /* EACH HOUR */
-    .global-clock-hours > div > div {
+    .global-clock-hours>div>div {
         width: 37px !important;
         min-width: 37px !important;
         height: 48px !important;
@@ -977,12 +977,12 @@
         line-height: 11px !important;
     }
 
-    .global-clock-hours > div > div > div {
+    .global-clock-hours>div>div>div {
         font-size: 9px !important;
         line-height: 11px !important;
     }
 
-    .global-clock-hours > div > div > div:nth-child(2) {
+    .global-clock-hours>div>div>div:nth-child(2) {
         font-size: 8px !important;
     }
 }
@@ -995,28 +995,25 @@
 }
 
 /* Notification title */
-.ant-notification-notice.custom-dark-notification
-.ant-notification-notice-message {
+.ant-notification-notice.custom-dark-notification .ant-notification-notice-message {
     color: #fff !important;
 }
 
 /* Notification description */
-.ant-notification-notice.custom-dark-notification
-.ant-notification-notice-description {
+.ant-notification-notice.custom-dark-notification .ant-notification-notice-description {
     color: #ddd !important;
 }
 
 /* Close button */
-.ant-notification-notice.custom-dark-notification
-.ant-notification-notice-close {
+.ant-notification-notice.custom-dark-notification .ant-notification-notice-close {
     color: #fff !important;
 }
 
 /* Progress bar if Ant Design renders it */
-.ant-notification-notice.custom-dark-notification
-.ant-notification-notice-progress {
+.ant-notification-notice.custom-dark-notification .ant-notification-notice-progress {
     background-color: #91C25F !important;
 }
+
 .green-checkbox {
     --ant-color-primary: #91C25F !important;
     --ant-color-primary-hover: #62a839 !important;
@@ -1035,4 +1032,40 @@
 .green-checkbox .ant-checkbox-checked:hover .ant-checkbox-inner {
     background-color: #91C25F !important;
     border-color: #91C25F !important;
+}
+
+
+.mobile-only-logo {
+    display: none !important;
+}
+
+/* Show logo only on mobile */
+@media (max-width: 767px) {
+    .mobile-only-logo {
+        display: flex !important;
+        align-items: center;
+        font-size: 10px;
+    }
+}
+
+.mobile-menu-scroll {
+    -ms-overflow-style: none;
+}
+
+.mobile-menu-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.mobile-menu-scroll .ant-menu-item::after {
+    display: none !important;
+}
+
+.mobile-menu-scroll .ant-menu-item {
+    border-bottom: none !important;
+}
+
+@media (min-width: 769px) {
+    .mobile-menu-scroll {
+        display: none;
+    }
 }

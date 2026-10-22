@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import { ROUTES } from "../../config/routes";
-import { Layout, Menu, Button, theme, message, Spin, Skeleton } from 'antd';
+import { Layout, Menu, Button, theme, message, Spin, Skeleton, Drawer } from 'antd';
 const { Content, Sider } = Layout;
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
@@ -39,14 +39,16 @@ function getItem(label, key, icon, text) {
         key,
         icon,
         label,
-        text
+        text,
+
     };
 }
 
-export default function Sidebar({ role, userPermissions }) {
+export default function Sidebar({ role, userPermissions, theme, mobileMenuOpen,
+    setMobileMenuOpen }) {
     const router = useRouter();
     const [collapsed, setCollapsed] = useState(true);
-    const [darkMode, setDarkMode] = useState(false);
+
     const pathname = usePathname();
     const [usersDataForLogin, setusersDataForLogin] = [{ role: 'Admin', email: "praveen@adsoat.in" }]
     const toggleCollapsed = () => {
@@ -55,6 +57,22 @@ export default function Sidebar({ role, userPermissions }) {
     const handleMenuItemClick = (key) => {
         router.push(key);
     };
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 576);
+        };
+
+        checkMobile();
+
+        window.addEventListener("resize", checkMobile);
+
+        return () => {
+            window.removeEventListener("resize", checkMobile);
+        };
+    }, []);
+
     // const menuItems = [
     //     usersDataForLogin[0]?.role !== 'Network_Partner' && usersDataForLogin[0]?.email !== "careers@adsgoat.in" && getItem('Dashboard', '/Dashboard', <AppstoreOutlined className={pathname === '/Dashboard' && 'black-icon'} />, 'Dashboard'),
     //     usersDataForLogin[0]?.role !== 'Network_Partner' && usersDataForLogin[0]?.email !== "careers@adsgoat.in" && usersDataForLogin[0]?.role !== 'Revenue_Partner' && getItem('Reports', '/Reports', <BarChartOutlined className={pathname === '/Reports' && 'black-icon'} />, 'Reports'),
@@ -101,12 +119,11 @@ export default function Sidebar({ role, userPermissions }) {
             width={150}
             collapsedWidth={60}
             style={{
-                backgroundColor: darkMode ? '#3f3e3eff' : '#fff',
-                color: darkMode ? '#fff' : '#000',
-                borderRadius: '5px',
-                overflow: 'hidden',
-                height: '100vh',
-
+                backgroundColor: theme === "dark" ? "#3f3e3e" : "#fff",
+                color: theme === "dark" ? "#fff" : "#000",
+                borderRadius: "5px",
+                overflow: "hidden",
+                height: "100vh",
             }}
             className="sider"
         >
@@ -129,7 +146,7 @@ export default function Sidebar({ role, userPermissions }) {
                             height: '30px',
                             background: '#91C25F',
                             color: "rgb(56 102 121)",
-                            border: `solid 5px ${darkMode ? '#282628' : '#f1f1f1'}`,
+                            border: `solid 5px ${theme === "dark" ? '#282628' : '#f1f1f1'}`,
                             position: "fixed",
                             zIndex: "999"
                         }}
@@ -140,7 +157,7 @@ export default function Sidebar({ role, userPermissions }) {
             <>
                 {collapsed ? (
                     <Image
-                        src={darkMode ? "/Collapselogo.png" : "/light.png"}
+                        src={theme === "dark" ? "/Collapselogo.png" : "/light.png"}
                         width={60}
                         height={55}
                         priority={true}
@@ -152,7 +169,7 @@ export default function Sidebar({ role, userPermissions }) {
                     />
                 ) : (
                     <Image
-                        src={darkMode ? "/Expandlogo.png" : "/logolight.png"}
+                        src={theme === "dark" ? "/Expandlogo.png" : "/logolight.png"}
                         width={100}
                         height={50}
                         priority={true}
@@ -168,11 +185,10 @@ export default function Sidebar({ role, userPermissions }) {
                     mode="inline"
                     selectedKeys={[pathname]}
                     style={{
-                        backgroundColor: darkMode ? ' #3f3e3eff' : '#fff',
-                        color: darkMode ? '#007BFF' : '#000',
-                        fontSize: '16px',
-                        borderRight: 'none',
-                        marginTop: '10px',
+                        backgroundColor: theme === "dark" ? "#3f3e3e" : "#fff",
+                        borderRight: "none",
+                        marginTop: "10px",
+                        fontSize: "16px",
                     }}
                     onClick={(e) => handleMenuItemClick(e.key)}
                     items={menuItems.map(item => ({
@@ -183,7 +199,7 @@ export default function Sidebar({ role, userPermissions }) {
                         style: {
                             borderRadius: '8px',
                             margin: '5px 3px',
-                            color: darkMode
+                            color: theme === "dark"
                                 ? item.label === pathname.split("/")[1]
                                     ? "#000"
                                     : '#ffffff'
@@ -200,7 +216,142 @@ export default function Sidebar({ role, userPermissions }) {
                     }))}
                 />
             </>
+            {isMobile && (
+                <Drawer
+                    open={mobileMenuOpen}
+                    onClose={() => setMobileMenuOpen(false)}
+                    placement="top"
+                    height={48}
+                    closable={false}
+                    mask={false}
+                    destroyOnClose={false}
+                    motion={{
+                        motionAppear: false,
+                        motionEnter: false,
+                        motionLeave: false,
+                    }}
+                    styles={{
+                        wrapper: {
+                            top: "60px",
+                            marginLeft:"6px",
+                            // marginRight:"2px"
+                        },
 
+                        content: {
+                            backgroundColor:
+                                theme === "dark" ? "#3f3e3e" : "#ffffff",
+
+                            boxShadow:
+                                "0 4px 12px rgba(0,0,0,0.12)",
+
+                            borderBottom:
+                                theme === "dark"
+                                    ? "1px solid #555"
+                                    : "1px solid #e5e5e5",
+                        },
+
+                        body: {
+                            padding: "0 8px",
+                            overflow: "hidden",
+
+                            backgroundColor:
+                                theme === "dark" ? "#3f3e3e" : "#ffffff",
+                        },
+
+                        header: {
+                            display: "none",
+
+                            backgroundColor:
+                                theme === "dark" ? "#3f3e3e" : "#ffffff",
+                        },
+                    }}
+                >
+                    <div
+                        className="mobile-menu-scroll"
+                        style={{
+                            width: "100%",
+                            overflowX: "auto",
+                            overflowY: "hidden",
+                            scrollbarWidth: "none",
+                        }}
+                    >
+                        <Menu
+                            mode="horizontal"
+                            selectedKeys={[pathname]}
+                            selectable={false}
+                            onClick={(e) => handleMenuItemClick(e.key)}
+                            style={{
+                                background: "transparent",
+                                borderBottom: "none",
+                                display: "flex",
+                                alignItems: "center",
+                                width: "100%",
+                                height: "52px",
+                                padding: "0 4px",
+                            }}
+                            items={menuItems.map((item) => {
+                                const isSelected = pathname === item.key;
+
+                                return {
+                                    key: item.key,
+
+                                    label: null,
+
+                                    icon: (
+                                        <div
+                                            style={{
+                                                width: "36px",
+                                                height: "36px",
+                                                borderRadius: "7px",
+
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+
+                                                backgroundColor: isSelected
+                                                    ? "#91C25F"
+                                                    : "transparent",
+                                            }}
+                                        >
+                                            <span
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+
+                                                    fontSize: "17px",
+                                                    lineHeight: 1,
+
+                                                    color: isSelected
+                                                        ? "#000"
+                                                        : theme === "dark"
+                                                            ? "#fff"
+                                                            : "#333",
+                                                }}
+                                            >
+                                                {item.icon}
+                                            </span>
+                                        </div>
+                                    ),
+
+                                    style: {
+                                        flex: "1 1 0",
+                                        minWidth: 0,
+
+                                        height: "52px",
+                                        padding: 0,
+                                        margin: 0,
+
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    },
+                                };
+                            })}
+                        />
+                    </div>
+                </Drawer>
+            )}
         </Sider>
     )
 }
