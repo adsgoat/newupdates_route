@@ -329,6 +329,9 @@ export default function CampaignsModule({ email, userData, userPermissions, auth
                 network={revenuePartner}
                 draftsData={[]}
                 theme="light"
+                userData={userData}
+                auth={auth}
+                username={userdetails.username}
             />
             <Row style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Col flex="auto">

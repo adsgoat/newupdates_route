@@ -176,7 +176,10 @@ const CreateCampaignDrawer = ({
     changeRRefrst,
     accountis = [],
     network,
-    theme
+    theme,
+    userData,
+    auth,
+    username
 }) => {
     const [budgetType, setBudgetType] = useState("daily");
     const [campaignSchedulingEnabled, setCampaignSchedulingEnabled] =
@@ -685,6 +688,9 @@ const CreateCampaignDrawer = ({
                                                                             "isDynamicCreative"
                                                                         ]) ?? false
                                                                     }
+                                                                    username={username}
+                                                                    auth={auth}
+                                                                    userData={userData}
                                                                 />
                                                             )}
                                                         </Form.Item>

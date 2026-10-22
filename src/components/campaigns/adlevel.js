@@ -11,7 +11,7 @@ import {
     UserOutlined,
 } from "@ant-design/icons";
 import { getAccountKey } from "./accountadsettings";
-import ImageUploadPage from "../../Creatives/page";
+import CreativesPage from "@/modules/creatives/page";
 
 const { Text, Title } = Typography;
 const { TextArea } = Input;
@@ -308,6 +308,10 @@ const AdLevel = ({
     availableCreatives = [],
     network = "",
     Account_Number,
+    userData,
+    auth,
+    theme,
+    username
 }) => {
     const processedUids = useRef(new Set());
     const replacementUids = useRef(new Set());
@@ -1678,7 +1682,7 @@ const AdLevel = ({
                 destroyOnClose={false}
                 styles={{ body: { padding: 12 } }}
             >
-                <ImageUploadPage
+                {/* <ImageUploadPage
                     selectedFilesData={handleCreativesSelected}
                     fromCampaigns
                     network={network}
@@ -1688,7 +1692,8 @@ const AdLevel = ({
                         selectedAccounts[0]?.Account_Number ??
                         selectedAccounts[0]?.accountNumber
                     }
-                />
+                /> */}
+                <CreativesPage userData={userData} username={username} theme={theme} auth={auth}  />
             </Drawer>
 
             <style jsx>

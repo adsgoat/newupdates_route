@@ -472,7 +472,10 @@ const AdSetLevel = ({
     adSchedulingToShowCampaign = false,
     setScheduleErrorByAdset: externalSetScheduleErrorByAdset,
     scheduleErrorByAdset: externalScheduleErrorByAdset,
-    setShowScheduleSubmitError: externalSetShowScheduleSubmitError
+    setShowScheduleSubmitError: externalSetShowScheduleSubmitError,
+    userData,
+    auth,
+    username
 }) => {
     const isCreate = mode === "create";
 
@@ -2359,6 +2362,10 @@ const AdSetLevel = ({
                                                         ...generatedAds,
                                                     ]);
                                                 }}
+                                                userData={userData}
+                                                auth={auth}
+                                                theme={theme}
+                                                username={username}
                                             />
                                         </div>
                                     );
