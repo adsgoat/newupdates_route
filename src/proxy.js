@@ -292,6 +292,8 @@ export const config = {
         "/live/:path",
         "/newuser/:path*",
         "/api/newuser/:path*",
-        "/api/reportshistory/:path"
+        "/api/reportshistory/:path",
+        "/campaigns/:path*",
+        "/api/campaigns/:path*",
     ],
 };

@@ -1,0 +1,1373 @@
+.campaign-dropdown .ant-select-item {
+    font-size: 12px !important;
+}
+
+.custom-modal .ant-form-item-label {
+    padding: 0px 0px 2px 0px !important;
+}
+
+.custom-modal .ant-collapse-body {
+    padding: 4px 8px 0px 8px !important;
+}
+
+.campaign-collapse {
+    border: none !important;
+    background: transparent !important;
+}
+
+.campaign-collapse .ant-collapse-item {
+    border: none !important;
+    margin-bottom: 10px;
+}
+
+.campaign-collapse .ant-collapse-header {
+    padding: 8px 12px !important;
+    min-height: 30px;
+    background: rgba(237, 241, 238, 0.93) !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 10px !important;
+}
+
+.campaign-collapse .ant-collapse-content {
+    margin-top: 10px !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 10px !important;
+    border-block-start: 1px solid #e5e7eb !important;
+}
+
+.campaign-collapse .ant-collapse-content-box {
+    padding: 10px 12px !important;
+}
+
+.campaign-collapse .ant-collapse-panel {
+    border: none !important;
+}
+
+.campaign-collapse .ant-collapse-panel-active {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+@media (min-width: 400px) and (max-width: 576px) {
+    .dashboard-row .project-col {
+        flex: 0 0 40% !important;
+        max-width: 40% !important;
+    }
+
+    .dashboard-row .account-col {
+        flex: 0 0 58% !important;
+        max-width: 58% !important;
+    }
+
+    /* .dashboard-row .date-col {
+        flex: 0 0 25% !important;
+        max-width: 25% !important;
+    } */
+}
+
+.campaign-dropdown .ant-dropdown-menu-item,
+.campaign-dropdown .ant-dropdown-menu-title-content {
+    font-size: 12px;
+}
+
+.compact-pagination .ant-pagination-options .ant-select-dropdown {
+    padding: 2px !important;
+}
+
+.compact-pagination .ant-pagination-options .ant-select-item {
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+    line-height: 20px !important;
+}
+
+.compact-pagination .ant-pagination-options .ant-select-item-option-content {
+    font-size: 12px !important;
+}
+
+.ant-select-dropdown {
+    padding: 2px !important;
+}
+
+.ant-select-dropdown .ant-select-item {
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+    line-height: 20px !important;
+}
+
+@media (max-width: 500px) {
+    .campaign-card-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 6px !important;
+    }
+
+    .campaign-card-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .campaign-card-title {
+        font-size: 6;
+    }
+}
+
+.custom-input-dark-campaign::placeholder {
+    color: #bfbfbf !important;
+    opacity: 1;
+}
+
+.custom-input-light-campaign::placeholder {
+    color: #8c8c8c !important;
+    opacity: 1;
+}
+
+/* Dropdown styling */
+.campaigns-status-dropdown-dark .ant-dropdown-menu {
+    background-color: #2b2b2b !important;
+}
+
+.campaigns-status-dropdown-dark .ant-dropdown-menu-item {
+    color: #ffffff !important;
+}
+
+.campaigns-status-dropdown-dark .ant-dropdown-menu-item:hover {
+    background-color: #3a3a3a !important;
+}
+
+.campaigns-status-dropdown-dark .ant-dropdown-menu-item-selected {
+    background-color: #1f4b70 !important;
+    color: #ffffff !important;
+}
+
+.campaigns-status-dropdown-light .ant-dropdown-menu {
+    background-color: #ffffff !important;
+}
+
+.campaigns-status-dropdown-light .ant-dropdown-menu-item {
+    color: #333333 !important;
+}
+
+.campaigns-status-dropdown-light .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5 !important;
+}
+
+.campaigns-status-dropdown-light .ant-dropdown-menu-item-selected {
+    background-color: #e6f4ff !important;
+    color: #1677ff !important;
+}
+
+/* Dropdown styling */
+
+/* Pagination */
+/* =========================================================
+   CAMPAIGNS PAGINATION — COMMON
+   ========================================================= */
+
+.campaigns-pagination {
+    font-size: 12px !important;
+}
+
+
+/* =========================================================
+   DARK THEME
+   ========================================================= */
+
+.campaigns-pagination-dark .ant-pagination-item,
+.campaigns-pagination-dark .ant-pagination-prev,
+.campaigns-pagination-dark .ant-pagination-next,
+.campaigns-pagination-dark .ant-pagination-jump-prev,
+.campaigns-pagination-dark .ant-pagination-jump-next {
+    background-color: #2b2b2b !important;
+    border-color: #444444 !important;
+}
+
+.campaigns-pagination-dark .ant-pagination-item a {
+    color: #ffffff !important;
+}
+
+.campaigns-pagination-dark .ant-pagination-item-active {
+    background-color: #91c25f !important;
+    border-color: #91c25f !important;
+}
+
+.campaigns-pagination-dark .ant-pagination-item-active a {
+    color: #ffffff !important;
+}
+
+.campaigns-pagination-dark .ant-pagination-prev button,
+.campaigns-pagination-dark .ant-pagination-next button {
+    color: #ffffff !important;
+}
+
+.campaigns-pagination-dark .ant-pagination-disabled button {
+    color: #666666 !important;
+}
+
+/* Closed page-size selector */
+.campaigns-pagination-dark .ant-pagination-options .ant-select,
+.campaigns-pagination-dark .ant-pagination-options .ant-select-selector {
+    background-color: #2b2b2b !important;
+    border-color: #555555 !important;
+    color: #ffffff !important;
+}
+
+.campaigns-pagination-dark .ant-pagination-options .ant-select-selection-item {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+.campaigns-pagination-dark .ant-pagination-options .ant-select-arrow {
+    color: #bfbfbf !important;
+}
+
+/* Quick jumper — hidden because showQuickJumper={false} */
+.campaigns-pagination-dark .ant-pagination-options-quick-jumper {
+    display: none !important;
+}
+
+/* Opened page-size popup */
+.campaigns-pagination-size-dropdown-dark,
+.campaigns-pagination-size-dropdown-dark .ant-select-dropdown {
+    background-color: #2b2b2b !important;
+}
+
+.campaigns-pagination-size-dropdown-dark .ant-select-item {
+    color: #ffffff !important;
+}
+
+.campaigns-pagination-size-dropdown-dark .ant-select-item-option-active {
+    background-color: #3a3a3a !important;
+}
+
+.campaigns-pagination-size-dropdown-dark .ant-select-item-option-selected {
+    background-color: #1f4b70 !important;
+    color: #ffffff !important;
+}
+
+
+/* =========================================================
+   LIGHT THEME
+   ========================================================= */
+
+.campaigns-pagination-light .ant-pagination-item,
+.campaigns-pagination-light .ant-pagination-prev,
+.campaigns-pagination-light .ant-pagination-next,
+.campaigns-pagination-light .ant-pagination-jump-prev,
+.campaigns-pagination-light .ant-pagination-jump-next {
+    background-color: #ffffff !important;
+    border-color: #d9d9d9 !important;
+}
+
+.campaigns-pagination-light .ant-pagination-item a {
+    color: #000000 !important;
+}
+
+.campaigns-pagination-light .ant-pagination-item-active {
+    background-color: #91c25f !important;
+    border-color: #91c25f !important;
+}
+
+.campaigns-pagination-light .ant-pagination-item-active a {
+    color: #ffffff !important;
+}
+
+.campaigns-pagination-light .ant-pagination-prev button,
+.campaigns-pagination-light .ant-pagination-next button {
+    color: #000000 !important;
+}
+
+.campaigns-pagination-light .ant-pagination-disabled button {
+    color: #bfbfbf !important;
+}
+
+/* Closed page-size selector */
+.campaigns-pagination-light .ant-pagination-options .ant-select,
+.campaigns-pagination-light .ant-pagination-options .ant-select-selector {
+    background-color: #ffffff !important;
+    border-color: #d9d9d9 !important;
+    color: #000000 !important;
+}
+
+.campaigns-pagination-light .ant-pagination-options .ant-select-selection-item {
+    color: #000000 !important;
+    opacity: 1 !important;
+}
+
+.campaigns-pagination-light .ant-pagination-options .ant-select-arrow {
+    color: #666666 !important;
+}
+
+/* Quick jumper — hidden because showQuickJumper={false} */
+.campaigns-pagination-light .ant-pagination-options-quick-jumper {
+    display: none !important;
+}
+
+/* Opened page-size popup */
+.campaigns-pagination-size-dropdown-light,
+.campaigns-pagination-size-dropdown-light .ant-select-dropdown {
+    background-color: #ffffff !important;
+}
+
+.campaigns-pagination-size-dropdown-light .ant-select-item {
+    color: #333333 !important;
+}
+
+.campaigns-pagination-size-dropdown-light .ant-select-item-option-active {
+    background-color: #f5f5f5 !important;
+}
+
+.campaigns-pagination-size-dropdown-light .ant-select-item-option-selected {
+    background-color: #e6f4ff !important;
+    color: black !important;
+}
+
+/* Pagination */
+
+@keyframes blinking {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.blinking-campaigns {
+    animation: blinking 1.5s infinite;
+    /* color: white;
+  background-color:rgb(148, 53, 53); */
+}
+
+@media (max-width: 699px) {
+    .adsets-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .ads-grid>div {
+        flex: 0 0 100% !important;
+    }
+}
+
+/* Modal Dark theme start */
+
+.dark-theme-modal .ant-modal-header {
+    background-color: #333 !important;
+    /* border-bottom: 1px solid #333 !important; */
+}
+
+/* ant modal title color */
+.dark-theme-modal .ant-modal-title {
+    color: white !important;
+}
+
+/* Modal content background */
+.dark-theme-modal .ant-modal-content {
+    background-color: #333 !important;
+    color: white !important;
+}
+
+/* TextArea inside modal */
+.dark-theme-modal .ant-modal-content textarea {
+    background-color: #2a2a2a !important;
+    color: white !important;
+    border: 1px solid #444 !important;
+}
+
+/* Placeholder inside textarea */
+.dark-theme-modal .ant-modal-content textarea::placeholder {
+    color: #ccc !important;
+    opacity: 1;
+}
+
+/* Dark theme modal header background and title text */
+.dark-theme-modal .ant-modal-header {
+    background-color: #333 !important;
+    /* border-bottom: 1px solid #333 !important; */
+}
+
+/* ant modal title color */
+.dark-theme-modal .ant-modal-title {
+    color: white !important;
+}
+
+/* Modal content background */
+.dark-theme-modal .ant-modal-content {
+    background-color: #333 !important;
+    color: white !important;
+}
+
+/* TextArea inside modal */
+.dark-theme-modal .ant-modal-content textarea {
+    background-color: #2a2a2a !important;
+    color: white !important;
+    border: 1px solid #444 !important;
+}
+
+/* Placeholder inside textarea */
+.dark-theme-modal .ant-modal-content textarea::placeholder {
+    color: #ccc !important;
+    opacity: 1;
+}
+
+/* Modal Dark theme end */
+
+/* Input text area */
+
+.rejection-textarea-dark::placeholder {
+    color: #aaa !important;
+    opacity: 1;
+}
+
+.rejection-textarea-light::placeholder {
+    color: #888 !important;
+    opacity: 1;
+}
+
+/* InputNumber dark theme styling */
+.dark-input-number,
+.dark-input-number .ant-input-number-input,
+.dark-input-number .ant-input-number-handler-wrap,
+.dark-input-number .ant-input-number-handler,
+.dark-input-number .ant-input-number-handler-up,
+.dark-input-number .ant-input-number-handler-down {
+    background: #333 !important;
+    color: #fff !important;
+}
+
+.dark-input-number .ant-input-number-handler {
+    border-color: #444 !important;
+}
+
+.dark-input-number .ant-input-number-handler:hover {
+    background: #333 !important;
+    color: #91C25F !important;
+}
+
+/* Input dark theme styling */
+.dark-input::placeholder {
+    color: #aaa !important;
+    opacity: 1 !important;
+}
+
+.dark-badge .ant-badge-status-dot {
+    background: #fff !important;
+}
+
+/* Campaign card dropdown theme */
+.campaigns-dropdown-dark .ant-dropdown-menu {
+    background: #333 !important;
+}
+
+.campaigns-dropdown-dark .ant-dropdown-menu-item {
+    color: #fff !important;
+}
+
+.campaigns-dropdown-dark .ant-dropdown-menu-item:hover {
+    background: #444 !important;
+}
+
+.campaigns-dropdown-dark .ant-dropdown-menu-item-divider {
+    background: #555 !important;
+}
+
+.campaigns-dropdown-dark .ant-dropdown-menu-item-danger {
+    color: #ff4d4f !important;
+}
+
+.campaigns-dropdown-dark .ant-dropdown-menu-item-disabled {
+    color: #777 !important;
+}
+
+/* Popover styling */
+.campaigns-flow {
+    display: grid;
+    grid-template-columns: 330px minmax(0, 1fr);
+    width: max-content;
+    max-width: 95vw;
+    max-height: 420px;
+    overflow: auto;
+    padding: 12px;
+}
+
+.campaigns-flow-campaign {
+    width: 330px;
+    padding-right: 15px;
+}
+
+.campaigns-flow-steps {
+    width: 100%;
+}
+
+.campaigns-flow-steps .ant-steps-item {
+    min-width: 135px !important;
+}
+
+.campaigns-flow-steps .ant-steps-item-content {
+    text-align: center;
+}
+
+.campaigns-flow-steps .ant-steps-item-icon {
+    width: 13px !important;
+    height: 13px !important;
+    margin-inline: auto !important;
+    font-size: 8px !important;
+    line-height: 13px !important;
+}
+
+.campaigns-flow-steps .ant-steps-icon {
+    font-size: 8px !important;
+}
+
+.campaigns-flow-steps .ant-steps-item-title {
+    font-size: 11px !important;
+}
+
+.campaigns-flow-steps .ant-steps-item-description {
+    font-size: 9px !important;
+    line-height: 13px !important;
+    max-width: 120px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Adset / child flow */
+.campaigns-flow-branch {
+    min-width: 0;
+    padding: 5px 0;
+}
+
+.campaigns-flow-row {
+    display: flex;
+    align-items: center;
+    min-height: 65px;
+    position: relative;
+}
+
+.campaigns-flow-connector {
+    width: 25px;
+    flex-shrink: 0;
+}
+
+.campaigns-flow-row .ant-steps {
+    min-width: 0;
+    flex: 1;
+}
+
+.campaigns-flow-row .ant-steps-item {
+    min-width: 100px !important;
+    max-width: 130px !important;
+}
+
+.campaigns-flow-row .ant-steps-item-content {
+    text-align: center;
+}
+
+.campaigns-flow-row .ant-steps-item-icon {
+    width: 18px !important;
+    height: 18px !important;
+    margin-inline: auto !important;
+    font-size: 10px !important;
+    line-height: 18px !important;
+}
+
+.campaigns-flow-row .ant-steps-icon {
+    font-size: 9px !important;
+}
+
+.campaigns-flow-row .ant-steps-item-title {
+    font-size: 8px !important;
+    white-space: nowrap;
+}
+
+.campaigns-flow-row .ant-steps-item-description {
+    font-size: 8px !important;
+    line-height: 12px !important;
+    max-width: 100px !important;
+    margin: 0 auto;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.campaigns-flow-id {
+    color: #888;
+    font-size: 9px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Popover styling */
+
+/* Campaign History */
+
+.campaigns-history {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+}
+
+.campaigns-history-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+    margin-top: 4px;
+    /* padding: 10px; */
+}
+
+.campaigns-history-filter {
+    width: 200px;
+    min-width: 160px;
+}
+
+.campaigns-history-table {
+    width: 100%;
+    min-width: 0;
+}
+
+.campaigns-history-table .ant-table-wrapper {
+    width: 100%;
+}
+
+.campaigns-history-table .ant-table {
+    width: 100%;
+}
+
+.campaigns-history-table .ant-table-body {
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+}
+
+/* .campaigns-history-table .ant-table-pagination {
+    margin: 12px 0 0 !important;
+    display: flex;
+    justify-content: flex-end;
+} */
+
+.campaigns-history-details {
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.campaigns-history-loading {
+    width: 100%;
+    padding: 10px;
+}
+
+.campaigns-icon-dark {
+    color: #fff;
+}
+
+.campaigns-icon-light {
+    color: #000;
+}
+
+@media (max-width: 768px) {
+    /* .campaigns-history-header {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 8px;
+    } */
+
+    /* .campaigns-history-filter {
+        width: 100%;
+    } */
+
+    .campaigns-history-table {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .campaigns-history-table .ant-table-body {
+        overflow-x: auto !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .campaigns-history-header {
+        align-items: stretch;
+        /* flex-direction: column; */
+        gap: 10px;
+        /* margin-bottom: 10px; */
+    }
+
+    /* .campaigns-history-filter {
+        min-width: 0;
+    } */
+
+    .campaigns-history-loading {
+        padding: 4px;
+    }
+}
+
+.campaigns-history-pagination {
+    font-size: 10px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 0 10px;
+}
+
+.campaigns-history-pagination.ant-pagination {
+    margin: 4px 0px 0px 0px !important;
+    padding: 0 10px !important;
+}
+
+.campaigns-history-pagination .ant-pagination-item,
+.campaigns-history-pagination .ant-pagination-prev,
+.campaigns-history-pagination .ant-pagination-next {
+    width: 24px !important;
+    min-width: 24px !important;
+    height: 24px !important;
+    line-height: 24px !important;
+    margin-inline: 2px !important;
+}
+
+.campaigns-history-pagination .ant-pagination-item a {
+    font-size: 11px !important;
+    line-height: 24px !important;
+}
+
+.campaigns-history-pagination .ant-pagination-prev .anticon,
+.campaigns-history-pagination .ant-pagination-next .anticon {
+    font-size: 10px !important;
+}
+
+.campaigns-history-table .ant-table-tbody>tr>td {
+    padding: 6px 12px !important;
+    line-height: 1.2 !important;
+}
+
+.campaigns-history-table .ant-table-thead>tr>th {
+    padding: 7px 12px !important;
+    line-height: 1.2 !important;
+}
+
+.campaigns-history-modal .ant-modal-container {
+    padding: 15px !important;
+}
+
+.campaigns-history-table .ant-table-thead>tr>th {
+    font-size: 12px !important;
+}
+
+
+/* Select */
+.campaigns-history-select.ant-select {
+    width: 180px !important;
+    min-width: 140px !important;
+    font-size: 12px;
+}
+
+.campaigns-history-select.ant-select .ant-select-selector {
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 0 8px !important;
+    border-radius: 6px !important;
+}
+
+.campaigns-history-select.ant-select .ant-select-selection-item {
+    font-size: 11px !important;
+    line-height: 28px !important;
+}
+
+.campaigns-history-select.ant-select .ant-select-arrow {
+    font-size: 10px !important;
+    right: 8px !important;
+}
+
+@media (max-width: 600px) {
+    .campaigns-history-modal-title {
+        font-size: 13;
+    }
+
+    .campaigns-history-select.ant-select {
+        width: calc(50% - 4px) !important;
+        min-width: 0 !important;
+        flex: 1 1 0 !important;
+    }
+
+    .campaigns-history-select.ant-select .ant-select-selector {
+        height: 28px !important;
+        min-height: 28px !important;
+        padding: 0 6px !important;
+    }
+
+    .campaigns-history-select.ant-select .ant-select-selection-item {
+        font-size: 10px !important;
+        line-height: 26px !important;
+    }
+}
+
+/* Dark theme */
+.campaigns-history-dark {
+    color: #fff;
+}
+
+.campaigns-history-dark .ant-table,
+.campaigns-history-dark .ant-table-container,
+.campaigns-history-dark .ant-table-thead>tr>th,
+.campaigns-history-dark .ant-table-tbody>tr>td {
+    background: #141414 !important;
+    color: #fff !important;
+    border-color: #303030 !important;
+}
+
+.campaigns-history-dark .ant-table-thead>tr>th {
+    background: #1f1f1f !important;
+}
+
+.campaigns-history-dark .ant-table-tbody>tr:hover>td {
+    background: #262626 !important;
+}
+
+.campaigns-history-dark .ant-select-selector {
+    background: #141414 !important;
+    color: #fff !important;
+    border-color: #434343 !important;
+}
+
+.campaigns-history-dark .ant-select-selection-item,
+.campaigns-history-dark .ant-select-arrow {
+    color: #fff !important;
+}
+
+.campaigns-history-dark .ant-pagination-item {
+    background: #141414 !important;
+    border-color: #434343 !important;
+}
+
+.campaigns-history-dark .ant-pagination-item a,
+.campaigns-history-dark .ant-pagination-prev,
+.campaigns-history-dark .ant-pagination-next {
+    color: #fff !important;
+}
+
+/* .campaigns-history-dark .ant-pagination-item-active {
+    border-color: #1677ff !important;
+} */
+
+/* .campaigns-history-dark .ant-pagination-item-active a {
+    color: #1677ff !important;
+} */
+
+/* Dark Select */
+.campaigns-history-dark .campaigns-history-select .ant-select-selector {
+    background: #141414 !important;
+    border-color: #434343 !important;
+    color: #fff !important;
+}
+
+.campaigns-history-dark .campaigns-history-select .ant-select-selection-item {
+    color: #fff !important;
+}
+
+.campaigns-history-dark .campaigns-history-select .ant-select-arrow {
+    color: #aaa !important;
+}
+
+/* Select dropdown */
+.campaigns-history-select-dropdown-dark {
+    background: #1f1f1f !important;
+}
+
+.campaigns-history-select-dropdown-dark .ant-select-item {
+    color: #fff !important;
+    background: #1f1f1f !important;
+}
+
+.campaigns-history-select-dropdown-dark .ant-select-item-option-active {
+    background: #303030 !important;
+}
+
+.campaigns-history-select-dropdown-dark .ant-select-item-option-selected {
+    background: #91c25f !important;
+    color: #fff !important;
+}
+
+.campaigns-history-dark .campaigns-history-select.ant-select {
+    background: #141414 !important;
+    color: white;
+}
+
+.campaigns-history-dark .campaigns-history-select.ant-select .ant-select-selector {
+    background: #141414 !important;
+    border: 1px solid #434343 !important;
+    color: white;
+}
+
+
+/* Campaign History */
+
+/* Popover */
+.campaigns-history-steps-wrapper {
+    width: 320px;
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+/* =========================
+   COMMON
+   ========================= */
+
+.campaigns-history-steps .ant-steps-item-icon,
+.campaigns-history-ad-steps .ant-steps-item-icon {
+    border-width: 1px !important;
+}
+
+.campaigns-history-step-title {
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+}
+
+.campaigns-history-ad-title {
+    max-width: 200px;
+}
+
+.campaigns-history-step-id {
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: #888;
+}
+
+.campaigns-history-error {
+    color: #ff4d4f;
+    font-size: 12px;
+}
+
+/* =========================
+   LIGHT THEME
+   ========================= */
+
+/* Campaign created */
+.campaigns-history-steps-light .campaigns-history-steps>.ant-steps-item:first-child .ant-steps-item-icon {
+    background: #1677ff !important;
+    border-color: #1677ff !important;
+}
+
+.campaigns-history-steps-light .campaigns-history-steps>.ant-steps-item:first-child .ant-steps-icon,
+.campaigns-history-steps-light .campaigns-history-steps>.ant-steps-item:first-child .ant-steps-icon svg {
+    color: #fff !important;
+    fill: #fff !important;
+}
+
+/* Campaign launched + adsets + successful ads */
+.campaigns-history-steps-light .campaigns-history-steps>.ant-steps-item:not(:first-child):not(.ant-steps-item-error) .ant-steps-item-icon,
+.campaigns-history-steps-light .campaigns-history-ad-steps .ant-steps-item:not(.ant-steps-item-error) .ant-steps-item-icon,
+.campaigns-history-steps-light .campaigns-history-ad-steps .ant-steps-item-finish .ant-steps-item-icon {
+    background: #e6f4ff !important;
+    border-color: #e6f4ff !important;
+}
+
+.campaigns-history-steps-light .campaigns-history-steps>.ant-steps-item:not(:first-child):not(.ant-steps-item-error) .ant-steps-icon,
+.campaigns-history-steps-light .campaigns-history-ad-steps .ant-steps-item:not(.ant-steps-item-error) .ant-steps-icon,
+.campaigns-history-steps-light .campaigns-history-ad-steps .ant-steps-item-finish .ant-steps-icon {
+    color: #1677ff !important;
+}
+
+/* Successful ad SVG */
+.campaigns-history-steps-light .campaigns-history-ad-steps .ant-steps-item-finish .ant-steps-item-icon .ant-steps-icon svg,
+.campaigns-history-steps-light .campaigns-history-ad-steps .ant-steps-item-finish .ant-steps-item-icon .ant-steps-icon svg * {
+    color: #1677ff !important;
+    fill: #1677ff !important;
+    stroke: #1677ff !important;
+}
+
+/* Error */
+.campaigns-history-steps-light .ant-steps-item-error .ant-steps-item-icon,
+.campaigns-history-steps-light .campaigns-history-ad-steps .ant-steps-item-error .ant-steps-item-icon {
+    background: #fff1f0 !important;
+    border-color: #ff4d4f !important;
+}
+
+.campaigns-history-steps-light .ant-steps-item-error .ant-steps-icon,
+.campaigns-history-steps-light .ant-steps-item-error .ant-steps-icon svg {
+    color: #ff4d4f !important;
+}
+
+.campaigns-history-steps-light .ant-steps-item-error .ant-steps-icon svg *,
+.campaigns-history-steps-light .campaigns-history-ad-steps .ant-steps-item-error .ant-steps-icon svg * {
+    color: #ff4d4f !important;
+    fill: #ff4d4f !important;
+    stroke: #ff4d4f !important;
+}
+
+/* Light text */
+.campaigns-history-steps-light .ant-steps-item-title,
+.campaigns-history-steps-light .ant-steps-item-description {
+    color: #222 !important;
+}
+
+/* =========================
+   DARK THEME
+   ========================= */
+
+/* Campaign created */
+.campaigns-history-steps-dark .campaigns-history-steps>.ant-steps-item:first-child .ant-steps-item-icon {
+    background: #1677ff !important;
+    border-color: #1677ff !important;
+}
+
+.campaigns-history-steps-dark .campaigns-history-steps>.ant-steps-item:first-child .ant-steps-icon,
+.campaigns-history-steps-dark .campaigns-history-steps>.ant-steps-item:first-child .ant-steps-icon svg,
+.campaigns-history-steps-dark .campaigns-history-steps>.ant-steps-item:first-child .ant-steps-icon svg * {
+    color: #fff !important;
+    fill: #fff !important;
+    stroke: #fff !important;
+}
+
+/* Campaign launched + adsets + successful ads */
+.campaigns-history-steps-dark .campaigns-history-steps>.ant-steps-item:not(:first-child):not(.ant-steps-item-error) .ant-steps-item-icon,
+.campaigns-history-steps-dark .campaigns-history-ad-steps .ant-steps-item:not(.ant-steps-item-error) .ant-steps-item-icon,
+.campaigns-history-steps-dark .campaigns-history-ad-steps .ant-steps-item-finish .ant-steps-item-icon {
+    background: #1f3a4d !important;
+    border-color: #1f3a4d !important;
+}
+
+.campaigns-history-steps-dark .campaigns-history-steps>.ant-steps-item:not(:first-child):not(.ant-steps-item-error) .ant-steps-icon,
+.campaigns-history-steps-dark .campaigns-history-ad-steps .ant-steps-item:not(.ant-steps-item-error) .ant-steps-icon,
+.campaigns-history-steps-dark .campaigns-history-ad-steps .ant-steps-item-finish .ant-steps-icon {
+    color: #91caff !important;
+}
+
+/* Successful ad SVG */
+.campaigns-history-steps-dark .campaigns-history-ad-steps .ant-steps-item-finish .ant-steps-item-icon .ant-steps-icon svg,
+.campaigns-history-steps-dark .campaigns-history-ad-steps .ant-steps-item-finish .ant-steps-item-icon .ant-steps-icon svg * {
+    color: #91caff !important;
+    fill: #91caff !important;
+    stroke: #91caff !important;
+}
+
+/* Error */
+.campaigns-history-steps-dark .ant-steps-item-error .ant-steps-item-icon,
+.campaigns-history-steps-dark .campaigns-history-ad-steps .ant-steps-item-error .ant-steps-item-icon {
+    background: #3a1f20 !important;
+    border-color: #ff4d4f !important;
+}
+
+.campaigns-history-steps-dark .ant-steps-item-error .ant-steps-icon,
+.campaigns-history-steps-dark .ant-steps-item-error .ant-steps-icon svg,
+.campaigns-history-steps-dark .campaigns-history-ad-steps .ant-steps-item-error .ant-steps-icon {
+    color: #ff7875 !important;
+}
+
+/* Error SVG */
+.campaigns-history-steps-dark .ant-steps-item-error .ant-steps-icon svg *,
+.campaigns-history-steps-dark .campaigns-history-ad-steps .ant-steps-item-error .ant-steps-icon svg * {
+    color: #ff7875 !important;
+    fill: #ff7875 !important;
+    stroke: #ff7875 !important;
+}
+
+/* Dark text */
+.campaigns-history-steps-dark .ant-steps-item-title,
+.campaigns-history-steps-dark .ant-steps-item-description {
+    color: #fff !important;
+}
+
+/* =========================
+   EXPLICIT CUSTOM ICONS
+   ========================= */
+
+.campaigns-history-steps-light .campaigns-history-ad-check {
+    color: #1677ff !important;
+    fill: #1677ff !important;
+    stroke: #1677ff !important;
+}
+
+.campaigns-history-steps-dark .campaigns-history-ad-check {
+    color: #91caff !important;
+    fill: #91caff !important;
+    stroke: #91caff !important;
+}
+
+.campaigns-history-steps-light .campaigns-history-ad-error {
+    color: #ff4d4f !important;
+    fill: #ff4d4f !important;
+    stroke: #ff4d4f !important;
+}
+
+.campaigns-history-steps-dark .campaigns-history-ad-error {
+    color: #ff7875 !important;
+    fill: #ff7875 !important;
+    stroke: #ff7875 !important;
+}
+
+/* =========================
+   STEP CONNECTING LINE
+   ========================= */
+
+.campaigns-history-steps-light .ant-steps-item-tail::after {
+    background: #91caff !important;
+}
+
+.campaigns-history-steps-dark .ant-steps-item-tail::after {
+    background: #91caff !important;
+}
+
+/* =========================
+   LIGHT POPOVER
+   ========================= */
+
+.campaigns-history-popover-light .ant-popover-inner {
+    background: #fff !important;
+    color: #222 !important;
+}
+
+.campaigns-history-popover-light .ant-popover-title,
+.campaigns-history-popover-light .ant-popover-inner-content {
+    color: #222 !important;
+}
+
+
+/* =========================
+   DARK POPOVER
+   ========================= */
+
+.campaigns-history-popover-dark .ant-popover-inner {
+    background: #1f1f1f !important;
+    color: #fff !important;
+}
+
+.campaigns-history-popover-dark .ant-popover-title,
+.campaigns-history-popover-dark .ant-popover-inner-content {
+    color: #fff !important;
+}
+
+/* Arrow */
+.campaigns-history-popover-dark .ant-popover-arrow::before,
+.campaigns-history-popover-dark .ant-popover-arrow::after {
+    background: #1f1f1f !important;
+}
+
+/* =========================
+   POPOVER
+   ========================= */
+
+.campaigns-history-popover-light .ant-popover-inner {
+    background: #fff !important;
+    color: #222 !important;
+}
+
+.campaigns-history-popover-light .ant-popover-title,
+.campaigns-history-popover-light .ant-popover-inner-content {
+    color: #222 !important;
+}
+
+.campaigns-history-popover-light .ant-popover-arrow::before,
+.campaigns-history-popover-light .ant-popover-arrow::after {
+    background: #fff !important;
+}
+
+
+/* =========================
+   DARK POPOVER
+   ========================= */
+
+.campaigns-history-popover-dark .ant-popover-inner {
+    background: #333 !important;
+    color: #fff !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45) !important;
+}
+
+.campaigns-history-popover-dark .ant-popover-title,
+.campaigns-history-popover-dark .ant-popover-inner-content {
+    background: #333 !important;
+    color: #fff !important;
+}
+
+.campaigns-history-popover-dark .ant-popover-arrow::before,
+.campaigns-history-popover-dark .ant-popover-arrow::after {
+    background: #333 !important;
+}
+
+
+/* =========================
+   STEPS INSIDE POPOVER
+   ========================= */
+
+.campaigns-history-popover-dark .campaigns-history-steps-wrapper {
+    background: #333 !important;
+}
+
+.campaigns-history-popover-light .campaigns-history-steps-wrapper {
+    background: #fff !important;
+}
+
+/* Popover */
+
+@media (max-width: 400px) {
+    .campaigns-element-hide {
+        display: none !important;
+    }
+
+    .campaigns-input {
+        width: 100px !important;
+        height: 21px !important;
+        font-size: 10px !important;
+    }
+
+    .campaigns-budget-button {
+        font-size: 10px !important;
+        height: 21px !important;
+    }
+
+    .campaigns-clone-button {
+        font-size: 10px !important;
+        height: 21px !important;
+    }
+
+    .campaigns-comment-button {
+        font-size: 10px !important;
+        height: 21px !important;
+    }
+}
+
+@media (max-width: 350px) {
+    .campaigns-element-hide {
+        display: none !important;
+    }
+
+    .campaigns-input {
+        width: 90px !important;
+        height: 21px !important;
+        font-size: 10px !important;
+    }
+
+    .campaigns-budget-button {
+        font-size: 9px !important;
+        height: 21px !important;
+        padding: 5px !important;
+    }
+
+    .campaigns-clone-button {
+        font-size: 10px !important;
+        height: 21px !important;
+        width: 40px !important;
+    }
+
+    .campaigns-comment-button {
+        font-size: 10px !important;
+        height: 21px !important;
+    }
+}
+
+.campaigns-card-layout {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+}
+
+@media (max-width: 885px) {
+    .campaigns-card-layout {
+        display: grid !important;
+        grid-template-columns: 28px minmax(0, 1fr);
+        column-gap: 8px;
+        row-gap: 2px;
+        width: 100%;
+    }
+
+    .campaigns-card-layout>div:nth-child(1) {
+        grid-column: 1;
+        grid-row: 1 / 3;
+    }
+
+    .campaigns-card-left {
+        grid-column: 2;
+        grid-row: 1;
+        width: 100% !important;
+        min-width: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .campaigns-card-right {
+        grid-column: 2;
+        grid-row: 2;
+        width: 100% !important;
+        min-width: 0 !important;
+        align-items: flex-end !important;
+        flex-direction: row !important;
+        flex-direction: row-reverse !important;
+    }
+}
+
+@media (max-width: 520px) {
+    .campaigns-card-right {
+        grid-column: 2;
+        grid-row: 2;
+        width: 100% !important;
+        min-width: 0 !important;
+        align-items: flex-end !important;
+        flex-direction: row !important;
+        flex-direction: row-reverse !important;
+        flex-wrap: wrap-reverse !important;
+    }
+}
+
+.campaigns-adset-item .ant-form-item-label {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    padding: 0 0 4px !important;
+    text-align: left !important;
+}
+
+.campaigns-adset-item .ant-form-item-label > label {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    color: #B4B4B4;
+    font-size: 13px;
+    line-height: 1.4;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+.campaigns-adset-item
+.ant-form-item-label {
+    padding-bottom: 4px;
+}
+
+.campaigns-adset-item
+.ant-form-item-label > label {
+    color: #B4B4B4;
+    font-size: 13px;
+    height: auto;
+}
+
+/* Reduce Account Number tag size */
+.ant-select-multiple .ant-select-selection-item {
+    height: 20px !important;
+    line-height: 18px !important;
+    font-size: 11px !important;
+    padding-inline: 4px !important;
+    margin-block: 2px !important;
+}
+
+/* Reduce the remove icon */
+.ant-select-multiple .ant-select-selection-item-remove {
+    font-size: 10px !important;
+}
+
+/* Reduce the Select input height */
+.ant-select-multiple .ant-select-selector {
+    min-height: 32px !important;
+    padding: 2px 6px !important;
+}

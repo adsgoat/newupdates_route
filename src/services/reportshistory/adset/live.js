@@ -1,9 +1,0 @@
-import axios from "axios";
-
-export default async function AdsetData(AdsetId, network, timezone, accountNumber, token) {
-    const apiCall = await axios.get(`http://test.app.vyaktimetrics.com/reports/livehistory/adsethistory/v2?accountNumber=${accountNumber}&timezone=${timezone}&network=${network}&AdsetId=${AdsetId}`, {
-        headers: { Authorization: token }
-    });
-    const res = apiCall.data;
-    return res;
-}
