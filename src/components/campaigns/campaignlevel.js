@@ -54,9 +54,7 @@ const CampaignLevel = ({
             ? [specialCategories]
             : [];
 
-    const hasSpecialCategory = normalizedCategories.some(
-        value => value !== "NONE"
-    );
+    const hasSpecialCategory = normalizedCategories.some( value => value !== "NONE" );
 
     const geoTreeData = useMemo(() => {
         const source = Array.isArray(continents)
@@ -354,7 +352,7 @@ const CampaignLevel = ({
                         ? "Lifetime Budget"
                         : "Daily Budget",
                 type: "number",
-                required: false,
+                required: true,
                 props: {
                     min: 0,
                     step: 0.01,

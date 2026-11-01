@@ -90,6 +90,9 @@ export default function CampaignsModule({ email, userData, userPermissions, auth
     };
     const filteredAccounts = useMemo(() => { return transformedData[revenuePartner] }, [revenuePartner]);
     const onChangeTime = (value) => { setTime(value) };
+    const changeRRefrst = () => {
+        setRefreshTabs(prev => prev + 1);
+    };
     const OnClickSubmit = async () => {
         setUpdatedReevenuePartner(revenuePartner);
         setUpdatedAccountsValue(accountsValue);
@@ -325,7 +328,7 @@ export default function CampaignsModule({ email, userData, userPermissions, auth
                 visible={cdrawerVisible}
                 accountis={updatedAccountsValue}
                 onClose={onCloseDrawer}
-                // changeRRefrst={changeRRefrst}
+                changeRRefrst={changeRRefrst}
                 network={revenuePartner}
                 draftsData={[]}
                 theme="light"
@@ -760,7 +763,7 @@ export default function CampaignsModule({ email, userData, userPermissions, auth
                         </div>
                     ))
                 ) : (
-                    <div style={{width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", border: "1px solid #4caf50" }}>
+                    <div style={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", border: "1px solid #4caf50" }}>
                         <Empty
                             description="No campaigns found"
                             style={{ margin: "auto", color: theme === "dark" ? "white" : "", }}

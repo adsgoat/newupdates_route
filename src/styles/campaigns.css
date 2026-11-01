@@ -1371,3 +1371,18 @@
     min-height: 32px !important;
     padding: 2px 6px !important;
 }
+
+.ad-page-select .ant-select-selector {
+    font-size: 12px !important;
+}
+
+.ad-page-select .ant-select-selection-item {
+    font-size: 12px !important;
+    background-color: #f0f0f0 !important;
+    border-radius: 4px;
+    padding-inline: 5px;
+}
+
+.no-files-selected-empty {
+    margin: 8px !important;
+}

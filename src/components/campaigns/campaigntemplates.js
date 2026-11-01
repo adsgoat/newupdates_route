@@ -479,7 +479,7 @@ export default function CampaignTemplates({
     return (
         <>
             {contextHolder}
-            <Button onClick={openTemplates}>Templates</Button>
+            <Button onClick={openTemplates} style={{height:24, backgroundColor:"#91c25F", color:"white"}}>Templates</Button>
             <Modal
                 title="Campaign Templates"
                 open={open}

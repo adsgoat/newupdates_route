@@ -1,24 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-    Form,
-    Input,
-    InputNumber,
-    Select,
-    TreeSelect,
-    DatePicker,
-    Switch,
-    Tooltip,
-    Popover,
-    Button
-} from "antd";
-import {
-    DownOutlined,
-    RightOutlined,
-    InfoCircleOutlined,
-    ShareAltOutlined
-} from "@ant-design/icons";
+import { Form, Input, InputNumber, Select, TreeSelect, DatePicker, Switch, Tooltip, Popover, Button, Row, Col } from "antd";
+import { DownOutlined, RightOutlined, InfoCircleOutlined, ShareAltOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import AdLevel, { createInitialAd } from "./adlevel";
 
@@ -26,7 +10,6 @@ const { SHOW_CHILD } = TreeSelect;
 
 const HiddenField = () => null;
 
-/* Scheduling grid: update DOM classes during dragging and commit once. */
 const AdScheduleGrid = ({ selectedCells = {}, onCommit }) => {
     const gridRef = useRef(null);
     const dragRef = useRef(null);
@@ -177,202 +160,46 @@ const AdScheduleGrid = ({ selectedCells = {}, onCommit }) => {
             <div className="campaigns-adset-schedule-row campaigns-adset-schedule-header">
                 <div />
                 {Array.from({ length: 24 }, (_, hour) => (
-                    <div
-                        key={hour}
-                        className="campaigns-adset-schedule-hour-label"
-                    >
-                        {hour % 3 === 0
-                            ? hour === 0
-                                ? "12 am"
-                                : hour < 12
-                                    ? `${hour} am`
-                                    : hour === 12
-                                        ? "12 pm"
-                                        : `${hour - 12} pm`
-                            : ""}
+                    <div key={hour} className="campaigns-adset-schedule-hour">
+                        {hour}
                     </div>
                 ))}
             </div>
 
-            {dayNames.map((day, dayIndex) => (
+            {dayNames.map((dayName, day) => (
                 <div
-                    key={day}
+                    key={dayName}
                     className="campaigns-adset-schedule-row"
                 >
                     <div className="campaigns-adset-schedule-day">
-                        {day}
+                        {dayName}
                     </div>
-
                     {Array.from({ length: 24 }, (_, hour) => (
                         <div
                             key={hour}
+                            className="campaigns-adset-schedule-cell"
                             data-schedule-cell="cell"
-                            data-day={dayIndex}
+                            data-day={day}
                             data-hour={hour}
-                            className={`campaigns-adset-schedule-cell ${selectedCells[`${dayIndex}-${hour}`]
-                                ? "active"
-                                : ""
-                                } ${hour % 3 === 0 ? "group-start" : ""}`}
                         />
                     ))}
                 </div>
             ))}
 
-            <div className="campaigns-adset-schedule-row campaigns-adset-schedule-every-day">
-                <div className="campaigns-adset-schedule-day">
-                    Every Day
-                </div>
-
-                {Array.from({ length: 24 }, (_, hour) => {
-                    const active = [0, 1, 2, 3, 4, 5, 6].every(
-                        day => selectedCells[`${day}-${hour}`]
-                    );
-
-                    return (
-                        <div
-                            key={hour}
-                            data-schedule-cell="every"
-                            data-hour={hour}
-                            className={`campaigns-adset-schedule-cell ${active ? "active" : ""
-                                } ${hour % 3 === 0 ? "group-start" : ""}`}
-                        />
-                    );
-                })}
+            <div className="campaigns-adset-schedule-row campaigns-adset-schedule-every-row">
+                <div className="campaigns-adset-schedule-day">Every day</div>
+                {Array.from({ length: 24 }, (_, hour) => (
+                    <div
+                        key={hour}
+                        className="campaigns-adset-schedule-cell"
+                        data-schedule-cell="every"
+                        data-hour={hour}
+                    />
+                ))}
             </div>
         </div>
     );
 };
-
-const EU_AND_ASSOCIATED = [
-    "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR",
-    "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL",
-    "PL", "PT", "RO", "SK", "SI", "ES", "SE", "AX", "PT-20",
-    "DE-BS", "IT-CO", "ES-CN", "GF", "GP", "DE-HL", "IT-LI",
-    "PT-30", "MQ", "YT", "ES-ML", "GR-MA", "RE", "FR-MF"
-];
-
-const needsBeneficiaryAndPayer = value => {
-    const countries = Array.isArray(value)
-        ? value
-        : typeof value === "string"
-            ? value.split(/[,;]\s*|\s+/).filter(Boolean)
-            : value && typeof value === "object"
-                ? Object.values(value).flat().map(String)
-                : [];
-
-    return countries.some(country =>
-        EU_AND_ASSOCIATED.includes(String(country))
-    );
-};
-
-const actionSourceOptions = {
-    OUTCOME_LEADS: [{ value: "website", label: "Website" }],
-    OUTCOME_SALES: [{ value: "website", label: "Website" }]
-};
-
-const optimizationGoalOptions = {
-    OUTCOME_LEADS: [
-        { value: "OFFSITE_CONVERSIONS", label: "Maximize number of conversions" },
-        { value: "LANDING_PAGE_VIEWS", label: "Maximize number of landing page views" },
-        { value: "LINK_CLICKS", label: "Maximize number of link clicks" },
-        { value: "REACH", label: "Maximize daily unique reach" },
-        { value: "IMPRESSIONS", label: "Maximize number of impressions" }
-    ],
-    OUTCOME_SALES: [
-        { value: "OFFSITE_CONVERSIONS", label: "Maximize number of conversions" },
-        { value: "VALUE", label: "Maximize value of conversions" },
-        { value: "LANDING_PAGE_VIEWS", label: "Maximize number of landing page views" },
-        { value: "LINK_CLICKS", label: "Maximize number of link clicks" },
-        { value: "REACH", label: "Maximize daily unique reach" },
-        { value: "IMPRESSIONS", label: "Maximize number of impressions" }
-    ]
-};
-
-const conversionEventOptions = {
-    OUTCOME_LEADS: [
-        { value: "LEAD", label: "Lead" },
-        { value: "CONTACT", label: "Contact" },
-        { value: "SCHEDULE", label: "Schedule" }
-    ],
-    OUTCOME_SALES: [
-        { value: "PURCHASE", label: "Purchase" },
-        { value: "INITIATED_CHECKOUT", label: "Initiate Checkout" },
-        { value: "ADD_TO_CART", label: "Add to Cart" },
-        { value: "CONTENT_VIEW", label: "View Content" },
-        { value: "ADD_TO_WISHLIST", label: "Add to Wishlist" }
-    ]
-};
-
-const billingEventOptions = {
-    OFFSITE_CONVERSIONS: [{ value: "IMPRESSIONS", label: "Impressions" }],
-    VALUE: [{ value: "IMPRESSIONS", label: "Impressions" }],
-    LANDING_PAGE_VIEWS: [{ value: "IMPRESSIONS", label: "Impressions" }],
-    LINK_CLICKS: [
-        { value: "IMPRESSIONS", label: "Impressions" },
-        { value: "LINK_CLICKS", label: "Link Clicks" }
-    ],
-    REACH: [{ value: "IMPRESSIONS", label: "Impressions" }],
-    IMPRESSIONS: [{ value: "IMPRESSIONS", label: "Impressions" }]
-};
-
-const specialOptimizationRules = {
-    OUTCOME_SALES: {
-        LOWEST_COST_WITH_MIN_ROAS: [
-            { value: "VALUE", label: "Maximize value of conversions" }
-        ]
-    }
-};
-
-const platformPositions = {
-    facebook: [
-        "feed", "story_f", "marketplace", "search", "profile_feed_f",
-        "notification", "right_hand_column", "facebook_reels"
-    ],
-    instagram: [
-        "instagram_feed", "story_i", "reels", "explore",
-        "explore_home", "profile_feed_i"
-    ],
-    messenger: ["messenger_inbox", "story_m", "sponsored_messages"],
-    audience_network: ["classic", "rewarded_video"],
-    threads: ["threads_stream"]
-};
-
-const platformOptions = [
-    { value: "facebook", label: "Facebook" },
-    { value: "instagram", label: "Instagram" },
-    { value: "messenger", label: "Messenger" },
-    { value: "audience_network", label: "Audience Network" },
-    { value: "threads", label: "Threads" }
-];
-
-const allPositionOptions = [
-    { value: "feed", label: "Facebook Feed", platform: "facebook" },
-    { value: "story_f", label: "Facebook Stories", platform: "facebook" },
-    { value: "marketplace", label: "Facebook Marketplace", platform: "facebook" },
-    { value: "search", label: "Facebook Search", platform: "facebook" },
-    { value: "profile_feed_f", label: "Facebook Profile Feed", platform: "facebook" },
-    { value: "notification", label: "Facebook Notifications", platform: "facebook" },
-    { value: "right_hand_column", label: "Facebook Right Column", platform: "facebook" },
-    { value: "facebook_reels", label: "Facebook Reels", platform: "facebook" },
-    { value: "instagram_feed", label: "Instagram Feed", platform: "instagram" },
-    { value: "story_i", label: "Instagram Stories", platform: "instagram" },
-    { value: "reels", label: "Instagram Reels", platform: "instagram" },
-    { value: "explore", label: "Instagram Explore", platform: "instagram" },
-    { value: "explore_home", label: "Instagram Explore Home", platform: "instagram" },
-    { value: "profile_feed_i", label: "Instagram Profile Feed", platform: "instagram" },
-    { value: "messenger_inbox", label: "Messenger Inbox", platform: "messenger" },
-    { value: "story_m", label: "Messenger Stories", platform: "messenger" },
-    { value: "sponsored_messages", label: "Messenger Sponsored Messages", platform: "messenger" },
-    { value: "classic", label: "Audience Network", platform: "audience_network" },
-    { value: "rewarded_video", label: "Audience Network Rewarded Video", platform: "audience_network" },
-    { value: "threads_stream", label: "Threads", platform: "threads" }
-];
-
-const genderOptions = [
-    { value: "0", label: "All" },
-    { value: "1", label: "Male" },
-    { value: "2", label: "Female" }
-];
 
 const ageOptions = Array.from({ length: 48 }, (_, i) => ({
     value: String(i + 18),
@@ -392,10 +219,6 @@ const above25Options = ageOptions.filter(
     item => Number(item.value) >= 26 && Number(item.value) <= 65
 );
 
-const deviceOptions = [
-    { value: "mobile", label: "Mobile" },
-    { value: "desktop", label: "Desktop" }
-];
 
 const normalizeList = value => {
     if (Array.isArray(value)) return value;
@@ -444,7 +267,8 @@ const cloneValue = value => {
 
 const AdSetLevel = ({
     form,
-    index,
+    index: fallbackIndex,
+    adsetId: propAdsetId,
     mode = "create",
     theme,
     budgetType = "daily",
@@ -475,9 +299,43 @@ const AdSetLevel = ({
     setShowScheduleSubmitError: externalSetShowScheduleSubmitError,
     userData,
     auth,
-    username
+    username,
+    multipleGeo,
+    multiplePixel = "Pixel",
+    multiplePage,
+    adsetConfig
 }) => {
     const isCreate = mode === "create";
+
+    const {
+        EU_AND_ASSOCIATED = [],
+        actionSourceOptions = {},
+        optimizationGoalOptions = {},
+        conversionEventOptions = {},
+        billingEventOptions = {},
+        specialOptimizationRules = {},
+        platformPositions = {},
+        platformOptions = [],
+        allPositionOptions = [],
+        genderOptions = [],
+        deviceOptions = []
+    } = adsetConfig || {};
+
+    const getSelectedPositionObjects = selected => {
+        const selectedValues = new Set(
+            normalizeList(selected).map(position =>
+                String(
+                    typeof position === "object"
+                        ? position?.value
+                        : position
+                )
+            )
+        );
+
+        return allPositionOptions.filter(position =>
+            selectedValues.has(String(position.value))
+        );
+    };
 
     const [localAdSchedulingToShow, setLocalAdSchedulingToShow] = useState({});
     const [localSelectedByAdset, setLocalSelectedByAdset] = useState({});
@@ -500,10 +358,622 @@ const AdSetLevel = ({
     const campaignBudget = Number(Form.useWatch("Daily_amount", form) || 0);
     const adsetsValue = Form.useWatch("adsets", form);
     const adsets = Array.isArray(adsetsValue) ? adsetsValue : [];
+    const matchedIndex =
+        propAdsetId != null
+            ? adsets.findIndex(
+                adset => String(adset?.id) === String(propAdsetId)
+            )
+            : -1;
+
+    // console.log(matchedIndex, "matchedIndex");
+
+    // Ant Design Form.List requires numeric positions for array field paths.
+    // Resolve the current position using the stable ID.
+    const index =
+        matchedIndex >= 0 ? matchedIndex : fallbackIndex;
     const currentAdset = adsets[index] || {};
-    const adsetScheduleId = currentAdset.id || index;
+    // const adsetScheduleId = currentAdset.id || index;
+    const adsetScheduleId = currentAdset.id ?? propAdsetId;
     const watchedAccountList = Form.useWatch("Account_Number", form) || [];
     const watchedAds = Form.useWatch(["adsets", index, "ads"], form);
+    const campaignName = Form.useWatch("Name", form) || "";
+    const watchedAdsets = Form.useWatch("adsets", form) || [];
+    const watchedAdsetName = Form.useWatch(["adsets", index, "AdsetName"], form) || "";
+    const needsBeneficiaryAndPayer = value => {
+        const countries = Array.isArray(value)
+            ? value
+            : typeof value === "string"
+                ? value.split(/[,;]\s*|\s+/).filter(Boolean)
+                : value && typeof value === "object"
+                    ? Object.values(value).flat().map(String)
+                    : [];
+
+        return countries.some(country =>
+            EU_AND_ASSOCIATED.includes(String(country))
+        );
+    };
+    const firstAdsetCountries = Form.useWatch(["adsets", 0, "countries"], form);
+    // console.log(pixel_id_list, pixelIdList, "pixel");
+    // console.log(page_id_list, pageidList, "page");
+    const watchedDynamicCreative = Form.useWatch(
+        ["adsets", index, "isDynamicCreative"],
+        form,
+        { preserve: true }
+    );
+
+    const isDynamicCreative =
+        watchedDynamicCreative === true ||
+        watchedDynamicCreative === 1 ||
+        String(watchedDynamicCreative).toLowerCase() === "true";
+
+    const watchedCurrentAds =
+        Form.useWatch(["adsets", index, "ads"], form, { preserve: true }) || [];
+    const previousDynamicCreativeRef = useRef(isDynamicCreative);
+
+    useEffect(() => {
+        if (!form || index == null) return;
+
+        // Do not reset anything on initial render.
+        if (previousDynamicCreativeRef.current === isDynamicCreative) {
+            return;
+        }
+
+        previousDynamicCreativeRef.current = isDynamicCreative;
+
+        const adsPath = ["adsets", index, "ads"];
+        const activeAdPath = ["adsets", index, "activeAdId"];
+        const backupPath = ["adsets", index, "_dynamicCreativeAdsBackup"];
+
+        const currentAds = form.getFieldValue(adsPath) || [];
+        const firstAd = currentAds[0];
+
+        if (!firstAd) return;
+
+        const resetAd = {
+            ...firstAd,
+            media: {
+                images: [],
+                videos: [],
+                thumbnail: null,
+            },
+            filename: null,
+            mediaUrl: undefined,
+            mediaName: undefined,
+            mediaType: undefined,
+            creativeId: undefined,
+            creativeAssetId: undefined,
+            sourceCreative: undefined,
+            mediaSource: "",
+        };
+
+        // Keep exactly one ad card and clear its selected media.
+        form.setFieldValue(adsPath, [resetAd]);
+        form.setFieldValue(activeAdPath, resetAd.id);
+
+        // Prevent old ads and media from being restored.
+        form.setFieldValue(backupPath, undefined);
+    }, [form, index, isDynamicCreative]);
+
+    // useEffect(() => {
+    //     if (!form || index == null || !Array.isArray(watchedCurrentAds)) return;
+
+    //     const adsPath = ["adsets", index, "ads"];
+    //     const backupPath = ["adsets", index, "_dynamicCreativeAdsBackup"];
+    //     const activeAdPath = ["adsets", index, "activeAdId"];
+
+    //     const createId = () =>
+    //         globalThis.crypto?.randomUUID?.() ||
+    //         `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    //     const getMediaKey = (media) =>
+    //         String(
+    //             media?.uid ||
+    //             media?.creativeId ||
+    //             media?.creativeAssetId ||
+    //             media?.url ||
+    //             media?.src ||
+    //             media?.uri ||
+    //             media?.name ||
+    //             media?.filename ||
+    //             ""
+    //         );
+
+    //     const getAdMediaItems = (ad) => {
+    //         const items = [
+    //             ...(Array.isArray(ad?.media?.images) ? ad.media.images : []),
+    //             ...(Array.isArray(ad?.media?.videos) ? ad.media.videos : []),
+    //         ];
+
+    //         if (items.length) return deduplicateMedia(items);
+
+    //         if (Array.isArray(ad?.filename)) {
+    //             return deduplicateMedia(ad.filename);
+    //         }
+
+    //         if (ad?.filename && typeof ad.filename === "object") {
+    //             return [ad.filename];
+    //         }
+
+    //         if (ad?.mediaUrl) {
+    //             return [{
+    //                 uid: ad.creativeId || ad.creativeAssetId || ad.id,
+    //                 url: ad.mediaUrl,
+    //                 name: ad.mediaName || ad.mediaUrl.split("/").pop(),
+    //                 type: ad.mediaType,
+    //                 mediaType: ad.mediaType,
+    //                 isRemote: true,
+    //                 creativeId: ad.creativeId,
+    //                 creativeAssetId: ad.creativeAssetId,
+    //                 sourceCreative: ad.sourceCreative,
+    //             }];
+    //         }
+
+    //         return [];
+    //     };
+
+    //     const deduplicateMedia = (items = []) => {
+    //         const seen = new Set();
+
+    //         return items.filter((item) => {
+    //             if (!item) return false;
+
+    //             const key = getMediaKey(item);
+
+    //             if (!key) return true;
+    //             if (seen.has(key)) return false;
+
+    //             seen.add(key);
+    //             return true;
+    //         });
+    //     };
+
+    //     const isVideoMedia = (item) => {
+    //         const type = String(
+    //             item?.type || item?.mediaType || item?.mimeType || ""
+    //         ).toLowerCase();
+
+    //         const source = String(
+    //             item?.url || item?.src || item?.name || item?.filename || ""
+    //         );
+
+    //         return (
+    //             type.includes("video") ||
+    //             /\.(mp4|mov|webm|m4v|avi|mpeg|mpg)(?:$|\?)/i.test(source)
+    //         );
+    //     };
+
+    //     const makeMediaObject = (items = [], previousMedia = {}) => ({
+    //         images: items.filter((item) => !isVideoMedia(item)),
+    //         videos: items.filter(isVideoMedia),
+    //         thumbnail: previousMedia?.thumbnail ?? null,
+    //     });
+
+    //     const collectAllMedia = (ads = []) =>
+    //         deduplicateMedia(ads.flatMap((ad) => getAdMediaItems(ad)));
+
+    //     const cloneAd = (ad) => ({
+    //         ...ad,
+    //         media: ad?.media
+    //             ? {
+    //                 ...ad.media,
+    //                 images: [...(ad.media.images || [])],
+    //                 videos: [...(ad.media.videos || [])],
+    //             }
+    //             : ad?.media,
+    //         filename: Array.isArray(ad?.filename)
+    //             ? [...ad.filename]
+    //             : ad?.filename,
+    //         accountSettings: Object.fromEntries(
+    //             Object.entries(ad?.accountSettings || {}).map(([key, value]) => [
+    //                 key,
+    //                 {
+    //                     ...value,
+    //                     creativeOverrides: {
+    //                         ...(value?.creativeOverrides || {}),
+    //                     },
+    //                 },
+    //             ])
+    //         ),
+    //     });
+
+    //     const mergeTextOptions = (ads, field, fallback) => {
+    //         const values = [];
+    //         const seen = new Set();
+
+    //         ads.forEach((ad) => {
+    //             const raw =
+    //                 ad?.[field] ??
+    //                 (field === "primaryText" ? ad?.message : undefined) ??
+    //                 (field === "description" ? ad?.Description : undefined);
+
+    //             (Array.isArray(raw) ? raw : [raw]).forEach((value) => {
+    //                 if (typeof value !== "string" || !value.trim()) return;
+
+    //                 const key = value.trim();
+
+    //                 if (seen.has(key) || values.length >= 5) return;
+
+    //                 seen.add(key);
+    //                 values.push(value);
+    //             });
+    //         });
+
+    //         if (!values.length) {
+    //             (Array.isArray(fallback) ? fallback : [fallback]).forEach((value) => {
+    //                 if (
+    //                     typeof value === "string" &&
+    //                     value.trim() &&
+    //                     values.length < 5
+    //                 ) {
+    //                     values.push(value);
+    //                 }
+    //             });
+    //         }
+
+    //         return values.length ? values : [""];
+    //     };
+
+    //     const toScalar = (value) =>
+    //         Array.isArray(value)
+    //             ? String(value.find((item) => String(item ?? "").trim()) ?? "")
+    //             : String(value ?? "");
+
+    //     const backupAds = form.getFieldValue(backupPath);
+
+    //     // =========================================================
+    //     // DYNAMIC CREATIVE ON
+    //     // Preserve original ads before merging them.
+    //     // =========================================================
+    //     if (isDynamicCreative) {
+    //         if (!watchedCurrentAds.length) return;
+
+    //         // Do not overwrite the original backup with the merged ad.
+    //         if (!Array.isArray(backupAds)) {
+    //             form.setFieldValue(
+    //                 backupPath,
+    //                 watchedCurrentAds.map(cloneAd)
+    //             );
+    //         }
+
+    //         // Already merged. Do not rewrite the ad or its media.
+    //         if (watchedCurrentAds.length === 1) return;
+
+    //         const originalAds = watchedCurrentAds;
+    //         const firstAd = originalAds[0];
+
+    //         const allMedia = collectAllMedia(originalAds);
+
+    //         const mergedAd = {
+    //             ...firstAd,
+    //             primaryText: mergeTextOptions(
+    //                 originalAds,
+    //                 "primaryText",
+    //                 firstAd?.primaryText ?? firstAd?.message
+    //             ),
+    //             message: mergeTextOptions(
+    //                 originalAds,
+    //                 "primaryText",
+    //                 firstAd?.primaryText ?? firstAd?.message
+    //             ),
+    //             headline: mergeTextOptions(
+    //                 originalAds,
+    //                 "headline",
+    //                 firstAd?.headline
+    //             ),
+    //             description: mergeTextOptions(
+    //                 originalAds,
+    //                 "description",
+    //                 firstAd?.description ?? firstAd?.Description
+    //             ),
+    //             Description: mergeTextOptions(
+    //                 originalAds,
+    //                 "description",
+    //                 firstAd?.description ?? firstAd?.Description
+    //             ),
+    //             media: makeMediaObject(allMedia, firstAd?.media),
+    //             filename: allMedia,
+    //             mediaUrl: undefined,
+    //             mediaName: undefined,
+    //             mediaType: undefined,
+    //             creativeId: undefined,
+    //             creativeAssetId: undefined,
+    //             sourceCreative: undefined,
+    //         };
+
+    //         form.setFieldValue(adsPath, [mergedAd]);
+    //         form.setFieldValue(activeAdPath, mergedAd.id);
+
+    //         return;
+    //     }
+
+    //     // =========================================================
+    //     // DYNAMIC CREATIVE OFF
+    //     // Restore original ads and retain every selected media file.
+    //     // =========================================================
+    //     if (!watchedCurrentAds.length) return;
+
+    //     const hasBackup =
+    //         Array.isArray(backupAds) && backupAds.length > 0;
+
+    //     const originalAds = hasBackup
+    //         ? backupAds.map(cloneAd)
+    //         : watchedCurrentAds.map(cloneAd);
+
+    //     const currentMedia = collectAllMedia(watchedCurrentAds);
+    //     const originalMedia = collectAllMedia(originalAds);
+
+    //     // Merge the current selected media with the original media.
+    //     // This prevents files added during Dynamic Creative from vanishing.
+    //     const allMedia = deduplicateMedia([
+    //         ...originalMedia,
+    //         ...currentMedia,
+    //     ]);
+
+    //     const usedKeys = new Set();
+
+    //     // First, preserve each original ad's own media.
+    //     const restoredAds = originalAds.map((originalAd) => {
+    //         const originalItems = getAdMediaItems(originalAd);
+
+    //         const mediaItems = originalItems.map((originalItem) => {
+    //             const key = getMediaKey(originalItem);
+
+    //             const currentItem = currentMedia.find(
+    //                 (item) => key && getMediaKey(item) === key
+    //             );
+
+    //             const selectedItem = currentItem || originalItem;
+
+    //             if (key) usedKeys.add(key);
+
+    //             return selectedItem;
+    //         });
+
+    //         return {
+    //             ...originalAd,
+    //             media: makeMediaObject(mediaItems, originalAd?.media),
+    //             filename: mediaItems.length ? mediaItems : null,
+    //         };
+    //     });
+
+    //     // Assign remaining media to ads without media first.
+    //     // If there are more files than original ads, create additional ads.
+    //     allMedia.forEach((media) => {
+    //         const key = getMediaKey(media);
+
+    //         if (key && usedKeys.has(key)) return;
+
+    //         let targetIndex = restoredAds.findIndex(
+    //             (ad) => getAdMediaItems(ad).length === 0
+    //         );
+
+    //         if (targetIndex === -1) {
+    //             const sourceAd = restoredAds[0] || originalAds[0] || {};
+
+    //             restoredAds.push({
+    //                 ...cloneAd(sourceAd),
+    //                 id: createId(),
+    //                 media: makeMediaObject([media], sourceAd?.media),
+    //                 filename: [media],
+    //                 mediaUrl: undefined,
+    //                 mediaName: undefined,
+    //                 mediaType: undefined,
+    //                 creativeId: undefined,
+    //                 creativeAssetId: undefined,
+    //                 sourceCreative: undefined,
+    //                 primaryText: toScalar(
+    //                     sourceAd?.primaryText ?? sourceAd?.message
+    //                 ),
+    //                 message: toScalar(
+    //                     sourceAd?.primaryText ?? sourceAd?.message
+    //                 ),
+    //                 headline: toScalar(sourceAd?.headline),
+    //                 description: toScalar(
+    //                     sourceAd?.description ?? sourceAd?.Description
+    //                 ),
+    //                 Description: toScalar(
+    //                     sourceAd?.description ?? sourceAd?.Description
+    //                 ),
+    //             });
+
+    //             targetIndex = restoredAds.length - 1;
+    //         } else {
+    //             const targetAd = restoredAds[targetIndex];
+
+    //             restoredAds[targetIndex] = {
+    //                 ...targetAd,
+    //                 media: makeMediaObject([media], targetAd?.media),
+    //                 filename: [media],
+    //                 mediaUrl: undefined,
+    //                 mediaName: undefined,
+    //                 mediaType: undefined,
+    //                 creativeId: undefined,
+    //                 creativeAssetId: undefined,
+    //                 sourceCreative: undefined,
+    //             };
+    //         }
+
+    //         if (key) usedKeys.add(key);
+    //     });
+
+    //     // Convert text option arrays back to scalar values after Dynamic Creative.
+    //     const finalAds = restoredAds.map((ad) => ({
+    //         ...ad,
+    //         primaryText: toScalar(ad?.primaryText ?? ad?.message),
+    //         message: toScalar(ad?.primaryText ?? ad?.message),
+    //         headline: toScalar(ad?.headline),
+    //         description: toScalar(ad?.description ?? ad?.Description),
+    //         Description: toScalar(ad?.description ?? ad?.Description),
+    //     }));
+
+    //     // Avoid a redundant write only when ad IDs AND media identities match.
+    //     const currentSignature = JSON.stringify(
+    //         watchedCurrentAds.map((ad) => ({
+    //             id: ad?.id,
+    //             media: getAdMediaItems(ad).map(getMediaKey),
+    //         }))
+    //     );
+
+    //     const restoredSignature = JSON.stringify(
+    //         finalAds.map((ad) => ({
+    //             id: ad?.id,
+    //             media: getAdMediaItems(ad).map(getMediaKey),
+    //         }))
+    //     );
+
+    //     if (currentSignature !== restoredSignature) {
+    //         form.setFieldValue(adsPath, finalAds);
+    //         form.setFieldValue(activeAdPath, finalAds[0]?.id);
+    //     }
+
+    //     // Clear backup only after restoring the original ad structure.
+    //     if (hasBackup) {
+    //         form.setFieldValue(backupPath, undefined);
+    //     }
+    // }, [form, index, isDynamicCreative, watchedCurrentAds]);
+
+    useEffect(() => {
+        if (multipleGeo !== "Geos" || index !== 0 || !form) return;
+
+        const currentAdsets = form.getFieldValue("adsets") || [];
+        const countries = normalizeList(firstAdsetCountries);
+
+        const updatedAdsets = currentAdsets.map((adset, adsetIndex) =>
+            adsetIndex === 0
+                ? adset
+                : { ...adset, countries: [...countries] }
+        );
+
+        if (
+            currentAdsets.some(
+                (adset, i) =>
+                    JSON.stringify(normalizeList(adset?.countries)) !==
+                    JSON.stringify(updatedAdsets[i]?.countries)
+            )
+        ) {
+            form.setFieldsValue({ adsets: updatedAdsets });
+        }
+    }, [multipleGeo, firstAdsetCountries, adsets.length, index, form]);
+
+
+    useEffect(() => {
+        if (!form || index !== 0 || multiplePage !== "Page") return;
+
+        const currentAdsets = form.getFieldValue("adsets") || [];
+        const availablePages = new Set(
+            page_id_list.map(option => String(option.value))
+        );
+
+        const firstSelectedAd = currentAdsets
+            .flatMap(adset => adset.ads || [])
+            .find(ad => normalizeList(ad?.page_id).length);
+
+        const currentPages = normalizeList(firstSelectedAd?.page_id)
+            .filter(page => availablePages.has(String(page)));
+
+        const pagesByAccount = new Map();
+
+        currentPages.forEach(page => {
+            const accountKey = String(page).split(" - ")[0];
+
+            if (
+                selectedAccounts.some(
+                    account => String(account) === accountKey
+                ) &&
+                !pagesByAccount.has(accountKey)
+            ) {
+                pagesByAccount.set(accountKey, page);
+            }
+        });
+
+        // Fill any missing account from its default page, when available.
+        selectedAccounts.forEach(account => {
+            const accountKey = String(account);
+
+            if (!pagesByAccount.has(accountKey)) {
+                const fallback = pageidList.find(
+                    page =>
+                        String(page).startsWith(`${accountKey} - `) &&
+                        availablePages.has(String(page))
+                );
+
+                if (fallback !== undefined) {
+                    pagesByAccount.set(accountKey, fallback);
+                }
+            }
+        });
+
+        const selectedPages = [...pagesByAccount.values()];
+
+        const updatedAdsets = currentAdsets.map(adset => ({
+            ...adset,
+            ads: (adset.ads || []).map(ad => ({
+                ...ad,
+                page_id: [...selectedPages]
+            }))
+        }));
+
+        const changed = currentAdsets.some((adset, adsetIndex) =>
+            (adset.ads || []).some((ad, adIndex) =>
+                JSON.stringify(normalizeList(ad?.page_id)) !==
+                JSON.stringify(
+                    updatedAdsets[adsetIndex]?.ads?.[adIndex]?.page_id
+                )
+            )
+        );
+
+        if (changed) {
+            form.setFieldsValue({ adsets: updatedAdsets });
+        }
+    }, [
+        form,
+        index,
+        multiplePage,
+        selectedAccounts,
+        page_id_list,
+        pageidList
+    ]);
+
+    useEffect(() => {
+        if (!form || !campaignName.trim()) return;
+
+        const adsetCount = watchedAdsets.length;
+        const adsetName =
+            adsetCount === 1
+                ? campaignName.trim()
+                : `${campaignName.trim()}_${index + 1}`;
+
+        const path = ["adsets", index, "AdsetName"];
+
+        if (form.getFieldValue(path) !== adsetName) {
+            form.setFieldValue(path, adsetName);
+        }
+    }, [form, campaignName, watchedAdsets.length, index]);
+
+    useEffect(() => {
+        if (!form || currentAdset.id == null) return;
+
+        const adsets = form.getFieldValue("adsets") || [];
+        const adsetIndex = adsets.findIndex(
+            item => String(item?.id) === String(currentAdset.id)
+        );
+
+        if (adsetIndex === -1) return;
+
+        const adsPath = ["adsets", adsetIndex, "ads"];
+        const ads = form.getFieldValue(adsPath) || [];
+
+        if (!ads.length) return;
+
+        form.setFieldValue(
+            adsPath,
+            ads.map(ad => ({
+                ...ad,
+                AdName: watchedAdsetName,
+                AddName: watchedAdsetName,
+            }))
+        );
+    }, [form, currentAdset.id, watchedAdsetName]);
 
     useEffect(() => {
         if (!form || index == null) return;
@@ -520,6 +990,52 @@ const AdSetLevel = ({
             description: firstAd.description || "",
         });
     }, [form, index]);
+
+    useEffect(() => {
+        if (!form || multiplePixel !== "Pixel") return;
+
+        const currentAdsets = form.getFieldValue("adsets") || [];
+        const selectedPixels = normalizeList(
+            currentAdsets.find(adset =>
+                normalizeList(adset?.pixel_id).length
+            )?.pixel_id
+        );
+
+        const isValidSelection = selectedAccounts.every(account =>
+            selectedPixels.filter(
+                pixel => String(pixel).split(" - ")[0] === String(account)
+            ).length === 1
+        );
+
+        const hasOnlyValidAccounts = selectedPixels.every(pixel =>
+            selectedAccounts.some(
+                account => String(account) === String(pixel).split(" - ")[0]
+            )
+        );
+
+        // Keep the current selection if each account has exactly one pixel.
+        if (isValidSelection && hasOnlyValidAccounts) return;
+
+        const availableValues = new Set(
+            pixel_id_list.map(option => String(option.value))
+        );
+
+        const defaultPixels = normalizeList(pixelIdList).filter(pixel =>
+            availableValues.has(String(pixel))
+        );
+
+        const updatedAdsets = currentAdsets.map(adset => ({
+            ...adset,
+            pixel_id: [...defaultPixels]
+        }));
+
+        form.setFieldsValue({ adsets: updatedAdsets });
+
+        currentAdsets.forEach((_, index) => {
+            form.validateFields([["adsets", index, "pixel_id"]])
+                .catch(() => { });
+        });
+    }, [multiplePixel, form, selectedAccounts, pixelIdList, pixel_id_list]);
     const isSpecialCategory = (
         Array.isArray(specialCategories)
             ? specialCategories
@@ -651,44 +1167,6 @@ const AdSetLevel = ({
             slot.days.length > 0
         );
 
-    // useEffect(() => {
-    //     if (adsetScheduleId == null || !timezoneType) return;
-
-    //     const schedule = buildAdsetSchedule(
-    //         currentAdset.selectedScheduleCells ||
-    //         selectedByAdset[adsetScheduleId] ||
-    //         {},
-    //         timezoneType
-    //     );
-
-    //     const schedulePath = ["adsets", index, "ad_schedule"];
-    //     const existingSchedule = form.getFieldValue(schedulePath);
-
-    //     if (JSON.stringify(existingSchedule || []) !== JSON.stringify(schedule)) {
-    //         form.setFieldValue(schedulePath, schedule);
-    //     }
-
-    //     setAdsetSchedule(previous => ({
-    //         ...previous,
-    //         [adsetScheduleId]: schedule
-    //     }));
-
-    //     if (isValidAdSchedule(schedule)) {
-    //         setScheduleErrorByAdset(previous =>
-    //             previous[adsetScheduleId]
-    //                 ? { ...previous, [adsetScheduleId]: false }
-    //                 : previous
-    //         );
-    //         setShowScheduleSubmitError(false);
-    //     }
-    // }, [
-    //     currentAdset.selectedScheduleCells,
-    //     selectedByAdset,
-    //     adsetScheduleId,
-    //     timezoneType,
-    //     index,
-    //     form
-    // ]);
 
     useEffect(() => {
         if (adsetScheduleId == null || !timezoneType) return;
@@ -987,8 +1465,9 @@ const AdSetLevel = ({
             Language: [6],
             platforms: [],
             positions: [],
+            selectedPositions: [],
             device_platforms: [],
-            pixel_id: [],
+            pixel_id: pixelIdList,
             page_id: [],
             ads: [createInitialAd(selectedAccounts)]
         };
@@ -1032,8 +1511,46 @@ const AdSetLevel = ({
         budgetType,
         selectedAccounts,
         watchedAccountList,
-        isCreate
+        isCreate,
+        pixelIdList
     ]);
+
+    // Keep your existing defaults useEffect unchanged above.
+
+    // Set default pixel selection when options become available.
+    useEffect(() => {
+        if (
+            !form ||
+            index == null ||
+            !isCreate ||
+            !Array.isArray(pixelIdList) ||
+            !pixelIdList.length ||
+            !Array.isArray(pixel_id_list) ||
+            !pixel_id_list.length
+        ) {
+            return;
+        }
+
+        const path = ["adsets", index, "pixel_id"];
+        const currentValue = form.getFieldValue(path);
+
+        // Preserve any existing selection.
+        if (Array.isArray(currentValue) && currentValue.length > 0) {
+            return;
+        }
+
+        const availableValues = new Set(
+            pixel_id_list.map(option => String(option.value))
+        );
+
+        const validDefaults = pixelIdList.filter(value =>
+            availableValues.has(String(value))
+        );
+
+        if (validDefaults.length) {
+            form.setFieldValue(path, validDefaults);
+        }
+    }, [form, index, isCreate, pixelIdList, pixel_id_list]);
 
     useEffect(() => {
         if (!form || index == null || !allCountryTree.length) return;
@@ -1126,6 +1643,32 @@ const AdSetLevel = ({
         }
     }, [optimizationGoalValue, index, form]);
 
+    // const handlePlatformsChange = selected => {
+    //     const selectedPlatforms = normalizeList(selected);
+
+    //     const nextPositions = [
+    //         ...new Set(
+    //             selectedPlatforms.flatMap(
+    //                 platform => platformPositions[platform] || []
+    //             )
+    //         )
+    //     ];
+
+    //     const currentAdsets = form.getFieldValue("adsets") || [];
+    //     const updatedAdsets = currentAdsets.map((adset, adsetIndex) =>
+    //         adsetIndex === index
+    //             ? {
+    //                 ...adset,
+    //                 platforms: selectedPlatforms,
+    //                 positions: nextPositions
+    //             }
+    //             : adset
+    //     );
+
+    //     form.setFieldsValue({ adsets: updatedAdsets });
+    //     Promise.resolve().then(validateDevicePlatforms);
+    // };
+
     const handlePlatformsChange = selected => {
         const selectedPlatforms = normalizeList(selected);
 
@@ -1138,12 +1681,14 @@ const AdSetLevel = ({
         ];
 
         const currentAdsets = form.getFieldValue("adsets") || [];
+
         const updatedAdsets = currentAdsets.map((adset, adsetIndex) =>
             adsetIndex === index
                 ? {
                     ...adset,
                     platforms: selectedPlatforms,
-                    positions: nextPositions
+                    positions: nextPositions,
+                    selectedPositions: getSelectedPositionObjects(nextPositions)
                 }
                 : adset
         );
@@ -1152,11 +1697,27 @@ const AdSetLevel = ({
         Promise.resolve().then(validateDevicePlatforms);
     };
 
+    // const handlePositionsChange = selected => {
+    //     form.setFieldValue(
+    //         ["adsets", index, "positions"],
+    //         normalizeList(selected)
+    //     );
+    //     Promise.resolve().then(validateDevicePlatforms);
+    // };
+
     const handlePositionsChange = selected => {
+        const selectedValues = normalizeList(selected);
+
         form.setFieldValue(
             ["adsets", index, "positions"],
-            normalizeList(selected)
+            selectedValues
         );
+
+        form.setFieldValue(
+            ["adsets", index, "selectedPositions"],
+            getSelectedPositionObjects(selectedValues)
+        );
+
         Promise.resolve().then(validateDevicePlatforms);
     };
 
@@ -1374,6 +1935,24 @@ const AdSetLevel = ({
             width: 2,
             options: billingEventOptions[optimizationGoalValue] || []
         },
+        // {
+        //     key: "pixel_id",
+        //     label: "Pixel",
+        //     type: "select",
+        //     required: true,
+        //     row: 2,
+        //     width: 4,
+        //     options: pixel_id_list,
+        //     props: {
+        //         mode: "multiple",
+        //         allowClear: true,
+        //         showSearch: true,
+        //         optionFilterProp: "label",
+        //         maxTagCount: 1,
+        //         placeholder: "Select pixel(s)"
+        //     }
+        // },
+
         {
             key: "pixel_id",
             label: "Pixel",
@@ -1381,7 +1960,41 @@ const AdSetLevel = ({
             required: true,
             row: 2,
             width: 4,
-            options: pixel_id_list,
+            options: pixel_id_list.map(option => {
+                const account = String(option.value).split(" - ")[0];
+                const selectedPixels = normalizeList(
+                    form.getFieldValue(["adsets", index, "pixel_id"])
+                );
+                const selectedForAccount = selectedPixels.filter(
+                    value => String(value).split(" - ")[0] === account
+                );
+
+                return {
+                    ...option,
+                    disabled:
+                        multiplePixel === "Pixel" &&
+                        selectedForAccount.length > 0 &&
+                        !selectedPixels.includes(option.value)
+                };
+            }),
+            rules: [
+                {
+                    validator: (_, value) => {
+                        const selectedPixels = normalizeList(value);
+                        const missingAccount = selectedAccounts.find(account =>
+                            !selectedPixels.some(
+                                pixel => String(pixel).split(" - ")[0] === String(account)
+                            )
+                        );
+
+                        return missingAccount
+                            ? Promise.reject(
+                                new Error(`Please select a pixel for account ${missingAccount}.`)
+                            )
+                            : Promise.resolve();
+                    }
+                }
+            ],
             props: {
                 mode: "multiple",
                 allowClear: true,
@@ -1533,7 +2146,43 @@ const AdSetLevel = ({
             row: 3,
             width: 3,
             options: countryTreeData,
+            // props: {
+            //     treeCheckable: true,
+            //     showCheckedStrategy: SHOW_CHILD,
+            //     showSearch: true,
+            //     allowClear: true,
+            //     treeNodeFilterProp: "label",
+            //     treeDefaultExpandedKeys: ["all_countries"],
+            //     placeholder: campaignCountryValues.length
+            //         ? "Select from campaign countries"
+            //         : "Select countries",
+            //     maxTagCount: 2,
+            //     fieldNames: {
+            //         label: "label",
+            //         value: "value",
+            //         children: "children"
+            //     },
+            //     treeLine: true,
+            //     switcherIcon: ({ expanded, isLeaf }) =>
+            //         isLeaf
+            //             ? null
+            //             : expanded
+            //                 ? <DownOutlined />
+            //                 : <RightOutlined />,
+            //     className: `${theme === "dark" ? "dark-theme" : "light-theme"
+            //         } green-border-select`,
+            //     classNames: {
+            //         popup: {
+            //             root: `${theme === "dark"
+            //                 ? "custom-dropdown"
+            //                 : "custom-dropdown-light"
+            //                 } campaigns-campaign-level-tree-dropdown campaigns-adset-level-tree-dropdown`
+            //         }
+            //     },
+            //     style: { width: "100%" }
+            // }
             props: {
+                disabled: multipleGeo === "Geos" && index !== 0,
                 treeCheckable: true,
                 showCheckedStrategy: SHOW_CHILD,
                 showSearch: true,
@@ -1556,8 +2205,7 @@ const AdSetLevel = ({
                         : expanded
                             ? <DownOutlined />
                             : <RightOutlined />,
-                className: `${theme === "dark" ? "dark-theme" : "light-theme"
-                    } green-border-select`,
+                className: `${theme === "dark" ? "dark-theme" : "light-theme"} green-border-select`,
                 classNames: {
                     popup: {
                         root: `${theme === "dark"
@@ -1726,6 +2374,16 @@ const AdSetLevel = ({
                     {...props}
                     variant="outlined"
                     options={field.options}
+                    // onChange={
+                    //     field.key === "platforms"
+                    //         ? handlePlatformsChange
+                    //         : field.key === "positions"
+                    //             ? handlePositionsChange
+                    //             : field.key === "device_platforms"
+                    //                 ? validateDevicePlatforms
+                    //                 : undefined
+                    // }
+
                     onChange={
                         field.key === "platforms"
                             ? handlePlatformsChange
@@ -1733,7 +2391,26 @@ const AdSetLevel = ({
                                 ? handlePositionsChange
                                 : field.key === "device_platforms"
                                     ? validateDevicePlatforms
-                                    : undefined
+                                    : field.key === "pixel_id"
+                                        ? value => {
+                                            const selectedPixels = normalizeList(value);
+                                            const currentAdsets = form.getFieldValue("adsets") || [];
+
+                                            form.setFieldValue(
+                                                "adsets",
+                                                currentAdsets.map(adset => ({
+                                                    ...adset,
+                                                    pixel_id: [...selectedPixels]
+                                                }))
+                                            );
+
+                                            currentAdsets.forEach((_, adsetIndex) => {
+                                                form.validateFields([
+                                                    ["adsets", adsetIndex, "pixel_id"]
+                                                ]).catch(() => { });
+                                            });
+                                        }
+                                        : undefined
                     }
                     classNames={{
                         popup: { root: "campaigns-dropdown" }
@@ -1767,6 +2444,43 @@ const AdSetLevel = ({
             )
         }))
         .filter(item => item.fields.length);
+
+    const isLibraryCreativeAd = (ad) => {
+        const source = String(ad?.mediaSource || "").toLowerCase();
+
+        if (["creatives", "creative", "library"].includes(source)) {
+            return true;
+        }
+
+        if (["upload", "local", "device"].includes(source)) {
+            return false;
+        }
+
+        if (ad?.sourceCreative || ad?.creativeId || ad?.creativeAssetId) {
+            return true;
+        }
+
+        const media = [
+            ...(Array.isArray(ad?.media?.images) ? ad.media.images : []),
+            ...(Array.isArray(ad?.media?.videos) ? ad.media.videos : []),
+            ...(Array.isArray(ad?.filename)
+                ? ad.filename
+                : ad?.filename
+                    ? [ad.filename]
+                    : []),
+        ];
+
+        return media.some(item =>
+            item &&
+            typeof item === "object" &&
+            (
+                item.sourceCreative ||
+                item.creativeId ||
+                item.creativeAssetId ||
+                item.isRemote === true
+            )
+        );
+    };
 
     return (
         <>
@@ -1994,14 +2708,6 @@ const AdSetLevel = ({
                 >
                     <HiddenField />
                 </Form.Item>
-
-                {/* <Form.Item
-                    name={[index, "ad_schedule"]}
-                    hidden
-                    preserve
-                >
-                    <HiddenField />
-                </Form.Item> */}
                 <Form.Item
                     name={[index, "ad_schedule"]}
                     hidden
@@ -2224,36 +2930,44 @@ const AdSetLevel = ({
                             )}
                         </div>
 
-                        {normalizeList(watchedAccountList).map(account => (
+                        {normalizeList(watchedAccountList).map((account) => (
                             <div
                                 key={account}
                                 style={{
-                                    display: selectedAccount === account
-                                        ? "block"
-                                        : "none"
+                                    display: selectedAccount === account ? "block" : "none",
                                 }}
                             >
-                                <Form.Item
-                                    name={[index, "Beneficiary", account]}
-                                    label={`Beneficiary (${account})`}
-                                    rules={[{
-                                        required: true,
-                                        message: "Please enter Beneficiary."
-                                    }]}
-                                >
-                                    <Input placeholder="Enter Beneficiary ID" />
-                                </Form.Item>
+                                <Row gutter={12}>
+                                    <Col xs={12}>
+                                        <Form.Item
+                                            name={[index, "Beneficiary", account]}
+                                            label={`Beneficiary (${account})`}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message: "Please enter Beneficiary.",
+                                                },
+                                            ]}
+                                        >
+                                            <Input placeholder="Enter Beneficiary ID" />
+                                        </Form.Item>
+                                    </Col>
 
-                                <Form.Item
-                                    name={[index, "Payer", account]}
-                                    label={`Payer (${account})`}
-                                    rules={[{
-                                        required: showPayer,
-                                        message: "Please enter Payer."
-                                    }]}
-                                >
-                                    <Input placeholder="Enter Payer ID" />
-                                </Form.Item>
+                                    <Col xs={12}>
+                                        <Form.Item
+                                            name={[index, "Payer", account]}
+                                            label={`Payer (${account})`}
+                                            rules={[
+                                                {
+                                                    required: showPayer,
+                                                    message: "Please enter Payer.",
+                                                },
+                                            ]}
+                                        >
+                                            <Input placeholder="Enter Payer ID" />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
                             </div>
                         ))}
                     </div>
@@ -2261,10 +2975,31 @@ const AdSetLevel = ({
 
                 {/* Existing AdLevel form list remains intentionally commented out. */}
                 <div className="campaigns-adset-ads">
-                    <Form.List name={[index, "ads"]}>
+                    {/* <Form.List name={[index, "ads"]}>
                         {(adFields, { remove }) => (
                             <>
-                                {adFields.map(adField => {
+                                {[
+                                    ...adFields.filter(field =>
+                                        isLibraryCreativeAd(
+                                            form.getFieldValue([
+                                                "adsets",
+                                                index,
+                                                "ads",
+                                                field.name
+                                            ])
+                                        )
+                                    ),
+                                    ...adFields.filter(field =>
+                                        !isLibraryCreativeAd(
+                                            form.getFieldValue([
+                                                "adsets",
+                                                index,
+                                                "ads",
+                                                field.name
+                                            ])
+                                        )
+                                    ),
+                                ].map((adField, renderIndex) => {
                                     const adPath = [
                                         "adsets",
                                         index,
@@ -2279,6 +3014,8 @@ const AdSetLevel = ({
                                         >
                                             <AdLevel
                                                 form={form}
+                                                network={network}
+                                                adsetId={form.getFieldValue(["adsets", index, "id"])}
                                                 adsetIndex={index}
                                                 adIndex={adField.name}
                                                 field={adField}
@@ -2286,52 +3023,132 @@ const AdSetLevel = ({
                                                 mode={mode}
                                                 selectedAccounts={selectedAccounts}
                                                 pagesByAccount={pagesByAccount}
+                                                multiplePage={multiplePage}
                                                 removeAd={() => remove(adField.name)}
                                                 onBatchCreate={newFiles => {
-                                                    if (
-                                                        !Array.isArray(newFiles) ||
-                                                        !newFiles.length
-                                                    ) {
-                                                        return;
-                                                    }
+                                                    const currentAdsetName =
+                                                        form.getFieldValue([
+                                                            "adsets",
+                                                            index,
+                                                            "AdsetName",
+                                                        ]) || "";
 
-                                                    const adsPath = [
+                                                    return {
+                                                        ...source,
+                                                        id:
+                                                            globalThis.crypto?.randomUUID?.() ||
+                                                            `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                                                        AdName: currentAdsetName,
+                                                        AddName: currentAdsetName,
+                                                        textOverridesEnabled: false,
+                                                        media: {
+                                                            images: isVideo ? [] : [file],
+                                                            videos: isVideo ? [file] : [],
+                                                            thumbnail: null,
+                                                        },
+                                                        accountSettings: Object.fromEntries(
+                                                            Object.entries(source.accountSettings || {}).map(([key, value]) => [
+                                                                key,
+                                                                {
+                                                                    ...value,
+                                                                    creativeOverrides: {
+                                                                        ...(value?.creativeOverrides || {}),
+                                                                    },
+                                                                },
+                                                            ])
+                                                        ),
+                                                    };
+                                                }}
+                                                userData={userData}
+                                                auth={auth}
+                                                theme={theme}
+                                                username={username}
+                                                showCreativeStrip={renderIndex === 0}
+                                                pageidList={pageidList}
+                                                page_id_list={page_id_list}
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </>
+                        )}
+                    </Form.List> */}
+                    <Form.List name={[index, "ads"]}>
+                        {(adFields, { remove }) => {
+                            const orderedAdFields = [
+                                ...adFields.filter((field) =>
+                                    isLibraryCreativeAd(
+                                        form.getFieldValue([
+                                            "adsets",
+                                            index,
+                                            "ads",
+                                            field.name,
+                                        ])
+                                    )
+                                ),
+                                ...adFields.filter(
+                                    (field) =>
+                                        !isLibraryCreativeAd(
+                                            form.getFieldValue([
+                                                "adsets",
+                                                index,
+                                                "ads",
+                                                field.name,
+                                            ])
+                                        )
+                                ),
+                            ];
+
+                            const visibleAdFields = isDynamicCreative
+                                ? adFields.slice(0, 1)
+                                : orderedAdFields;
+
+                            return (
+                                <>
+                                    {visibleAdFields.map((adField, renderIndex) => {
+                                        const adPath = [
+                                            "adsets",
+                                            index,
+                                            "ads",
+                                            adField.name,
+                                        ];
+
+                                        return (
+                                            <div
+                                                key={adField.key}
+                                                style={{ marginBottom: 12 }}
+                                            >
+                                                <AdLevel
+                                                    form={form}
+                                                    network={network}
+                                                    adsetId={form.getFieldValue([
                                                         "adsets",
                                                         index,
-                                                        "ads",
-                                                    ];
-
-                                                    const source =
-                                                        form.getFieldValue(adPath) ||
-                                                        createInitialAd(selectedAccounts);
-
-                                                    const generatedAds = newFiles.map(file => {
-                                                        const fileType =
-                                                            file?.type ||
-                                                            file?.originFileObj?.type ||
-                                                            "";
-
-                                                        const fileName =
-                                                            file?.name ||
-                                                            file?.originFileObj?.name ||
-                                                            "";
-
-                                                        const isVideo =
-                                                            fileType.startsWith("video/") ||
-                                                            /\.(mp4|mov|m4v|webm|avi|mpeg|mpg)$/i.test(
-                                                                fileName
-                                                            );
+                                                        "id",
+                                                    ])}
+                                                    adsetIndex={index}
+                                                    adIndex={adField.name}
+                                                    field={adField}
+                                                    adPath={adPath}
+                                                    mode={mode}
+                                                    selectedAccounts={selectedAccounts}
+                                                    pagesByAccount={pagesByAccount}
+                                                    removeAd={() => remove(adField.name)}
+                                                    onBatchCreate={newFiles => {
+                                                        const currentAdsetName =
+                                                            form.getFieldValue([
+                                                                "adsets",
+                                                                index,
+                                                                "AdsetName",
+                                                            ]) || "";
 
                                                         return {
                                                             ...source,
                                                             id:
                                                                 globalThis.crypto?.randomUUID?.() ||
-                                                                `${Date.now()}-${Math.random()
-                                                                    .toString(36)
-                                                                    .slice(2)}`,
-                                                            AdName: fileName
-                                                                ? fileName.replace(/\.[^.]+$/, "")
-                                                                : source.AdName || "",
+                                                                `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                                                            AdName: currentAdsetName,
+                                                            AddName: currentAdsetName,
                                                             textOverridesEnabled: false,
                                                             media: {
                                                                 images: isVideo ? [] : [file],
@@ -2339,9 +3156,7 @@ const AdSetLevel = ({
                                                                 thumbnail: null,
                                                             },
                                                             accountSettings: Object.fromEntries(
-                                                                Object.entries(
-                                                                    source.accountSettings || {}
-                                                                ).map(([key, value]) => [
+                                                                Object.entries(source.accountSettings || {}).map(([key, value]) => [
                                                                     key,
                                                                     {
                                                                         ...value,
@@ -2352,26 +3167,22 @@ const AdSetLevel = ({
                                                                 ])
                                                             ),
                                                         };
-                                                    });
-
-                                                    const currentAds =
-                                                        form.getFieldValue(adsPath) || [];
-
-                                                    form.setFieldValue(adsPath, [
-                                                        ...currentAds,
-                                                        ...generatedAds,
-                                                    ]);
-                                                }}
-                                                userData={userData}
-                                                auth={auth}
-                                                theme={theme}
-                                                username={username}
-                                            />
-                                        </div>
-                                    );
-                                })}
-                            </>
-                        )}
+                                                    }}
+                                                    userData={userData}
+                                                    auth={auth}
+                                                    theme={theme}
+                                                    username={username}
+                                                    showCreativeStrip={renderIndex === 0}
+                                                    pageidList={pageidList}
+                                                    page_id_list={page_id_list}
+                                                    multiplePage={multiplePage}
+                                                />
+                                            </div>
+                                        );
+                                    })}
+                                </>
+                            );
+                        }}
                     </Form.List>
                 </div>
             </div>
