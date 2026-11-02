@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import axios from "axios";
-import { Grid, Row, Col, Upload, message } from "antd";
+import { Grid, Row, Col, Upload, message, Button, Badge } from "antd";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { DeleteOutlined, UploadOutlined, EditOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -41,7 +41,7 @@ const FabricCanvas = dynamic(
   }
 );
 const { useBreakpoint } = Grid;
-export default function CreativesPage({ email, userData, userPermissions, auth, username ,theme}) {
+export default function CreativesPage({ email, userData, userPermissions, auth, username, theme, route, onSubmitSelectedImages }) {
 
   // theme states
 
@@ -838,6 +838,25 @@ export default function CreativesPage({ email, userData, userPermissions, auth, 
                 />
               )}
             </Col>
+            {route === "campaigns" && <Col>
+              <Badge count={selectedImages.length} offset={[-5, 5]}>
+                <Button
+                  style={{
+                    height: "24px",
+                    color: theme === "dark" ? "white" : "black",
+                    backgroundColor: "#91c25f",
+                    fontSize: 12,
+                  }}
+                  onClick={() => {
+                    onSubmitSelectedImages(selectedImages);
+                    setSelectedImages([]);
+                    setIsModalVisible(false);
+                  }}
+                >
+                  Submit
+                </Button>
+              </Badge>
+            </Col>}
           </Row>
 
           {/* Search and Action Buttons */}
