@@ -5,7 +5,7 @@ export  default async function UpdateNetworkStatus(
     status
 ) {
     const apiCall = await axios.patch(
-        "http://test.app.vyaktimetrics.com/userrole/networks",
+        "https://app.vyaktimetrics.com/userrole/networks",
         null,
         {
             params: {

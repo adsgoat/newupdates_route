@@ -5,7 +5,7 @@ export default async function AddAccountData(
     newAccount
 ) {
     const response = await axios.post(
-        "http://test.app.vyaktimetrics.com/userrole/accounts",
+        "https://app.vyaktimetrics.com/userrole/accounts",
         {
             newAccount,
         },

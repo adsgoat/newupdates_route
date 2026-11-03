@@ -6,7 +6,7 @@ export default async function DeleteNote(
     token
 ) {
     const apiCall = await axios.delete(
-        `http://test.app.vyaktimetrics.com/open/notes/${encodeURIComponent(
+        `https://app.vyaktimetrics.com/open/notes/${encodeURIComponent(
             email
         )}/${encodeURIComponent(id)}`,
         {

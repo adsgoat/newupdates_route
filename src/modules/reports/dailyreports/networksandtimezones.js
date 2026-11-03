@@ -1,5 +1,6 @@
 export const newtworkCollections = {
   "FB_Mnet": "Facebook_Mnet_Daily",
+  "FB_Media": "Facebook_Media_Daily",
   "FB_MnetBing": "Facebook_MnetBing_Daily",
   "FB_Enki": "Facebook_Enki",
   "FB_System1": 'Facebook_System1',
@@ -23,6 +24,7 @@ export const newtworkCollections = {
 }
 export const newtworkCollectionsAdsets = {
   "FB_Mnet": "Facebook_Mnet_Daily",
+  "FB_Media": "Facebook_Media_Daily",
   "FB_MnetBing": "Facebook_MnetBing_Daily",
   "FB_Enki": "Facebook_Enki",
   "FB_System1": 'Facebook_System1',

@@ -7,7 +7,7 @@ export default async function NotificationView(
     token
 ) {
     const apiCall = await axios.put(
-        "http://test.app.vyaktimetrics.com/open/notifications/view",
+        "https://app.vyaktimetrics.com/open/notifications/view",
         {
             email,
             key,

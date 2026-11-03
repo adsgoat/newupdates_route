@@ -6,7 +6,7 @@ export default async function UpdateAccountStatus(
     token
 ) {
     const apiCall = await axios.patch(
-        `http://test.app.vyaktimetrics.com/userrole/accounts?accountNumber=${encodeURIComponent(
+        `https://app.vyaktimetrics.com/userrole/accounts?accountNumber=${encodeURIComponent(
             accountNumber
         )}&status=${encodeURIComponent(status)}`,
         {},

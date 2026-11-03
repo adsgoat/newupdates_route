@@ -5,7 +5,7 @@ export default async function UpdateUrlBuilder(
     token
 ) {
     const apiCall = await axios.put(
-        "http://test.app.vyaktimetrics.com/userrole/urlbuilder",
+        "https://app.vyaktimetrics.com/userrole/urlbuilder",
         {
             updatedData,
         },

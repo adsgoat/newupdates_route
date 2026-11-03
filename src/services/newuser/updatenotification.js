@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default async function UpdateUserData(token, formDataToSend) {
     const apiCall = await axios.post(
-        "http://test.app.vyaktimetrics.com/userrole/updates",
+        "https://app.vyaktimetrics.com/userrole/updates",
         formDataToSend,
         {
             headers: {

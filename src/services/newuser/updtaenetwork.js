@@ -5,7 +5,7 @@ export default async function UpdateNetwork(
     token
 ) {
     const apiCall = await axios.put(
-        "http://test.app.vyaktimetrics.com/userrole/networks",
+        "https://app.vyaktimetrics.com/userrole/networks",
         {
             updatedNetwork,
         },

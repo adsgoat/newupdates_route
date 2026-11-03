@@ -14,7 +14,7 @@ export default async function RestoreService({
         console.log("originalKey:", originalKey);
 
         const response = await axios.post(
-            `http://test.app.vyaktimetrics.com/creatives/trashfiles`,
+            `https://app.vyaktimetrics.com/creatives/trashfiles`,
             {
                 trashKey,
                 originalKey,
