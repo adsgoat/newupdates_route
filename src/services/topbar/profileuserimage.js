@@ -6,7 +6,7 @@ export default async function UploadProfileImage(file, token) {
     formData.append("file", file);
 
     const apiCall = await axios.post(
-        "http://test.app.vyaktimetrics.com/creatives/userfiles/uploaduserimage",
+        "https://app.vyaktimetrics.com/creatives/userfiles/uploaduserimage",
         formData,
         {
             headers: {

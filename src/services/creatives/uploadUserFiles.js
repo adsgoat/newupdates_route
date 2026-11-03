@@ -53,7 +53,7 @@ export default async function UploadUserFiles(
     }
 
     const response = await fetch(
-        "http://test.app.vyaktimetrics.com/creatives/userfiles/uploaduserfiles",
+        "https://app.vyaktimetrics.com/creatives/userfiles/uploaduserfiles",
         {
             method: "POST",
             headers,

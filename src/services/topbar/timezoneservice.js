@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default async function GetTimezonesData(token) {
     const apiCall = await axios.get(
-        "http://test.app.vyaktimetrics.com/open/globalclock/timezones",
+        "https://app.vyaktimetrics.com/open/globalclock/timezones",
         {
             headers: {
                 Authorization: token,

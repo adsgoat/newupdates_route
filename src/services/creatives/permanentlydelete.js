@@ -17,7 +17,7 @@ const PermanentDeleteService = async (
         console.log("token exists:", !!token);
 
         const response = await axios.delete(
-            "http://test.app.vyaktimetrics.com/creatives/trashfiles",
+            "https://app.vyaktimetrics.com/creatives/trashfiles",
             {
                 headers: {
                     Authorization: token,

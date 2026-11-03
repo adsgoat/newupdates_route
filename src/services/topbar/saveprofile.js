@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default async function SaveProfileImage(email, imageUrl, token) {
     const apiCall = await axios.post(
-        "http://test.app.vyaktimetrics.com/open/userimage",
+        "https://app.vyaktimetrics.com/open/userimage",
         {
             email,
             imageUrl,

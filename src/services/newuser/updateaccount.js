@@ -5,7 +5,7 @@ export default async function UpdateAccount(
     token
 ) {
     const apiCall = await axios.put(
-        "http://test.app.vyaktimetrics.com/userrole/accounts",
+        "https://app.vyaktimetrics.com/userrole/accounts",
         {
             newAccount,
         },
