@@ -5,7 +5,7 @@ export default async function MarkAllNotificationsAsSeen(
     token
 ) {
     const apiCall = await axios.put(
-        "http://test.app.vyaktimetrics.com/open/notifications/viewall",
+        "https://app.vyaktimetrics.com/open/notifications/viewall",
         {
             email,
         },

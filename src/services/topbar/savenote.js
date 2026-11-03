@@ -6,7 +6,7 @@ export default async function SaveNotes(
     token
 ) {
     const apiCall = await axios.post(
-        "http://test.app.vyaktimetrics.com/open/notes",
+        "https://app.vyaktimetrics.com/open/notes",
         {
             email,
             notes,

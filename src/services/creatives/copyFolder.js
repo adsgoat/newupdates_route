@@ -5,7 +5,7 @@ export default async function CopyFolder(reqData, token) {
 
     try {
         const apiCall = await axios.post(
-            "http://test.app.vyaktimetrics.com/creatives/folders/copyfolder",
+            "https://app.vyaktimetrics.com/creatives/folders/copyfolder",
             {
                 sourceKey,
                 destinationKey,

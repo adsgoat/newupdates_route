@@ -6,7 +6,7 @@ export default async function DeleteMultipleNotes(
     token
 ) {
     const apiCall = await axios.delete(
-        "http://test.app.vyaktimetrics.com/open/notes/bulk",
+        "https://app.vyaktimetrics.com/open/notes/bulk",
         {
             headers: {
                 Authorization: token,

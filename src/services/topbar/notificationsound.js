@@ -5,7 +5,7 @@ export default async function GetNotificationSoundData(
     token
 ) {
     const apiCall = await axios.get(
-        "http://test.app.vyaktimetrics.com/open/notifications/sound",
+        "https://app.vyaktimetrics.com/open/notifications/sound",
         {
             params: {
                 email,

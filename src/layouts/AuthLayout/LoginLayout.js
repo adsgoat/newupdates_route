@@ -48,12 +48,12 @@ const LoginPage = ({
     //     signIn('google'); // Use Next-auth for Google sign-in
     // };
     const handleGoogleSignIn = async () => {
-        // signIn('google', {
-        //     callbackUrl
-        // });
-        signIn('keycloak', {
+        await signIn('google', {
             callbackUrl
         });
+        // signIn('keycloak', {
+        //     callbackUrl
+        // });
         // const result = await signIn("google", {
         //     callbackUrl,
         //     redirect: false,

@@ -4,7 +4,7 @@ export default async function RenameUserFile(reqData, token) {
     const { key, newFilename, username } = reqData;
 
     const apiCall = await axios.post(
-        "http://test.app.vyaktimetrics.com/creatives/userfiles/renameuserfile",
+        "https://app.vyaktimetrics.com/creatives/userfiles/renameuserfile",
         {
             key,
             newFilename,

@@ -6,7 +6,7 @@ export default async function UpdateNotificationSound(
     token
 ) {
     const apiCall = await axios.put(
-        "http://test.app.vyaktimetrics.com/open/notifications/sound",
+        "https://app.vyaktimetrics.com/open/notifications/sound",
         {
             email,
             isMuted,
