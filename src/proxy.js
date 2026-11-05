@@ -334,7 +334,7 @@ export async function proxy(request) {
         }
 
         // Verify the signature and expiration.
-        jwt.verify(authToken, process.env.JWT_SECRET);
+        jwt.verify(authToken, process.env.Jwt_Secret);
 
         // Custom JWT is valid.
         return NextResponse.next();

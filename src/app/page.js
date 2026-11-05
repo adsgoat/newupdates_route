@@ -21,7 +21,7 @@ export default async function LoginPageLayout({
     // // const token = (await cookies()).get("auth_token")?.value;
     // // const token = await client.get("auth_token");
     // // const user = (await cookies()).get("user")?.value;
-    const token = await client.get(`auth_${email}`);
+    const token = await client.get(`auth_token_${email}`);
     // const callbackUrl = (await cookies()).get("redirect_after_login")?.value;
     const callbackUrl = (await searchParams)?.callbackUrl || "/dashboard";
     const isValidUser = (await cookies()).get("invalid_user")?.value === "true";
