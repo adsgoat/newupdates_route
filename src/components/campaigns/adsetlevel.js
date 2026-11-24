@@ -5,6 +5,7 @@ import { Form, Input, InputNumber, Select, TreeSelect, DatePicker, Switch, Toolt
 import { DownOutlined, RightOutlined, InfoCircleOutlined, ShareAltOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import AdLevel, { createInitialAd } from "./adlevel";
+import { v4 as uuidv4 } from "uuid";
 
 const { SHOW_CHILD } = TreeSelect;
 
@@ -285,7 +286,7 @@ const AdSetLevel = ({
     showBidAmount = false,
     minAgeToggle,
     setMinAgeToggle,
-    selectedAccounts = [],
+    // selectedAccounts = [],
     pagesByAccount = {},
     instagramAccountsByAccount = {},
     adSchedulingToShow: externalAdSchedulingToShow,
@@ -306,6 +307,8 @@ const AdSetLevel = ({
     adsetConfig
 }) => {
     const isCreate = mode === "create";
+    const isView = mode === "view";
+    const selectedAccounts = Form.useWatch("Account_Number", form) || [];
 
     const {
         EU_AND_ASSOCIATED = [],
@@ -371,6 +374,8 @@ const AdSetLevel = ({
     // Resolve the current position using the stable ID.
     const index =
         matchedIndex >= 0 ? matchedIndex : fallbackIndex;
+    const adsetDbId = Form.useWatch(["adsets", index, "Adsetid"], form);
+    const isEditLocked = mode === "edit" && Boolean(adsetDbId);
     const currentAdset = adsets[index] || {};
     // const adsetScheduleId = currentAdset.id || index;
     const adsetScheduleId = currentAdset.id ?? propAdsetId;
@@ -410,10 +415,689 @@ const AdSetLevel = ({
         Form.useWatch(["adsets", index, "ads"], form, { preserve: true }) || [];
     const previousDynamicCreativeRef = useRef(isDynamicCreative);
 
+    // const getAdMediaItems = ad => {
+    //     const media = [
+    //         ...(Array.isArray(ad?.media?.images) ? ad.media.images : []),
+    //         ...(Array.isArray(ad?.media?.videos) ? ad.media.videos : []),
+    //     ];
+
+    //     if (media.length) return media;
+
+    //     if (Array.isArray(ad?.filename)) {
+    //         return ad.filename;
+    //     }
+
+    //     if (ad?.filename) {
+    //         return [ad.filename];
+    //     }
+
+    //     if (ad?.mediaUrl) {
+    //         return [{
+    //             uid: ad?.creativeId || ad?.creativeAssetId || ad?.id,
+    //             url: ad.mediaUrl,
+    //             name: ad?.mediaName || ad.mediaUrl.split("/").pop(),
+    //             type: ad?.mediaType,
+    //             mediaType: ad?.mediaType,
+    //             creativeId: ad?.creativeId,
+    //             creativeAssetId: ad?.creativeAssetId,
+    //             sourceCreative: ad?.sourceCreative,
+    //             mediaSource:
+    //                 ad?.mediaSource === "creatives"
+    //                     ? "creatives"
+    //                     : "upload",
+    //         }];
+    //     }
+
+    //     return [];
+    // };
+
+    // const getAdMediaItems = ad => {
+    //     // filename contains the original ordered media list.
+    //     // Use it first so Creative Library files stay before Local Upload files.
+    //     if (Array.isArray(ad?.filename) && ad.filename.length) {
+    //         return ad.filename;
+    //     }
+
+    //     if (ad?.filename) {
+    //         return [ad.filename];
+    //     }
+
+    //     const media = [
+    //         ...(Array.isArray(ad?.media?.images) ? ad.media.images : []),
+    //         ...(Array.isArray(ad?.media?.videos) ? ad.media.videos : []),
+    //     ];
+
+    //     if (media.length) return media;
+
+    //     if (ad?.mediaUrl) {
+    //         return [{
+    //             uid: ad?.creativeId || ad?.creativeAssetId || ad?.id,
+    //             url: ad.mediaUrl,
+    //             name: ad?.mediaName || ad.mediaUrl.split("/").pop(),
+    //             type: ad?.mediaType,
+    //             mediaType: ad?.mediaType,
+    //             creativeId: ad?.creativeId,
+    //             creativeAssetId: ad?.creativeAssetId,
+    //             sourceCreative: ad?.sourceCreative,
+    //             mediaSource:
+    //                 ad?.mediaSource === "creatives"
+    //                     ? "creatives"
+    //                     : "upload",
+    //         }];
+    //     }
+
+    //     return [];
+    // };
+
+    const getAdMediaItems = (ad) => {
+        if (Array.isArray(ad?.filename)) {
+            return ad.filename;
+        }
+
+        if (ad?.filename) {
+            return [ad.filename];
+        }
+
+        const media = [
+            ...(Array.isArray(ad?.media?.images) ? ad.media.images : []),
+            ...(Array.isArray(ad?.media?.videos) ? ad.media.videos : []),
+        ];
+
+        if (media.length) {
+            return media;
+        }
+
+        if (ad?.mediaUrl) {
+            return [{
+                uid: ad?.creativeId || ad?.creativeAssetId || ad?.id,
+                url: ad.mediaUrl,
+                name: ad?.mediaName || ad.mediaUrl.split("/").pop(),
+                type: ad?.mediaType,
+                mediaType: ad?.mediaType,
+                creativeId: ad?.creativeId,
+                creativeAssetId: ad?.creativeAssetId,
+                sourceCreative: ad?.sourceCreative,
+                mediaSource:
+                    ad?.mediaSource === "creatives"
+                        ? "creatives"
+                        : "upload",
+            }];
+        }
+
+        return [];
+    };
+
+    const getMediaKey = media =>
+        String(
+            media?.uid ||
+            media?.creativeId ||
+            media?.creativeAssetId ||
+            media?.url ||
+            media?.src ||
+            media?.uri ||
+            media?.name ||
+            media?.filename ||
+            ""
+        );
+
+    const getMediaSource = (media, ad) => {
+        const source = String(
+            media?.mediaSource ||
+            media?.source ||
+            ""
+        ).toLowerCase();
+
+        if (["creatives", "creative", "library"].includes(source)) {
+            return "creatives";
+        }
+
+        if (["upload", "local", "device"].includes(source)) {
+            return "upload";
+        }
+
+        const adSource = String(ad?.mediaSource || "").toLowerCase();
+
+        if (["creatives", "creative", "library"].includes(adSource)) {
+            return "creatives";
+        }
+
+        if (["upload", "local", "device"].includes(adSource)) {
+            return "upload";
+        }
+
+        return (
+            media?.sourceCreative ||
+            media?.creativeId ||
+            media?.creativeAssetId
+        )
+            ? "creatives"
+            : "upload";
+    };
+
+    const getMediaIdentity = (media) => {
+        if (!media) return "";
+
+        return String(
+            media?.uid ||
+            media?.creativeId ||
+            media?.creativeAssetId ||
+            media?.url ||
+            media?.mediaUrl ||
+            media?.name ||
+            media?.filename ||
+            ""
+        );
+    };
+
+    const orderMediaBySource = (items = [], ad) => [
+        ...items.filter(
+            item => getMediaSource(item, ad) === "creatives"
+        ),
+        ...items.filter(
+            item => getMediaSource(item, ad) !== "creatives"
+        ),
+    ];
+
+    const deduplicateMedia = (items = []) => {
+        const seen = new Set();
+
+        return items.filter(item => {
+            if (!item) return false;
+
+            const key = getMediaKey(item);
+
+            if (!key) return true;
+            if (seen.has(key)) return false;
+
+            seen.add(key);
+            return true;
+        });
+    };
+
+    const cloneAd = ad => ({
+        ...ad,
+        media: ad?.media
+            ? {
+                ...ad.media,
+                images: [...(ad.media.images || [])],
+                videos: [...(ad.media.videos || [])],
+            }
+            : ad?.media,
+        filename: Array.isArray(ad?.filename)
+            ? [...ad.filename]
+            : ad?.filename,
+        accountSettings: Object.fromEntries(
+            Object.entries(ad?.accountSettings || {}).map(([key, value]) => [
+                key,
+                {
+                    ...value,
+                    creativeOverrides: {
+                        ...(value?.creativeOverrides || {}),
+                    },
+                },
+            ])
+        ),
+    });
+
+    const makeMediaObject = (items, previousMedia = {}) => ({
+        images: items.filter(item => !isVideoMedia(item)),
+        videos: items.filter(item => isVideoMedia(item)),
+        thumbnail: previousMedia?.thumbnail ?? null,
+    });
+
+    const isVideoMedia = item => {
+        const type = String(
+            item?.type ||
+            item?.mediaType ||
+            item?.mimeType ||
+            ""
+        ).toLowerCase();
+
+        const source = String(
+            item?.url ||
+            item?.src ||
+            item?.name ||
+            item?.filename ||
+            ""
+        );
+
+        return (
+            type.includes("video") ||
+            /\.(mp4|mov|webm|m4v|avi|mpeg|mpg)(?:$|\?)/i.test(source)
+        );
+    };
+
+    // main
+    // useEffect(() => {
+    //     if (!form || index == null) return;
+
+    //     if (previousDynamicCreativeRef.current === isDynamicCreative) {
+    //         return;
+    //     }
+
+    //     previousDynamicCreativeRef.current = isDynamicCreative;
+
+    //     const adsPath = ["adsets", index, "ads"];
+    //     const activeAdPath = ["adsets", index, "activeAdId"];
+    //     const backupPath = ["adsets", index, "_dynamicCreativeAdsBackup"];
+
+    //     const currentAds = form.getFieldValue(adsPath) || [];
+
+    //     if (!Array.isArray(currentAds) || !currentAds.length) {
+    //         return;
+    //     }
+
+    //     const backupAds = form.getFieldValue(backupPath);
+
+    //     // =========================================================
+    //     // DYNAMIC CREATIVE ON
+    //     // =========================================================
+    //     if (isDynamicCreative) {
+    //         // Save the original ads ONLY once.
+    //         if (!Array.isArray(backupAds)) {
+    //             form.setFieldValue(
+    //                 backupPath,
+    //                 currentAds.map(ad => {
+    //                     const source = getMediaSource(
+    //                         getAdMediaItems(ad)[0],
+    //                         ad
+    //                     );
+
+    //                     const mediaItems = getAdMediaItems(ad).map(media => ({
+    //                         ...media,
+    //                         mediaSource:
+    //                             media?.mediaSource ||
+    //                             media?.source ||
+    //                             source,
+    //                     }));
+
+    //                     return {
+    //                         ...cloneAd(ad),
+    //                         media: {
+    //                             images: mediaItems.filter(
+    //                                 media => !isVideoMedia(media)
+    //                             ),
+    //                             videos: mediaItems.filter(isVideoMedia),
+    //                             thumbnail: ad?.media?.thumbnail ?? null,
+    //                         },
+    //                         filename: mediaItems,
+    //                     };
+    //                 })
+    //             );
+    //         }
+
+    //         // Already one Dynamic Creative ad.
+    //         if (currentAds.length === 1) {
+    //             const existing = currentAds[0];
+    //             const mediaItems = getAdMediaItems(existing);
+
+    //             // Ensure every media item has its own source.
+    //             const normalizedMedia = mediaItems.map(media => ({
+    //                 ...media,
+    //                 mediaSource:
+    //                     media?.mediaSource ||
+    //                     media?.source ||
+    //                     getMediaSource(media, existing),
+    //             }));
+
+    //             const updatedAd = {
+    //                 ...existing,
+    //                 media: {
+    //                     images: normalizedMedia.filter(
+    //                         media => !isVideoMedia(media)
+    //                     ),
+    //                     videos: normalizedMedia.filter(isVideoMedia),
+    //                     thumbnail: existing?.media?.thumbnail ?? null,
+    //                 },
+    //                 filename: normalizedMedia,
+    //                 mediaSource: "dynamic",
+    //             };
+
+    //             form.setFieldValue(adsPath, [updatedAd]);
+    //             form.setFieldValue(activeAdPath, updatedAd.id);
+    //             return;
+    //         }
+
+    //         const firstAd = currentAds[0];
+
+    //         // const allMedia = deduplicateMedia(
+    //         //     currentAds.flatMap(ad =>
+    //         //         getAdMediaItems(ad).map(media => ({
+    //         //             ...media,
+    //         //             mediaSource:
+    //         //                 media?.mediaSource ||
+    //         //                 media?.source ||
+    //         //                 getMediaSource(media, ad),
+    //         //         }))
+    //         //     )
+    //         // );
+
+    //         const allMedia = deduplicateMedia(
+    //             currentAds.flatMap(ad =>
+    //                 getAdMediaItems(ad).map(media => ({
+    //                     ...media,
+    //                     mediaSource:
+    //                         media?.mediaSource ||
+    //                         media?.source ||
+    //                         getMediaSource(media, ad),
+    //                 }))
+    //             )
+    //         );
+
+    //         const orderedMedia = [
+    //             ...allMedia.filter(
+    //                 media => getMediaSource(media, firstAd) === "creatives"
+    //             ),
+    //             ...allMedia.filter(
+    //                 media => getMediaSource(media, firstAd) !== "creatives"
+    //             ),
+    //         ];
+
+    //         const mergedAd = {
+    //             ...firstAd,
+
+    //             primaryText: currentAds
+    //                 .flatMap(ad =>
+    //                     Array.isArray(ad?.primaryText)
+    //                         ? ad.primaryText
+    //                         : [ad?.primaryText]
+    //                 )
+    //                 .filter(Boolean)
+    //                 .slice(0, 5),
+
+    //             message: currentAds
+    //                 .flatMap(ad =>
+    //                     Array.isArray(ad?.primaryText)
+    //                         ? ad.primaryText
+    //                         : [ad?.primaryText]
+    //                 )
+    //                 .filter(Boolean)
+    //                 .slice(0, 5),
+
+    //             headline: currentAds
+    //                 .flatMap(ad =>
+    //                     Array.isArray(ad?.headline)
+    //                         ? ad.headline
+    //                         : [ad?.headline]
+    //                 )
+    //                 .filter(Boolean)
+    //                 .slice(0, 5),
+
+    //             description: currentAds
+    //                 .flatMap(ad =>
+    //                     Array.isArray(ad?.description)
+    //                         ? ad.description
+    //                         : [ad?.description]
+    //                 )
+    //                 .filter(Boolean)
+    //                 .slice(0, 5),
+
+    //             Description: currentAds
+    //                 .flatMap(ad =>
+    //                     Array.isArray(ad?.description)
+    //                         ? ad.description
+    //                         : [ad?.description]
+    //                 )
+    //                 .filter(Boolean)
+    //                 .slice(0, 5),
+
+    //             // media: {
+    //             //     images: allMedia.filter(
+    //             //         media => !isVideoMedia(media)
+    //             //     ),
+    //             //     videos: allMedia.filter(isVideoMedia),
+    //             //     thumbnail: firstAd?.media?.thumbnail ?? null,
+    //             // },
+
+    //             // filename: allMedia,
+
+    //             media: {
+    //                 images: orderedMedia.filter(
+    //                     media => !isVideoMedia(media)
+    //                 ),
+    //                 videos: orderedMedia.filter(isVideoMedia),
+    //                 thumbnail: firstAd?.media?.thumbnail ?? null,
+    //             },
+
+    //             filename: orderedMedia,
+
+    //             mediaSource: "dynamic",
+
+    //             mediaUrl: undefined,
+    //             mediaName: undefined,
+    //             mediaType: undefined,
+    //             creativeId: undefined,
+    //             creativeAssetId: undefined,
+    //             sourceCreative: undefined,
+    //         };
+
+    //         form.setFieldValue(adsPath, [mergedAd]);
+    //         form.setFieldValue(activeAdPath, mergedAd.id);
+
+    //         return;
+    //     }
+
+    //     // =========================================================
+    //     // DYNAMIC CREATIVE OFF
+    //     // =========================================================
+
+    //     const originalAds = Array.isArray(backupAds)
+    //         ? backupAds.map(cloneAd)
+    //         : currentAds.map(cloneAd);
+
+    //     const currentDynamicMedia = deduplicateMedia(
+    //         currentAds.flatMap(ad =>
+    //             getAdMediaItems(ad).map(media => ({
+    //                 ...media,
+    //                 mediaSource:
+    //                     media?.mediaSource ||
+    //                     media?.source ||
+    //                     getMediaSource(media, ad),
+    //             }))
+    //         )
+    //     );
+
+    //     const restoredAds = originalAds.map(originalAd => {
+    //         const originalMedia = getAdMediaItems(originalAd);
+
+    //         // const restoredMedia = originalMedia.map(originalMediaItem => {
+    //         //     const key = getMediaKey(originalMediaItem);
+
+    //         //     const currentItem = currentDynamicMedia.find(
+    //         //         media =>
+    //         //             key &&
+    //         //             getMediaKey(media) === key
+    //         //     );
+
+    //         //     return currentItem || {
+    //         //         ...originalMediaItem,
+    //         //         mediaSource:
+    //         //             originalMediaItem?.mediaSource ||
+    //         //             originalMediaItem?.source ||
+    //         //             getMediaSource(originalMediaItem, originalAd),
+    //         //     };
+    //         // });
+
+    //         const restoredMedia = originalMedia
+    //             .map(originalMediaItem => {
+    //                 const key = getMediaKey(originalMediaItem);
+
+    //                 const currentItem = currentDynamicMedia.find(
+    //                     media =>
+    //                         key &&
+    //                         getMediaKey(media) === key
+    //                 );
+
+    //                 return currentItem || {
+    //                     ...originalMediaItem,
+    //                     mediaSource:
+    //                         originalMediaItem?.mediaSource ||
+    //                         originalMediaItem?.source ||
+    //                         getMediaSource(originalMediaItem, originalAd),
+    //                 };
+    //             })
+    //             .sort((a, b) => {
+    //                 const aSource = getMediaSource(a, originalAd);
+    //                 const bSource = getMediaSource(b, originalAd);
+
+    //                 if (aSource === bSource) return 0;
+    //                 return aSource === "creatives" ? -1 : 1;
+    //             });
+
+    //         return {
+    //             ...originalAd,
+
+    //             media: {
+    //                 images: restoredMedia.filter(
+    //                     media => !isVideoMedia(media)
+    //                 ),
+    //                 videos: restoredMedia.filter(isVideoMedia),
+    //                 thumbnail: originalAd?.media?.thumbnail ?? null,
+    //             },
+
+    //             filename: restoredMedia.length
+    //                 ? restoredMedia
+    //                 : null,
+    //         };
+    //     });
+
+    //     // const usedKeys = new Set(
+    //     //     restoredAds.flatMap(ad =>
+    //     //         getAdMediaItems(ad).map(getMediaKey)
+    //     //     )
+    //     // );
+
+    //     // Media selected while Dynamic Creative was ON
+    //     // but not present in the original ads.
+    //     // currentDynamicMedia.forEach(media => {
+    //     //     const key = getMediaKey(media);
+
+    //     //     if (key && usedKeys.has(key)) {
+    //     //         return;
+    //     //     }
+
+    //     //     const sourceAd = restoredAds[0] || originalAds[0] || {};
+
+    //     //     restoredAds.push({
+    //     //         ...cloneAd(sourceAd),
+    //     //         id: uuidv4(),
+
+    //     //         media: {
+    //     //             images: isVideoMedia(media) ? [] : [media],
+    //     //             videos: isVideoMedia(media) ? [media] : [],
+    //     //             thumbnail: null,
+    //     //         },
+
+    //     //         filename: [media],
+
+    //     //         mediaUrl: undefined,
+    //     //         mediaName: undefined,
+    //     //         mediaType: undefined,
+    //     //         creativeId: undefined,
+    //     //         creativeAssetId: undefined,
+    //     //         sourceCreative: undefined,
+
+    //     //         primaryText: Array.isArray(sourceAd?.primaryText)
+    //     //             ? sourceAd.primaryText[0] || ""
+    //     //             : sourceAd?.primaryText || "",
+
+    //     //         message: Array.isArray(sourceAd?.message)
+    //     //             ? sourceAd.message[0] || ""
+    //     //             : sourceAd?.message || "",
+
+    //     //         headline: Array.isArray(sourceAd?.headline)
+    //     //             ? sourceAd.headline[0] || ""
+    //     //             : sourceAd?.headline || "",
+
+    //     //         description: Array.isArray(sourceAd?.description)
+    //     //             ? sourceAd.description[0] || ""
+    //     //             : sourceAd?.description || "",
+
+    //     //         Description: Array.isArray(sourceAd?.Description)
+    //     //             ? sourceAd.Description[0] || ""
+    //     //             : sourceAd?.Description || "",
+    //     //     });
+
+    //     //     if (key) {
+    //     //         usedKeys.add(key);
+    //     //     }
+    //     // });
+
+    //     const usedKeys = new Set(
+    //         restoredAds.flatMap(ad =>
+    //             getAdMediaItems(ad).map(getMediaKey)
+    //         )
+    //     );
+
+    //     const remainingMedia = currentDynamicMedia.filter(media => {
+    //         const key = getMediaKey(media);
+
+    //         return !key || !usedKeys.has(key);
+    //     });
+
+    //     if (remainingMedia.length) {
+    //         const orderedRemainingMedia = [
+    //             ...remainingMedia.filter(
+    //                 media =>
+    //                     getMediaSource(media) === "creatives"
+    //             ),
+    //             ...remainingMedia.filter(
+    //                 media =>
+    //                     getMediaSource(media) !== "creatives"
+    //             ),
+    //         ];
+
+    //         orderedRemainingMedia.forEach(media => {
+    //             const targetIndex = restoredAds.findIndex(
+    //                 ad => getAdMediaItems(ad).length === 0
+    //             );
+
+    //             if (targetIndex >= 0) {
+    //                 const targetAd = restoredAds[targetIndex];
+
+    //                 restoredAds[targetIndex] = {
+    //                     ...targetAd,
+    //                     media: {
+    //                         images: isVideoMedia(media) ? [] : [media],
+    //                         videos: isVideoMedia(media) ? [media] : [],
+    //                         thumbnail: targetAd?.media?.thumbnail ?? null,
+    //                     },
+    //                     filename: [media],
+    //                 };
+
+    //                 return;
+    //             }
+
+    //             const sourceAd = restoredAds[0] || originalAds[0] || {};
+
+    //             restoredAds.push({
+    //                 ...cloneAd(sourceAd),
+    //                 id: uuidv4(),
+    //                 media: {
+    //                     images: isVideoMedia(media) ? [] : [media],
+    //                     videos: isVideoMedia(media) ? [media] : [],
+    //                     thumbnail: null,
+    //                 },
+    //                 filename: [media],
+    //             });
+    //         });
+    //     }
+
+    //     form.setFieldValue(adsPath, restoredAds);
+    //     form.setFieldValue(
+    //         activeAdPath,
+    //         restoredAds[0]?.id
+    //     );
+
+    //     // Backup is only needed during the ON -> OFF transition.
+    //     form.setFieldValue(backupPath, undefined);
+
+    // }, [form, index, isDynamicCreative]);
+    // main
+
     useEffect(() => {
         if (!form || index == null) return;
 
-        // Do not reset anything on initial render.
         if (previousDynamicCreativeRef.current === isDynamicCreative) {
             return;
         }
@@ -425,34 +1109,519 @@ const AdSetLevel = ({
         const backupPath = ["adsets", index, "_dynamicCreativeAdsBackup"];
 
         const currentAds = form.getFieldValue(adsPath) || [];
-        const firstAd = currentAds[0];
 
-        if (!firstAd) return;
+        if (!Array.isArray(currentAds) || !currentAds.length) {
+            return;
+        }
 
-        const resetAd = {
-            ...firstAd,
-            media: {
-                images: [],
-                videos: [],
-                thumbnail: null,
-            },
-            filename: null,
-            mediaUrl: undefined,
-            mediaName: undefined,
-            mediaType: undefined,
-            creativeId: undefined,
-            creativeAssetId: undefined,
-            sourceCreative: undefined,
-            mediaSource: "",
-        };
+        const backupAds = form.getFieldValue(backupPath);
 
-        // Keep exactly one ad card and clear its selected media.
-        form.setFieldValue(adsPath, [resetAd]);
-        form.setFieldValue(activeAdPath, resetAd.id);
+        // =========================================================
+        // DYNAMIC CREATIVE ON
+        // =========================================================
+        if (isDynamicCreative) {
+            // Save the original ads only once.
+            if (!Array.isArray(backupAds)) {
+                form.setFieldValue(
+                    backupPath,
+                    currentAds.map(ad => {
+                        const mediaItems = getAdMediaItems(ad).map(media => ({
+                            ...media,
+                            mediaSource:
+                                media?.mediaSource ||
+                                media?.source ||
+                                getMediaSource(media, ad),
+                        }));
 
-        // Prevent old ads and media from being restored.
+                        return {
+                            ...cloneAd(ad),
+
+                            media: {
+                                images: mediaItems.filter(
+                                    media => !isVideoMedia(media)
+                                ),
+                                videos: mediaItems.filter(isVideoMedia),
+                                thumbnail: ad?.media?.thumbnail ?? null,
+                            },
+
+                            filename: mediaItems,
+                        };
+                    })
+                );
+            }
+
+            // Already one Dynamic Creative ad.
+            if (currentAds.length === 1) {
+                const existingAd = currentAds[0];
+
+                const mediaItems = getAdMediaItems(existingAd).map(media => ({
+                    ...media,
+                    mediaSource:
+                        media?.mediaSource ||
+                        media?.source ||
+                        getMediaSource(media, existingAd),
+                }));
+
+                // IMPORTANT:
+                // Creative Library first, Local Upload second.
+                // Image/video type is completely ignored here.
+                const orderedMedia = [
+                    ...mediaItems.filter(
+                        media =>
+                            getMediaSource(media, existingAd) === "creatives"
+                    ),
+                    ...mediaItems.filter(
+                        media =>
+                            getMediaSource(media, existingAd) !== "creatives"
+                    ),
+                ];
+
+                const updatedAd = {
+                    ...existingAd,
+
+                    media: {
+                        images: orderedMedia.filter(
+                            media => !isVideoMedia(media)
+                        ),
+                        videos: orderedMedia.filter(isVideoMedia),
+                        thumbnail: existingAd?.media?.thumbnail ?? null,
+                    },
+
+                    filename: orderedMedia,
+
+                    mediaSource: "dynamic",
+
+                    mediaUrl: undefined,
+                    mediaName: undefined,
+                    mediaType: undefined,
+                    creativeId: undefined,
+                    creativeAssetId: undefined,
+                    sourceCreative: undefined,
+                };
+
+                form.setFieldValue(adsPath, [updatedAd]);
+                form.setFieldValue(activeAdPath, updatedAd.id);
+
+                return;
+            }
+
+            // ---------------------------------------------------------
+            // Merge all existing ads into one Dynamic Creative ad.
+            // ---------------------------------------------------------
+            const firstAd = currentAds[0];
+
+            // const allMedia = deduplicateMedia(
+            //     currentAds.flatMap(ad =>
+            //         getAdMediaItems(ad).map(media => ({
+            //             ...media,
+            //             mediaSource:
+            //                 media?.mediaSource ||
+            //                 media?.source ||
+            //                 getMediaSource(media, ad),
+            //         }))
+            //     )
+            // );
+            const allMedia = deduplicateMedia(
+                currentAds.flatMap(ad =>
+                    getAdMediaItems(ad).map(media => ({
+                        ...media,
+                        mediaSource: getMediaSource(media, ad),
+                    }))
+                )
+            );
+
+            // IMPORTANT:
+            // Never sort by image/video.
+            //
+            // Only:
+            //   1. Creative Library
+            //   2. Local Upload
+            //
+            // Selection order inside each group is preserved.
+            // const orderedMedia = [
+            //     ...allMedia.filter(
+            //         media =>
+            //             getMediaSource(media, firstAd) === "creatives"
+            //     ),
+            //     ...allMedia.filter(
+            //         media =>
+            //             getMediaSource(media, firstAd) !== "creatives"
+            //     ),
+            // ];
+            // const orderedMedia = [
+            //     ...allMedia.filter(
+            //         media => getMediaSource(media) === "creatives"
+            //     ),
+            //     ...allMedia.filter(
+            //         media => getMediaSource(media) !== "creatives"
+            //     ),
+            // ];
+            const orderedMedia = orderMediaBySource(
+                allMedia,
+                firstAd
+            );
+
+            const mergedAd = {
+                ...firstAd,
+
+                // primaryText: currentAds
+                //     .flatMap(ad =>
+                //         Array.isArray(ad?.primaryText)
+                //             ? ad.primaryText
+                //             : [ad?.primaryText]
+                //     )
+                //     .filter(Boolean)
+                //     .slice(0, 5),
+
+                // message: currentAds
+                //     .flatMap(ad =>
+                //         Array.isArray(ad?.primaryText)
+                //             ? ad.primaryText
+                //             : [ad?.primaryText]
+                //     )
+                //     .filter(Boolean)
+                //     .slice(0, 5),
+
+                // headline: currentAds
+                //     .flatMap(ad =>
+                //         Array.isArray(ad?.headline)
+                //             ? ad.headline
+                //             : [ad?.headline]
+                //     )
+                //     .filter(Boolean)
+                //     .slice(0, 5),
+
+                // description: currentAds
+                //     .flatMap(ad =>
+                //         Array.isArray(ad?.description)
+                //             ? ad.description
+                //             : [ad?.description]
+                //     )
+                //     .filter(Boolean)
+                //     .slice(0, 5),
+
+                // Description: currentAds
+                //     .flatMap(ad =>
+                //         Array.isArray(ad?.description)
+                //             ? ad.description
+                //             : [ad?.description]
+                //     )
+                //     .filter(Boolean)
+                //     .slice(0, 5),
+
+                primaryText: Array.isArray(firstAd?.primaryText)
+                    ? [...firstAd.primaryText]
+                    : [firstAd?.primaryText ?? ""],
+
+                message: Array.isArray(firstAd?.primaryText)
+                    ? [...firstAd.primaryText]
+                    : [firstAd?.primaryText ?? ""],
+
+                headline: Array.isArray(firstAd?.headline)
+                    ? [...firstAd.headline]
+                    : [firstAd?.headline ?? ""],
+
+                description: Array.isArray(firstAd?.description)
+                    ? [...firstAd.description]
+                    : [firstAd?.description ?? ""],
+
+                Description: Array.isArray(firstAd?.description)
+                    ? [...firstAd.description]
+                    : [firstAd?.description ?? ""],
+
+                media: {
+                    images: orderedMedia.filter(
+                        media => !isVideoMedia(media)
+                    ),
+                    videos: orderedMedia.filter(isVideoMedia),
+                    thumbnail: firstAd?.media?.thumbnail ?? null,
+                },
+
+                filename: orderedMedia,
+
+                mediaSource: "dynamic",
+
+                mediaUrl: undefined,
+                mediaName: undefined,
+                mediaType: undefined,
+                creativeId: undefined,
+                creativeAssetId: undefined,
+                sourceCreative: undefined,
+            };
+
+            form.setFieldValue(adsPath, [mergedAd]);
+            form.setFieldValue(activeAdPath, mergedAd.id);
+
+            return;
+        }
+
+        // =========================================================
+        // DYNAMIC CREATIVE OFF
+        // =========================================================
+
+        const originalAds = Array.isArray(backupAds)
+            ? backupAds.map(cloneAd)
+            : currentAds.map(cloneAd);
+
+        // Get the CURRENT Dynamic Creative media.
+        //
+        // This is the source of truth when turning Dynamic Creative OFF.
+        // const currentDynamicMedia = deduplicateMedia(
+        //     currentAds.flatMap(ad =>
+        //         getAdMediaItems(ad).map(media => ({
+        //             ...media,
+        //             mediaSource:
+        //                 media?.mediaSource ||
+        //                 media?.source ||
+        //                 getMediaSource(media, ad),
+        //         }))
+        //     )
+        // );
+
+        // // =========================================================
+        // // IMPORTANT:
+        // //
+        // // Do NOT restore according to:
+        // //     original ad -> original media
+        // //
+        // // That loses newly selected files and their order.
+        // //
+        // // Instead, first create ONE canonical ordered list:
+        // //
+        // //     Creative Library files
+        // //     THEN
+        // //     Local Upload files
+        // //
+        // // Image/video type is ignored.
+        // // =========================================================
+
+        // // const orderedDynamicMedia = [
+        // //     ...currentDynamicMedia.filter(
+        // //         media => getMediaSource(media) === "creatives"
+        // //     ),
+        // //     ...currentDynamicMedia.filter(
+        // //         media => getMediaSource(media) !== "creatives"
+        // //     ),
+        // // ];
+
+        // const orderedDynamicMedia = orderMediaBySource(
+        //     currentDynamicMedia
+        // );
+        // const dynamicAd = currentAds[0];
+
+        // const currentDynamicMedia = deduplicateMedia(
+        //     Array.isArray(dynamicAd?.filename)
+        //         ? dynamicAd.filename.map(media => ({
+        //             ...media,
+        //             mediaSource:
+        //                 media?.mediaSource ||
+        //                 media?.source ||
+        //                 getMediaSource(media, dynamicAd),
+        //         }))
+        //         : getAdMediaItems(dynamicAd).map(media => ({
+        //             ...media,
+        //             mediaSource:
+        //                 media?.mediaSource ||
+        //                 media?.source ||
+        //                 getMediaSource(media, dynamicAd),
+        //         }))
+        // );
+
+        // // filename is already the canonical order:
+        // // Creative Library → Local Library.
+        // // DO NOT reorder it again.
+        // const orderedDynamicMedia = currentDynamicMedia;
+
+        const dynamicAd = currentAds[0];
+
+        const orderedDynamicMedia = deduplicateMedia(
+            Array.isArray(dynamicAd?.filename)
+                ? dynamicAd.filename
+                : getAdMediaItems(dynamicAd)
+        );
+
+        // =========================================================
+        // Restore the original ad structure.
+        //
+        // Each media item gets one ad.
+        // Existing ads keep their original ad-level configuration.
+        // =========================================================
+
+        // const restoredAds = [];
+
+        // orderedDynamicMedia.forEach((media, mediaIndex) => {
+        //     const originalAd =
+        //         originalAds[mediaIndex] ||
+        //         originalAds[0] ||
+        //         currentAds[0] ||
+        //         {};
+
+        //     const restoredAd = {
+        //         ...cloneAd(originalAd),
+
+        //         id:
+        //             originalAds[mediaIndex]?.id ||
+        //             uuidv4(),
+
+        //         media: {
+        //             images: isVideoMedia(media) ? [] : [media],
+        //             videos: isVideoMedia(media) ? [media] : [],
+        //             thumbnail:
+        //                 originalAd?.media?.thumbnail ?? null,
+        //         },
+
+        //         filename: [media],
+
+        //         mediaUrl: undefined,
+        //         mediaName: undefined,
+        //         mediaType: undefined,
+        //         creativeId: undefined,
+        //         creativeAssetId: undefined,
+        //         sourceCreative: undefined,
+        //     };
+
+        //     restoredAds.push(restoredAd);
+        // });
+
+        const originalAdsByMedia = new Map();
+
+        originalAds.forEach((originalAd) => {
+            const originalMedia = getAdMediaItems(originalAd);
+
+            originalMedia.forEach((media) => {
+                const key = getMediaIdentity(media);
+
+                if (key) {
+                    originalAdsByMedia.set(key, originalAd);
+                }
+            });
+        });
+
+        const restoredAds = [];
+
+        orderedDynamicMedia.forEach((media) => {
+            const mediaKey = getMediaIdentity(media);
+
+            const originalAd =
+                originalAdsByMedia.get(mediaKey) ||
+                originalAds[0] ||
+                currentAds[0] ||
+                {};
+
+            const restoredAd = {
+                ...cloneAd(originalAd),
+
+                id:
+                    originalAd?.id ||
+                    uuidv4(),
+
+                media: {
+                    images: isVideoMedia(media) ? [] : [media],
+                    videos: isVideoMedia(media) ? [media] : [],
+                    thumbnail:
+                        originalAd?.media?.thumbnail ?? null,
+                },
+
+                filename: [media],
+
+                mediaUrl: undefined,
+                mediaName: undefined,
+                mediaType: undefined,
+                creativeId: undefined,
+                creativeAssetId: undefined,
+                sourceCreative: undefined,
+            };
+
+            restoredAds.push(restoredAd);
+        });
+
+        // =========================================================
+        // If there were originally more ads than selected media,
+        // preserve those empty ads.
+        // =========================================================
+
+        if (restoredAds.length < originalAds.length) {
+            originalAds
+                .slice(restoredAds.length)
+                .forEach(originalAd => {
+                    restoredAds.push({
+                        ...cloneAd(originalAd),
+
+                        media: {
+                            images: [],
+                            videos: [],
+                            thumbnail:
+                                originalAd?.media?.thumbnail ?? null,
+                        },
+
+                        filename: null,
+                    });
+                });
+        }
+
+        // =========================================================
+        // If somehow there are no media items, retain original ads.
+        // =========================================================
+
+        const finalAds = restoredAds.length
+            ? restoredAds
+            : originalAds;
+
+        form.setFieldValue(adsPath, finalAds);
+
+        form.setFieldValue(
+            activeAdPath,
+            finalAds[0]?.id
+        );
+
+        // Backup is only needed for ON -> OFF transition.
         form.setFieldValue(backupPath, undefined);
     }, [form, index, isDynamicCreative]);
+
+
+    // useEffect(() => {
+    //     if (!form || index == null) return;
+
+    //     // Do not reset anything on initial render.
+    //     if (previousDynamicCreativeRef.current === isDynamicCreative) {
+    //         return;
+    //     }
+
+    //     previousDynamicCreativeRef.current = isDynamicCreative;
+
+    //     const adsPath = ["adsets", index, "ads"];
+    //     const activeAdPath = ["adsets", index, "activeAdId"];
+    //     const backupPath = ["adsets", index, "_dynamicCreativeAdsBackup"];
+
+    //     const currentAds = form.getFieldValue(adsPath) || [];
+    //     const firstAd = currentAds[0];
+
+    //     if (!firstAd) return;
+
+    //     const resetAd = {
+    //         ...firstAd,
+    //         media: {
+    //             images: [],
+    //             videos: [],
+    //             thumbnail: null,
+    //         },
+    //         filename: null,
+    //         mediaUrl: undefined,
+    //         mediaName: undefined,
+    //         mediaType: undefined,
+    //         creativeId: undefined,
+    //         creativeAssetId: undefined,
+    //         sourceCreative: undefined,
+    //         mediaSource: "",
+    //     };
+
+    //     // Keep exactly one ad card and clear its selected media.
+    //     form.setFieldValue(adsPath, [resetAd]);
+    //     form.setFieldValue(activeAdPath, resetAd.id);
+
+    //     // Prevent old ads and media from being restored.
+    //     form.setFieldValue(backupPath, undefined);
+    // }, [form, index, isDynamicCreative]);
 
     // useEffect(() => {
     //     if (!form || index == null || !Array.isArray(watchedCurrentAds)) return;
@@ -857,7 +2026,15 @@ const AdSetLevel = ({
 
 
     useEffect(() => {
-        if (!form || index !== 0 || multiplePage !== "Page") return;
+        // if ((!form || index !== 0 || multiplePage !== "Page") && !isCreate) return;
+        if (
+            !form ||
+            !isCreate ||
+            index !== 0 ||
+            multiplePage !== "Page"
+        ) {
+            return;
+        }
 
         const currentAdsets = form.getFieldValue("adsets") || [];
         const availablePages = new Set(
@@ -935,7 +2112,7 @@ const AdSetLevel = ({
     ]);
 
     useEffect(() => {
-        if (!form || !campaignName.trim()) return;
+        if (!form || !campaignName.trim() || mode === "edit" || mode === "view") return;
 
         const adsetCount = watchedAdsets.length;
         const adsetName =
@@ -951,7 +2128,7 @@ const AdSetLevel = ({
     }, [form, campaignName, watchedAdsets.length, index]);
 
     useEffect(() => {
-        if (!form || currentAdset.id == null) return;
+        if (!form || currentAdset.id == null || mode === "edit" || mode === "view") return;
 
         const adsets = form.getFieldValue("adsets") || [];
         const adsetIndex = adsets.findIndex(
@@ -992,7 +2169,15 @@ const AdSetLevel = ({
     }, [form, index]);
 
     useEffect(() => {
-        if (!form || multiplePixel !== "Pixel") return;
+        // if ((!form || multiplePixel !== "Pixel") && !isCreate) return;
+        if (
+            !form ||
+            !isCreate ||
+            multiplePixel !== "Pixel"
+        ) {
+            return;
+        }
+        console.log("Hi Pixel", mode);
 
         const currentAdsets = form.getFieldValue("adsets") || [];
         const selectedPixels = normalizeList(
@@ -1057,6 +2242,7 @@ const AdSetLevel = ({
     const selectedAccount = Form.useWatch(["adsets", index, "selectedAccount"], form);
     const showPayer = Form.useWatch(["adsets", index, "showPayer"], form) || false;
 
+
     const platforms = normalizeList(
         Form.useWatch(["adsets", index, "platforms"], form)
     );
@@ -1070,6 +2256,25 @@ const AdSetLevel = ({
         Form.useWatch(["adsets", 0, "optimization_goal"], form) || "";
 
     const beneficiaryAndPayerEnabled = needsBeneficiaryAndPayer(currentCountries);
+
+    const showBeneficiaryPayerValue = Form.useWatch(
+        ["adsets", index, "showBeneficiaryPayer"],
+        form
+    );
+    const watchedBeneficiary = Form.useWatch(["adsets", index, "Beneficiary"], form);
+
+    const hasBeneficiaryValue = value =>
+        typeof value === "string"
+            ? value.trim() !== ""
+            : value && typeof value === "object"
+                ? Object.values(value).some(v => String(v ?? "").trim() !== "")
+                : false;
+
+    const hasBeneficiary = hasBeneficiaryValue(watchedBeneficiary);
+
+    // EU forces the switch ON (and locked)
+    const isBeneficiaryPayerVisible =
+        beneficiaryAndPayerEnabled || Boolean(showBeneficiaryPayerValue);
 
     const selectedScheduleCells =
         currentAdset.selectedScheduleCells ||
@@ -1166,6 +2371,22 @@ const AdSetLevel = ({
             Array.isArray(slot.days) &&
             slot.days.length > 0
         );
+
+    useEffect(() => {
+        if (!form || index == null) return;
+
+        const path = ["adsets", index, "showBeneficiaryPayer"];
+        const current = form.getFieldValue(path);
+
+        // EU countries, or an existing beneficiary (edit / view / clone) -> ON
+        if (beneficiaryAndPayerEnabled || hasBeneficiary) {
+            if (current !== true) form.setFieldValue(path, true);
+            return;
+        }
+
+        // Otherwise default to OFF (create)
+        if (current == null) form.setFieldValue(path, false);
+    }, [form, index, beneficiaryAndPayerEnabled, hasBeneficiary]);
 
 
     useEffect(() => {
@@ -1669,6 +2890,23 @@ const AdSetLevel = ({
     //     Promise.resolve().then(validateDevicePlatforms);
     // };
 
+    const handleAdsetNameChange = event => {
+        const value = event?.target?.value ?? "";
+        const adsPath = ["adsets", index, "ads"];
+        const ads = form.getFieldValue(adsPath) || [];
+
+        if (!ads.length) return;
+
+        form.setFieldValue(
+            adsPath,
+            ads.map(ad => ({
+                ...ad,
+                AdName: value,
+                AddName: value,
+            }))
+        );
+    };
+
     const handlePlatformsChange = selected => {
         const selectedPlatforms = normalizeList(selected);
 
@@ -1894,7 +3132,7 @@ const AdSetLevel = ({
             required: true,
             row: 1,
             width: 3.5,
-            props: { placeholder: "Enter ad set name" }
+            props: { placeholder: "Enter ad set name", disabled: isView }
         },
         {
             key: "action_source",
@@ -1903,7 +3141,8 @@ const AdSetLevel = ({
             required: true,
             row: 1,
             width: 2,
-            options: actionSourceOptions[objectiveValue] || []
+            options: actionSourceOptions[objectiveValue] || [],
+            props: { disabled: isEditLocked || isView }
         },
         {
             key: "optimization_goal",
@@ -1915,7 +3154,8 @@ const AdSetLevel = ({
             options: currentOptimizationOptions.map(option => ({
                 ...option,
                 disabled: index !== 0 && option.value !== firstOptimizationGoal
-            }))
+            })),
+            props: { disabled: isEditLocked || isView }
         },
         {
             key: "custom_event_type",
@@ -1924,7 +3164,8 @@ const AdSetLevel = ({
             required: true,
             row: 1,
             width: 2,
-            options: conversionEventOptions[objectiveValue] || []
+            options: conversionEventOptions[objectiveValue] || [],
+            props: { disabled: isEditLocked || isView }
         },
         {
             key: "billing_event",
@@ -1933,7 +3174,8 @@ const AdSetLevel = ({
             required: true,
             row: 1,
             width: 2,
-            options: billingEventOptions[optimizationGoalValue] || []
+            options: billingEventOptions[optimizationGoalValue] || [],
+            props: { disabled: isEditLocked || isView }
         },
         // {
         //     key: "pixel_id",
@@ -2001,7 +3243,8 @@ const AdSetLevel = ({
                 showSearch: true,
                 optionFilterProp: "label",
                 maxTagCount: 1,
-                placeholder: "Select pixel(s)"
+                placeholder: "Select pixel(s)",
+                disabled: isEditLocked || isView,
             }
         },
         {
@@ -2010,7 +3253,8 @@ const AdSetLevel = ({
             type: "date",
             required: true,
             row: 2,
-            width: 2
+            width: 2,
+            props: { disabled: isEditLocked || isView }
         },
         {
             key: "DatePickerEnd",
@@ -2044,7 +3288,8 @@ const AdSetLevel = ({
                         return Promise.resolve();
                     }
                 }]
-                : []
+                : [],
+            props: { disabled: isView }
         },
         {
             key: "DailyAdd_amount",
@@ -2065,7 +3310,7 @@ const AdSetLevel = ({
                             disabled={
                                 campaignSchedulingActive ||
                                 budgetType === "daily" ||
-                                campaignBudget > 0
+                                campaignBudget > 0 || isView
                             }
                             checked={Boolean(isAdSchedulingEnabled)}
                             style={{
@@ -2098,7 +3343,7 @@ const AdSetLevel = ({
                 step: 0.01,
                 precision: 2,
                 placeholder: "$",
-                disabled: campaignBudget > 0
+                disabled: campaignBudget > 0 || isView
             }
         },
         {
@@ -2135,54 +3380,139 @@ const AdSetLevel = ({
                 step: 0.1,
                 precision: 2,
                 placeholder: "$",
-                onWheel: event => event.currentTarget.blur()
+                onWheel: event => event.currentTarget.blur(),
+                disabled: isView
             }
         },
+        // {
+        //     key: "countries",
+        //     label: "Countries",
+        //     type: "treeSelect",
+        //     required: true,
+        //     row: 3,
+        //     width: 3,
+        //     options: countryTreeData,
+        //     // props: {
+        //     //     treeCheckable: true,
+        //     //     showCheckedStrategy: SHOW_CHILD,
+        //     //     showSearch: true,
+        //     //     allowClear: true,
+        //     //     treeNodeFilterProp: "label",
+        //     //     treeDefaultExpandedKeys: ["all_countries"],
+        //     //     placeholder: campaignCountryValues.length
+        //     //         ? "Select from campaign countries"
+        //     //         : "Select countries",
+        //     //     maxTagCount: 2,
+        //     //     fieldNames: {
+        //     //         label: "label",
+        //     //         value: "value",
+        //     //         children: "children"
+        //     //     },
+        //     //     treeLine: true,
+        //     //     switcherIcon: ({ expanded, isLeaf }) =>
+        //     //         isLeaf
+        //     //             ? null
+        //     //             : expanded
+        //     //                 ? <DownOutlined />
+        //     //                 : <RightOutlined />,
+        //     //     className: `${theme === "dark" ? "dark-theme" : "light-theme"
+        //     //         } green-border-select`,
+        //     //     classNames: {
+        //     //         popup: {
+        //     //             root: `${theme === "dark"
+        //     //                 ? "custom-dropdown"
+        //     //                 : "custom-dropdown-light"
+        //     //                 } campaigns-campaign-level-tree-dropdown campaigns-adset-level-tree-dropdown`
+        //     //         }
+        //     //     },
+        //     //     style: { width: "100%" }
+        //     // }
+        //     props: {
+        //         disabled: (multipleGeo === "Geos" && index !== 0) || isView,
+        //         treeCheckable: true,
+        //         showCheckedStrategy: SHOW_CHILD,
+        //         showSearch: true,
+        //         allowClear: true,
+        //         treeNodeFilterProp: "label",
+        //         treeDefaultExpandedKeys: ["all_countries"],
+        //         placeholder: campaignCountryValues.length
+        //             ? "Select from campaign countries"
+        //             : "Select countries",
+        //         maxTagCount: 2,
+        //         fieldNames: {
+        //             label: "label",
+        //             value: "value",
+        //             children: "children"
+        //         },
+        //         treeLine: true,
+        //         switcherIcon: ({ expanded, isLeaf }) =>
+        //             isLeaf
+        //                 ? null
+        //                 : expanded
+        //                     ? <DownOutlined />
+        //                     : <RightOutlined />,
+        //         className: `${theme === "dark" ? "dark-theme" : "light-theme"} green-border-select`,
+        //         classNames: {
+        //             popup: {
+        //                 root: `${theme === "dark"
+        //                     ? "custom-dropdown"
+        //                     : "custom-dropdown-light"
+        //                     } campaigns-campaign-level-tree-dropdown campaigns-adset-level-tree-dropdown`
+        //             }
+        //         },
+        //         style: { width: "100%" }
+        //     }
+        // },
         {
             key: "countries",
+            labelNode: (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                    <span>Countries</span>
+                    <Tooltip
+                        title={
+                            beneficiaryAndPayerEnabled
+                                ? "Beneficiary and Payer are required for EU countries."
+                                : "Enable this to add Beneficiary and Payer information for Ads Transparency."
+                        }
+                        styles={{
+                            root: {
+                                backgroundColor: theme === "dark" ? "#111" : "#fff",
+                                color: theme === "dark" ? "#fff" : "#000"
+                            }
+                        }}
+                    >
+                        <InfoCircleOutlined
+                            style={{ color: theme === "dark" ? "#bbb" : "#888", cursor: "pointer" }}
+                        />
+                    </Tooltip>
+                    <Switch
+                        size="small"
+                        checked={isBeneficiaryPayerVisible}
+                        disabled={beneficiaryAndPayerEnabled || isView}
+                        style={{
+                            backgroundColor: isBeneficiaryPayerVisible ? "#91C25F" : undefined
+                        }}
+                        onChange={checked => {
+                            form.setFieldValue(["adsets", index, "showBeneficiaryPayer"], checked);
+
+                            // Clear stale values so hidden data isn't submitted
+                            if (!checked) {
+                                form.setFieldValue(["adsets", index, "Beneficiary"], {});
+                                form.setFieldValue(["adsets", index, "Payer"], {});
+                                form.setFieldValue(["adsets", index, "showPayer"], false);
+                            }
+                        }}
+                    />
+                </span>
+            ),
             label: "Countries",
             type: "treeSelect",
             required: true,
             row: 3,
             width: 3,
             options: countryTreeData,
-            // props: {
-            //     treeCheckable: true,
-            //     showCheckedStrategy: SHOW_CHILD,
-            //     showSearch: true,
-            //     allowClear: true,
-            //     treeNodeFilterProp: "label",
-            //     treeDefaultExpandedKeys: ["all_countries"],
-            //     placeholder: campaignCountryValues.length
-            //         ? "Select from campaign countries"
-            //         : "Select countries",
-            //     maxTagCount: 2,
-            //     fieldNames: {
-            //         label: "label",
-            //         value: "value",
-            //         children: "children"
-            //     },
-            //     treeLine: true,
-            //     switcherIcon: ({ expanded, isLeaf }) =>
-            //         isLeaf
-            //             ? null
-            //             : expanded
-            //                 ? <DownOutlined />
-            //                 : <RightOutlined />,
-            //     className: `${theme === "dark" ? "dark-theme" : "light-theme"
-            //         } green-border-select`,
-            //     classNames: {
-            //         popup: {
-            //             root: `${theme === "dark"
-            //                 ? "custom-dropdown"
-            //                 : "custom-dropdown-light"
-            //                 } campaigns-campaign-level-tree-dropdown campaigns-adset-level-tree-dropdown`
-            //         }
-            //     },
-            //     style: { width: "100%" }
-            // }
             props: {
-                disabled: multipleGeo === "Geos" && index !== 0,
+                disabled: (multipleGeo === "Geos" && index !== 0) || isView,
                 treeCheckable: true,
                 showCheckedStrategy: SHOW_CHILD,
                 showSearch: true,
@@ -2231,7 +3561,8 @@ const AdSetLevel = ({
                 showSearch: true,
                 optionFilterProp: "label",
                 placeholder: "Select language",
-                maxTagCount: 1
+                maxTagCount: 1,
+                disabled: isView
             }
         },
         {
@@ -2242,7 +3573,7 @@ const AdSetLevel = ({
             row: 3,
             width: 1,
             options: genderOptions,
-            props: { disabled: isSpecialCategory }
+            props: { disabled: isSpecialCategory || isView }
         },
         {
             key: "Min_Age",
@@ -2254,9 +3585,12 @@ const AdSetLevel = ({
                 }}>
                     <span>Min Age</span>
                     <Switch
+                        style={{
+                            backgroundColor: isMinAgeEnabled ? "#91C25F" : undefined
+                        }}
                         size="small"
                         checked={isMinAgeEnabled}
-                        disabled={isSpecialCategory}
+                        disabled={isSpecialCategory || isView}
                         onChange={handleMinAgeToggle}
                     />
                 </span>
@@ -2277,7 +3611,7 @@ const AdSetLevel = ({
             row: 3,
             width: 1,
             options: maxAgeOptions,
-            props: { disabled: isSpecialCategory }
+            props: { disabled: isSpecialCategory || isView }
         },
         {
             key: "placements",
@@ -2293,7 +3627,10 @@ const AdSetLevel = ({
                     disabled: network === "FB_Mnet"
                 },
                 { value: "manual", label: "Manual" }
-            ]
+            ],
+            props: {
+                disabled: isView
+            }
         },
         {
             key: "platforms",
@@ -2307,7 +3644,8 @@ const AdSetLevel = ({
             props: {
                 mode: "multiple",
                 allowClear: true,
-                placeholder: "Select platforms"
+                placeholder: "Select platforms",
+                disabled: isView
             }
         },
         {
@@ -2328,7 +3666,7 @@ const AdSetLevel = ({
                 placeholder: platforms.length
                     ? "Select positions"
                     : "Select platform first",
-                disabled: !platforms.length
+                disabled: !platforms.length || isView
             }
         },
         {
@@ -2344,7 +3682,8 @@ const AdSetLevel = ({
             props: {
                 mode: "multiple",
                 allowClear: true,
-                placeholder: "Select device"
+                placeholder: "Select device",
+                disabled: isView
             }
         }
     ];
@@ -2361,7 +3700,13 @@ const AdSetLevel = ({
         };
 
         if (field.type === "input") {
-            return <Input {...props} variant="outlined" />;
+            return <Input {...props} variant="outlined"
+                onChange={
+                    field.key === "AdsetName"
+                        ? handleAdsetNameChange
+                        : undefined
+                }
+            />;
         }
 
         if (field.type === "number") {
@@ -2487,6 +3832,13 @@ const AdSetLevel = ({
             {/* ADD IT HERE */}
             <Form.Item
                 name={[index, "id"]}
+                hidden
+                preserve
+            >
+                <Input />
+            </Form.Item>
+            <Form.Item
+                name={[index, "Adsetid"]}
                 hidden
                 preserve
             >
@@ -2685,6 +4037,9 @@ const AdSetLevel = ({
             `}</style>
 
             <div className="campaigns-adset-level">
+                <Form.Item name={[index, "showBeneficiaryPayer"]} hidden preserve>
+                    <HiddenField />
+                </Form.Item>
                 <Form.Item
                     name={[index, "minAgeEnabled"]}
                     hidden
@@ -2827,6 +4182,7 @@ const AdSetLevel = ({
                                         label: "Ad account time zone"
                                     }
                                 ]}
+                                disabled={isView || isEditLocked}
                             />
                         </Form.Item>
 
@@ -2851,7 +4207,7 @@ const AdSetLevel = ({
                     </div>
                 )}
 
-                {beneficiaryAndPayerEnabled && (
+                {isBeneficiaryPayerVisible && (
                     <div className="campaigns-beneficiary-payer">
                         <div className="campaigns-beneficiary-payer-header">
                             <span className="campaigns-beneficiary-payer-label">
@@ -2895,6 +4251,7 @@ const AdSetLevel = ({
                                         ? "dark-theme"
                                         : "light-theme"
                                         } green-border-select`}
+                                    disabled={isView}
                                 />
                             </Form.Item>
 
@@ -2949,7 +4306,7 @@ const AdSetLevel = ({
                                                 },
                                             ]}
                                         >
-                                            <Input placeholder="Enter Beneficiary ID" />
+                                            <Input placeholder="Enter Beneficiary ID" disabled={isView} />
                                         </Form.Item>
                                     </Col>
 
@@ -2964,7 +4321,7 @@ const AdSetLevel = ({
                                                 },
                                             ]}
                                         >
-                                            <Input placeholder="Enter Payer ID" />
+                                            <Input placeholder="Enter Payer ID" disabled={isView} />
                                         </Form.Item>
                                     </Col>
                                 </Row>
@@ -3075,6 +4432,155 @@ const AdSetLevel = ({
                     </Form.List> */}
                     <Form.List name={[index, "ads"]}>
                         {(adFields, { remove }) => {
+                            const ads =
+                                form.getFieldValue([
+                                    "adsets",
+                                    index,
+                                    "ads",
+                                ]) || [];
+
+                            // IMPORTANT:
+                            // adFields order MUST follow the actual ads array order.
+                            // Do not reorder adFields using isLibraryCreativeAd().
+                            //
+                            // Dynamic Creative:
+                            //   one Form.List item -> show all media from that ad.
+                            //
+                            // Normal Creative:
+                            //   each Form.List item -> show exactly its own media.
+
+                            const visibleAdFields = isDynamicCreative
+                                ? adFields.slice(0, 1)
+                                : adFields;
+
+                            return (
+                                <>
+                                    {visibleAdFields.map((adField, renderIndex) => {
+                                        const adPath = [
+                                            "adsets",
+                                            index,
+                                            "ads",
+                                            adField.name,
+                                        ];
+
+                                        const ad = ads[adField.name] || {};
+
+                                        let mediaFiles = [];
+
+                                        if (isDynamicCreative) {
+                                            // filename is the canonical Dynamic Creative
+                                            // order: Creative Library -> Local Library.
+                                            const dynamicMedia = Array.isArray(ad?.filename)
+                                                ? ad.filename
+                                                : getAdMediaItems(ad);
+
+                                            mediaFiles = deduplicateMedia(dynamicMedia);
+                                        } else {
+                                            // IMPORTANT:
+                                            // Never rebuild/re-sort the media here.
+                                            // The ad itself already represents the correct
+                                            // position in the restored ads array.
+                                            mediaFiles = getAdMediaItems(ad).slice(0, 1);
+                                        }
+
+                                        return (
+                                            <div
+                                                key={adField.key}
+                                                style={{ marginBottom: 12 }}
+                                            >
+                                                <AdLevel
+                                                    form={form}
+                                                    network={network}
+                                                    adsetId={form.getFieldValue([
+                                                        "adsets",
+                                                        index,
+                                                        "id",
+                                                    ])}
+                                                    adsetIndex={index}
+
+                                                    // REAL Form.List index
+                                                    adIndex={adField.name}
+
+                                                    // VISUAL index
+                                                    displayAdIndex={renderIndex}
+
+                                                    field={adField}
+                                                    adPath={adPath}
+                                                    mediaFiles={mediaFiles}
+                                                    mode={mode}
+                                                    selectedAccounts={selectedAccounts}
+                                                    pagesByAccount={pagesByAccount}
+                                                    removeAd={() =>
+                                                        remove(adField.name)
+                                                    }
+                                                    onBatchCreate={newFiles => {
+                                                        const currentAdsetName =
+                                                            form.getFieldValue([
+                                                                "adsets",
+                                                                index,
+                                                                "AdsetName",
+                                                            ]) || "";
+
+                                                        return {
+                                                            ...source,
+                                                            id:
+                                                                globalThis.crypto?.randomUUID?.() ||
+                                                                `${Date.now()}-${Math.random()
+                                                                    .toString(36)
+                                                                    .slice(2)}`,
+                                                            AdName: currentAdsetName,
+                                                            AddName: currentAdsetName,
+                                                            textOverridesEnabled: false,
+                                                            media: {
+                                                                images: isVideo
+                                                                    ? []
+                                                                    : [file],
+                                                                videos: isVideo
+                                                                    ? [file]
+                                                                    : [],
+                                                                thumbnail: null,
+                                                            },
+                                                            accountSettings:
+                                                                Object.fromEntries(
+                                                                    Object.entries(
+                                                                        source.accountSettings || {}
+                                                                    ).map(
+                                                                        ([key, value]) => [
+                                                                            key,
+                                                                            {
+                                                                                ...value,
+                                                                                creativeOverrides:
+                                                                                {
+                                                                                    ...(value?.creativeOverrides ||
+                                                                                        {}),
+                                                                                },
+                                                                            },
+                                                                        ]
+                                                                    )
+                                                                ),
+                                                        };
+                                                    }}
+                                                    userData={userData}
+                                                    auth={auth}
+                                                    theme={theme}
+                                                    username={username}
+                                                    showCreativeStrip={
+                                                        renderIndex === 0
+                                                    }
+                                                    pageidList={pageidList}
+                                                    page_id_list={page_id_list}
+                                                    multiplePage={multiplePage}
+                                                />
+                                            </div>
+                                        );
+                                    })}
+                                </>
+                            );
+                        }}
+                    </Form.List>
+                    {/* main */}
+                    {/* <Form.List name={[index, "ads"]}>
+                        {(adFields, { remove }) => {
                             const orderedAdFields = [
                                 ...adFields.filter((field) =>
                                     isLibraryCreativeAd(
@@ -3128,6 +4634,9 @@ const AdSetLevel = ({
                                                     ])}
                                                     adsetIndex={index}
                                                     adIndex={adField.name}
+                                                    // NEW:
+                                                    // This is only the visual/card position.
+                                                    displayAdIndex={renderIndex}
                                                     field={adField}
                                                     adPath={adPath}
                                                     mode={mode}
@@ -3183,7 +4692,7 @@ const AdSetLevel = ({
                                 </>
                             );
                         }}
-                    </Form.List>
+                    </Form.List> */}
                 </div>
             </div>
         </>

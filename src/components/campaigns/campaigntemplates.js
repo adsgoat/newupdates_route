@@ -14,15 +14,21 @@ import {
     message,
 } from "antd";
 import { FaPenToSquare, FaShareFromSquare, FaTrashCan } from "react-icons/fa6";
+import SelectProjects from "../common/selectprojects";
+import SelectAccounts from "../common/selectaccount";
+import axios from "axios";
 
 const { Text } = Typography;
 const API = "https://fblaunching.vyaktimetrics.com/open/templates";
 
 export default function CampaignTemplates({
+    userData,
     accounts = [],
     draftsByAccount = {},
     onSelectTemplate,
     theme = "light",
+    networksWithStatus = [],
+    userdetails = {},
 }) {
     const isDark = theme === "dark";
     const [messageApi, contextHolder] = message.useMessage();
@@ -43,6 +49,29 @@ export default function CampaignTemplates({
     const [deleteAccounts, setDeleteAccounts] = useState([]);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [accountsLoading, setAccountsLoading] = useState(false);
+    const [revenuePartner, setRevenuePartner] = useState();
+    const [accountsValue, setAccountsValue] = useState();
+
+    const transformData = (data) => {
+        return Object.fromEntries(
+            Object.entries(data || []).map(([key, value]) => {
+                if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
+                    return [key, value.map(obj => ({ accountNumber: obj.accountNumber, accountName: obj.accountName, status: obj.status, }))];
+                }
+                return [key, value];
+            })
+        );
+    };
+    const transformedData = transformData(userData);
+
+    const handleFirstSelectChange = (newCategories) => {
+        setRevenuePartner(newCategories);
+        // setAccountsValue([transformedData[newCategories][0]?.accountNumber]);
+    };
+    const filteredAccounts = useMemo(() => { return transformedData[revenuePartner] }, [revenuePartner]);
+
+    console.log("transformedData", transformedData);
+    console.log("filteredAccounts", filteredAccounts);
 
     useEffect(() => {
         setToken(localStorage.getItem("token") || "");
@@ -259,41 +288,120 @@ export default function CampaignTemplates({
         setShareOpen(true);
     };
 
+    // const shareTemplateNow = async () => {
+    //     if (!token) {
+    //         messageApi.error(
+    //             "Authentication token not found. Please log in again."
+    //         );
+    //         return;
+    //     }
+
+    //     if (!shareTemplate) return;
+
+    //     if (!accountsValue.length) {
+    //         messageApi.warning("Please select at least one account.");
+    //         return;
+    //     }
+
+    //     setShareLoading(true);
+
+    //     try {
+    //         const response = await fetch(`${API}/share`, {
+    //             method: "POST",
+    //             headers: headers(true),
+    //             body: JSON.stringify({
+    //                 draftData: {
+    //                     groupId: shareTemplate.groupId,
+    //                     Draft_Name: shareTemplate.Draft_Name,
+    //                     camapaignlevel: shareTemplate.camapaignlevel,
+    //                     adsetlevel_1: shareTemplate.adsetlevel_1,
+    //                 },
+    //                 targetAccounts: shareAccounts,
+    //             }),
+    //         });
+
+    //         const data = await response.json();
+
+    //         if (!response.ok || !data?.ok) {
+    //             throw new Error(
+    //                 data?.message || "Failed to share template."
+    //             );
+    //         }
+
+    //         const shared = Array.isArray(data.accountsShared)
+    //             ? data.accountsShared
+    //             : [];
+
+    //         messageApi.success(
+    //             shared.length
+    //                 ? `Template shared to: ${shared.join(", ")}`
+    //                 : "Template shared successfully."
+    //         );
+
+    //         const skipped = shareAccounts.filter(
+    //             (account) =>
+    //                 !shared.some(
+    //                     (value) => String(value) === String(account)
+    //                 )
+    //         );
+
+    //         if (skipped.length) {
+    //             messageApi.info(`Skipped accounts: ${skipped.join(", ")}`);
+    //         }
+
+    //         setShareOpen(false);
+    //         setShareTemplate(null);
+    //         setShareAccounts([]);
+    //     } catch (error) {
+    //         messageApi.error(error.message || "Failed to share template.");
+    //     } finally {
+    //         setShareLoading(false);
+    //     }
+    // };
+
     const shareTemplateNow = async () => {
-        if (!token) {
-            messageApi.error(
-                "Authentication token not found. Please log in again."
-            );
+        // if (!token) {
+        //     messageApi.error(
+        //         "Authentication token not found. Please log in again."
+        //     );
+        //     return;
+        // }
+
+        if (!shareTemplate) {
             return;
         }
 
-        if (!shareTemplate) return;
-
-        if (!shareAccounts.length) {
+        if (!shareAccounts || shareAccounts.length === 0) {
             messageApi.warning("Please select at least one account.");
             return;
         }
 
+        const cleanedDraft = {
+            groupId: shareTemplate.groupId,
+            Draft_Name: shareTemplate.Draft_Name,
+            camapaignlevel: shareTemplate.camapaignlevel,
+            adsetlevel_1: shareTemplate.adsetlevel_1,
+            createdby: userdetails?.username,
+        };
+
+        const payload = {
+            draftData: cleanedDraft,
+            targetAccounts: shareAccounts,
+            email: userdetails?.email,
+            userName: userdetails?.username,
+        };
+
         setShareLoading(true);
 
         try {
-            const response = await fetch(`${API}/share`, {
-                method: "POST",
-                headers: headers(true),
-                body: JSON.stringify({
-                    draftData: {
-                        groupId: shareTemplate.groupId,
-                        Draft_Name: shareTemplate.Draft_Name,
-                        camapaignlevel: shareTemplate.camapaignlevel,
-                        adsetlevel_1: shareTemplate.adsetlevel_1,
-                    },
-                    targetAccounts: shareAccounts,
-                }),
-            });
+            const response = await axios.post(
+                "/api/campaigns/templates/share",
+                payload
+            );
 
-            const data = await response.json();
+            const data = response.data;
 
-            if (!response.ok || !data?.ok) {
+            if (!data?.ok) {
                 throw new Error(
                     data?.message || "Failed to share template."
                 );
@@ -316,15 +424,23 @@ export default function CampaignTemplates({
                     )
             );
 
-            if (skipped.length) {
-                messageApi.info(`Skipped accounts: ${skipped.join(", ")}`);
+            if (skipped.length > 0) {
+                messageApi.info(
+                    `Skipped accounts: ${skipped.join(", ")}`
+                );
             }
 
             setShareOpen(false);
             setShareTemplate(null);
             setShareAccounts([]);
         } catch (error) {
-            messageApi.error(error.message || "Failed to share template.");
+            console.error("Error sharing template:", error);
+
+            messageApi.error(
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to share template."
+            );
         } finally {
             setShareLoading(false);
         }
@@ -479,7 +595,7 @@ export default function CampaignTemplates({
     return (
         <>
             {contextHolder}
-            <Button onClick={openTemplates} style={{height:24, backgroundColor:"#91c25F", color:"white"}}>Templates</Button>
+            <Button onClick={openTemplates} style={{ height: 24, backgroundColor: "#91c25F", color: "white" }}>Templates</Button>
             <Modal
                 title="Campaign Templates"
                 open={open}
@@ -609,7 +725,11 @@ export default function CampaignTemplates({
             <Modal
                 title={`Share Template: ${shareTemplate?.Draft_Name || ""}`}
                 open={shareOpen}
-                onCancel={() => setShareOpen(false)}
+                onCancel={() => {
+                    setShareOpen(false);
+                    // setAccountsValue();
+                    // setRevenuePartner();
+                }}
                 onOk={shareTemplateNow}
                 okText="Share"
                 cancelText="Close"
@@ -618,23 +738,39 @@ export default function CampaignTemplates({
                 className={modalClass}
                 styles={modalTheme}
             >
-                <Text style={{ display: "block", marginBottom: 8 }}>
+                {/* <Text style={{ display: "block", marginBottom: 8 }}>
                     Select target accounts
-                </Text>
+                </Text> */}
 
-                <Select
-                    mode="multiple"
-                    allowClear
-                    showSearch
-                    optionFilterProp="label"
-                    placeholder="Select accounts"
-                    value={shareAccounts}
-                    onChange={setShareAccounts}
-                    options={accountOptions.filter(
-                        (account) => account.value !== "ALL"
-                    )}
-                    style={{ width: "100%" }}
-                />
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <SelectProjects
+                        firstSelectValues={revenuePartner}
+                        networksWithStatus={networksWithStatus}
+                        handleFirstSelectChange={handleFirstSelectChange}
+                        transformedData={transformedData}
+                        theme={theme}
+                    />
+                    <SelectAccounts
+                        filteredAccounts={filteredAccounts}
+                        theme={theme}
+                        setValue={setShareAccounts}
+                        value={shareAccounts}
+                    />
+
+                    {/* <Select
+                        mode="multiple"
+                        allowClear
+                        showSearch
+                        optionFilterProp="label"
+                        placeholder="Select accounts"
+                        value={shareAccounts}
+                        onChange={setShareAccounts}
+                        options={accountOptions.filter(
+                            (account) => account.value !== "ALL"
+                        )}
+                        style={{ width: "100%" }}
+                    /> */}
+                </div>
             </Modal>
 
             <Modal

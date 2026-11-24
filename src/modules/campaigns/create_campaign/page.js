@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Modal, Collapse, Form, Button, Tooltip, Select, Switch, Spin, message } from "antd";
+import { Modal, Collapse, Form, Button, Tooltip, Select, Switch, Spin, message, Popconfirm, Input } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { FaRegClone } from "react-icons/fa";
 import axios from "axios";
@@ -11,6 +11,7 @@ import AdSetLevel from "@/components/campaigns/adsetlevel";
 import ReportCategoryTreeSelect from "@/components/campaigns/reportcategorytreeselect";
 import CampaignTemplates from "@/components/campaigns/campaigntemplates";
 import moment from "moment-timezone";
+import { Dayjs } from "dayjs";
 
 const formatContinent = value => value.replace(/[_-]+/g, " ").replace(/^./, c => c.toUpperCase());
 
@@ -74,7 +75,9 @@ const CreateCampaignDrawer = ({
     theme,
     userData,
     auth,
-    username
+    username,
+    networksWithStatus,
+    userdetails
 }) => {
     const [budgetType, setBudgetType] = useState("daily");
     const [loading, setLoading] = useState(false);
@@ -93,6 +96,11 @@ const CreateCampaignDrawer = ({
     const [pageidList, setPageIdList] = useState([]);
     const [pixelIdList, setPixelIdList] = useState([]);
     const [messageApi, contextHolder] = message.useMessage();
+    const [isEditingDraft, setIsEditingDraft] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [isEditAccountsModalOpen, setIsEditAccountsModalOpen] = useState(false);
+    const [matchedAccounts, setMatchedAccounts] = useState([]);
     const [popupInputs, setPopupInputs] = useState({
         input1: "",
         input2: "",
@@ -103,15 +111,20 @@ const CreateCampaignDrawer = ({
         input2: "",
         reportCat: ""
     });
+    const groupId = uuidv4();
     const [reportCategories, setReportCategories] = useState([]);
     const [draftsData, setDraftsData] = useState({});
     const [geo, setGeos] = useState("Geo");
     const [pixel, setPixels] = useState("Pixel");
     const [page, setPages] = useState("Page");
 
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
+
     const [form] = Form.useForm();
 
     const adSchedulingToShowCampaign = campaignSchedulingEnabled;
+
+
 
     const handleCampaignSchedulingChange = checked => {
         setCampaignSchedulingEnabled(checked);
@@ -119,13 +132,72 @@ const CreateCampaignDrawer = ({
     };
 
     const handleDrawerClose = () => {
+        setOpen(false);
+        setPopupInputs({
+            input1: "",
+            input2: "",
+            reportCat: ""
+        });
+
+        setErrors({
+            input1: "",
+            input2: "",
+            reportCat: ""
+        });
         setCampaignSchedulingEnabled(false);
         form.resetFields();
         setBudgetType("daily");
         setPages("Page");
         setPixels("Pixel");
         setGeos("Geo")
+        setErrors({
+            input1: "",
+            input2: "",
+            reportCat: ""
+        });
+        setSelectedTemplate(null);
         onClose();
+    };
+
+    const convertAdScheduleToSelectedCells = (schedule = []) => {
+        const selectedCells = {};
+
+        schedule.forEach(slot => {
+            const startHour = slot.start_minute / 60;
+            const endHour = slot.end_minute / 60;
+
+            slot.days.forEach(facebookDay => {
+                const uiDay = (Number(facebookDay) + 6) % 7;
+
+                for (let hour = startHour; hour < endHour; hour++) {
+                    selectedCells[`${uiDay}-${hour}`] = true;
+                }
+            });
+        });
+
+        return selectedCells;
+    };
+
+    const normalizeList = value => {
+        if (Array.isArray(value)) return value;
+        if (value === undefined || value === null || value === "") return [];
+        return [value];
+    };
+
+    const getSelectedPositionObjects = (selected, allPositionOptions) => {
+        const selectedValues = new Set(
+            normalizeList(selected).map(position =>
+                String(
+                    typeof position === "object"
+                        ? position?.value
+                        : position
+                )
+            )
+        );
+
+        return allPositionOptions.filter(position =>
+            selectedValues.has(String(position.value))
+        );
     };
 
     const getTheCampaignDetailsAlongWithContinentsAndAccountDetails =
@@ -237,13 +309,457 @@ const CreateCampaignDrawer = ({
             }
         };
 
+    const handleConfirmWithValidation = async () => {
+        if (!popupInputs.input2?.trim()) {
+            setErrors((prev) => ({
+                ...prev,
+                input2: "Please enter a Template Name.",
+            }));
+            return;
+        }
+
+        // Clear previous error
+        setErrors((prev) => ({
+            ...prev,
+            input2: "",
+        }));
+
+        const allValues = form.getFieldsValue(true);
+
+        if (isEditingDraft) {
+            // const trimmedCat = popupInputs.input1.trim();
+            const trimmedName = popupInputs.input2.trim();
+
+            const newErrors = {
+                // input1: trimmedCat ? "" : "Template category is required",
+                input2: trimmedName ? "" : "Template name is required",
+            };
+            setErrors(newErrors);
+            if (Object.values(newErrors).some(msg => msg !== "")) return Promise.reject();
+
+            try {
+                // Call your API that fetches all accounts with drafts
+                const res = await axios.get(`/api/campaigns/templates/edit/groupid?groupId=${selectedTemplate?.groupId}`);
+
+                const json = res.data;
+                const matchedAccounts = json.data
+                    .filter(account => account.Drafts.some(draft => draft.groupId === selectedTemplate.groupId))
+                    .map(account => account.accountNumber);
+
+                if (matchedAccounts.length === 0) {
+                    messageApi.info("No accounts have drafts with this groupId");
+                    return;
+                }
+
+
+                setMatchedAccounts(matchedAccounts);
+                setIsEditAccountsModalOpen(true);
+
+            } catch (err) {
+                console.error(err);
+                messageApi.error(err.message || "Failed to fetch matched accounts");
+            }
+            // const data = await CreateTemplate(allValues);
+            // try {
+
+            //     for (const template of data) {
+            //         const response = await axios.post("/api/campaigns/templates/create", {
+            //             accountNumber: template?.Account_Number,
+            //             draftData: { ...template, groupId },
+            //             email: userdetails?.email,
+            //             userName: username,
+            //         })
+            //         messageApi.success(`Template ${template?.Draft_Name ?? ""} created successfully`);
+            //     }
+            //     setConfirmLoading(false);
+            //     onClose();
+            // }
+            // catch (err) {
+            //     messageApi.error("Template creation failed");
+            // }
+            // finally {
+            //     setConfirmLoading(false);
+            // }
+        } else {
+            setConfirmLoading(true)
+            const data = await CreateTemplate(allValues);
+            console.log(data);
+            try {
+
+                for (const template of data) {
+                    const response = await axios.post("/api/campaigns/templates/create", {
+                        accountNumber: template?.Account_Number,
+                        draftData: { ...template, groupId },
+                        email: userdetails?.email,
+                        userName: username,
+                    })
+                    messageApi.success(`Template ${template?.Draft_Name ?? ""} created successfully`);
+                }
+                setConfirmLoading(false);
+                setOpen(false)
+                // onClose();
+                form.resetFields();
+                setSelectedTemplate(null);
+                changeRRefrst();
+                await getTheCampaignDetailsAlongWithContinentsAndAccountDetails();
+            }
+            catch (err) {
+                console.log(err);
+                messageApi.error("Template creation failed");
+            }
+            finally {
+                setConfirmLoading(false);
+            }
+        }
+    };
+
+    const handleEditDraft = async () => {
+        // setIsEditAccountsModalOpen(false);
+        setConfirmLoading(true);
+
+        try {
+            const allValues = form.getFieldsValue(true);
+            const accountsToUpdate = matchedAccounts;
+
+            for (const accountNumber of accountsToUpdate) {
+                const draftData = await CreateTemplate(allValues);
+                if (!draftData) continue;
+                // console.log({
+                //     accountNumber: accountNumber,
+                //     groupId: selectedTemplate.groupId,
+                //     payload: { ...draftData[0], Account_Number: accountNumber, Draft_Name: popupInputs.input2 },
+                // })
+                await axios.post("/api/campaigns/templates/edit", {
+                    accountNumber: accountNumber,
+                    groupId: selectedTemplate.groupId,
+                    payload: { ...draftData[0], Account_Number: accountNumber, Draft_Name: popupInputs.input2 },
+                })
+
+                // let filteredPayload;
+                // if (Array.isArray(draftData)) {
+                //     filteredPayload = draftData.find(d => d.Account_Number === accountNumber);
+                // } else {
+                //     filteredPayload = Object.values(draftData).find(d => d.Account_Number === accountNumber);
+                // }
+                // if (!filteredPayload) continue;
+                // filteredPayload = {
+                //     ...filteredPayload,
+                //     Category: popupInputs.input1,
+                //     Draft_Name: popupInputs.input2,
+                // };
+                // for (const accountNumber of matchedAccounts) {
+                //     const draftData = await MultipleAdsetsDraftFetching(allValues, accountNumber);
+                //     if (!draftData) continue;
+
+                //     let filteredPayload = Array.isArray(draftData)
+                //         ? draftData.find(d => d.Account_Number === accountNumber)
+                //         : Object.values(draftData).find(d => d.Account_Number === accountNumber);
+
+                //     if (!filteredPayload) continue;
+
+                //     filteredPayload = {
+                //         ...filteredPayload,
+                //         Category: popupInputs.input1,
+                //         Draft_Name: popupInputs.input2,
+                //     };
+
+                //     await fetch(
+                //         // "https://www.testapi.adsgoat.in/api/NewupdateDraftSmartnew", 
+                //         "https://fb.com/open/templates/update-smart",
+                //         {
+                //             method: "PATCH",
+                //             headers: { "Content-Type": "application/json", Authorization: token },
+                //             body: JSON.stringify({
+                //                 accountNumber: accountNumber,
+                //                 groupId: selectedRef.current.groupId,
+                //                 payload: filteredPayload,
+                //             }),
+                //         });
+                // }
+                // messageApi.success("Draft updated successfully for all accounts in this group");
+                // setIsEditAccountsModalOpen(false);
+                // await postDraftSaveCleanup();
+            }
+            setOpen(false)
+            // onClose();
+            form.resetFields();
+            setSelectedTemplate(null);
+            changeRRefrst();
+            await getTheCampaignDetailsAlongWithContinentsAndAccountDetails();
+            setIsEditingDraft(false);
+            setIsEditAccountsModalOpen(false);
+
+
+        } catch (err) {
+            console.error("Save draft (edit) error:", err);
+            messageApi.error(err?.message || "Failed to update draft");
+        } finally {
+            setConfirmLoading(false);
+        }
+    };
+
     useEffect(() => {
-        if (!visible) return;
+        if (!visible) {
+            setOpen(false);
+            return;
+        };
         if (visible && accountis.length > 0) {
             getTheCampaignDetailsAlongWithContinentsAndAccountDetails();
         }
         form.setFieldValue("Account_Number", [...accountis]);
     }, [visible, accountis, network, form]);
+
+    const toFileName = (p) =>
+        typeof p === "string" ? p.split(/[?#]/)[0].split("/").filter(Boolean).pop() || "" : "";
+
+    const toFile = (item, index = 0) => {
+        const url = typeof item === "string" ? item : item?.filename || item?.url || "";
+        if (typeof url !== "string" || !url.trim()) return "";
+        return { uid: `creative-${Date.now()}-${index}`, name: toFileName(url), url };
+    };
+
+    const toFileList = (value) =>
+        (Array.isArray(value) ? value : value ? [value] : [])
+            .map((item, index) => toFile(item, index))
+            .filter(Boolean);
+    useEffect(() => {
+        if (selectedTemplate) {
+            const { Category, geo, page, pixel, camapaignlevel, Account_Number } = selectedTemplate;
+            // First update campaign-level form values
+            const categoryObject = reportCategories.find(item => item.name === Category);
+            if (camapaignlevel) {
+                form.setFieldsValue({
+                    // ...camapaignlevel,
+                    // ...(camapaignlevel.Special_categories && { countries: camapaignlevel.Special_categories_countries || [] }),
+                    // ...(camapaignlevel.Daily_amount && { Daily_amount: (camapaignlevel.Daily_amount / 100) })
+                    ...camapaignlevel,
+                    ...(camapaignlevel.Special_categories !== "NONE" && {
+                        countries: Array.isArray(camapaignlevel.Special_categories_countries)
+                            ? camapaignlevel.Special_categories_countries
+                            : ["US"]
+                    }),
+                    ...(camapaignlevel.Special_categories === "NONE" ? { Special_categories: ["NONE"] } : { Special_categories: camapaignlevel.Special_categories }),
+                    ...(camapaignlevel.Daily_amount && { Daily_amount: (camapaignlevel.Daily_amount / 100) }),
+                });
+
+                if (camapaignlevel.Budget_type) {
+                    setBudgetType(camapaignlevel.Budget_type);
+                }
+                if (camapaignlevel.is_day_parting_enabled_campign) {
+                    setCampaignSchedulingEnabled(camapaignlevel.is_day_parting_enabled_campign);
+                }
+            }
+            const adsets = Object.entries(selectedTemplate)
+                .filter(([key]) => key.startsWith("adsetlevel_"))
+                .map(([key, adsetLevel]) => {
+                    const isDynamicCreative = adsetLevel.is_dynamic_creative;
+                    // const addLevel = adsetLevel.addlevel;
+                    // const Ads = addLevel.Ads;
+                    // const NewAds = addLevel.NewAds;
+                    const addLevel = adsetLevel.addlevel || {};
+                    const Ads = Array.isArray(addLevel.Ads) ? addLevel.Ads : [];
+                    const NewAds = Array.isArray(addLevel.NewAds) ? addLevel.NewAds : [];
+                    const newAds = isDynamicCreative && NewAds.length ? [{
+                        id: uuidv4(),
+                        AddName: NewAds[0].AddName || "",
+                        AdName: NewAds[0].AddName || "",
+                        page_id: [`${Account_Number} - ${NewAds[0].page_id}`],
+                        message: NewAds[0].message || "",
+                        primaryText: NewAds[0].message || "",
+                        messages: NewAds[0].message || "",
+                        headline: NewAds[0].headline || "",
+                        Description: NewAds[0].Description || "",
+                        descriptions: NewAds[0].Description || "",
+                        description: NewAds[0].Description || "",
+                        mediaSource: "creatives",
+                        accountSettings: {
+                            [Account_Number]: {
+                                Caption: NewAds[0].Caption || "",
+                                displayLink: NewAds[0].Caption || "",
+                                caption: NewAds[0].Caption || "",
+                                Website_URL: NewAds[0].Website_URL || "",
+                                websiteUrl: NewAds[0].Website_URL || ""
+                            }
+                        },
+                        filename: toFileList(NewAds[0].filename),
+                        Website_URL: NewAds[0].Website_URL,
+                        Caption: NewAds[0].Caption,
+
+                        // Caption: addLevel[]
+                    }] : NewAds.length ? NewAds.map((item, index) => ({
+                        id: uuidv4(),
+                        AddName: item.AddName,
+                        AdName: item.AddName,
+                        page_id: [`${Account_Number} - ${item.page_id}`],
+                        filename: toFile(item.filename, index),
+                        mediaSource: "creatives",
+                        message: item.message,
+                        primaryText: item.message,
+                        messages: item.message,
+                        headline: item.headline,
+                        Description: item.Description,
+                        descriptions: item.Description,
+                        description: item.Description,
+                        accountSettings: {
+                            [Account_Number]: {
+                                Caption: item.Caption,
+                                displayLink: item.Caption,
+                                caption: item.Caption,
+                                Website_URL: item.Website_URL,
+                                websiteUrl: item.Website_URL
+                            }
+                        },
+                        Website_URL: item.Website_URL,
+                        Caption: item.Caption,
+
+                    })) : []
+                    const ads = isDynamicCreative ? [{
+                        id: uuidv4(),
+                        AddName: addLevel.AddName || "",
+                        AdName: addLevel.AddName || "",
+                        page_id: [`${Account_Number} - ${addLevel.page_id}`],
+                        message: addLevel.message || "",
+                        primaryText: addLevel.message || "",
+                        messages: addLevel.message || "",
+                        headline: addLevel.headline || "",
+                        Description: addLevel.Description || "",
+                        descriptions: addLevel.Description || "",
+                        description: addLevel.Description || "",
+                        mediaSource: "creatives",
+                        accountSettings: {
+                            [Account_Number]: {
+                                Caption: addLevel.Caption || "",
+                                displayLink: addLevel.Caption || "",
+                                caption: addLevel.Caption || "",
+                                Website_URL: addLevel.Website_URL || "",
+                                websiteUrl: addLevel.Website_URL || ""
+                            }
+                        },
+                        filename: toFileList(Ads),
+                        Website_URL: addLevel.Website_URL,
+                        Caption: addLevel.Caption,
+
+                        // Caption: addLevel[]
+                    }] : Ads.length ? Ads.map((item, index) => ({
+                        id: uuidv4(),
+                        AddName: addLevel.AddName,
+                        AdName: addLevel.AddName,
+                        page_id: [`${Account_Number} - ${addLevel.page_id}`],
+                        filename: toFile(item, index),
+                        mediaSource: "creatives",
+                        message: addLevel.message,
+                        primaryText: addLevel.message,
+                        messages: addLevel.message,
+                        headline: addLevel.headline,
+                        Description: addLevel.Description,
+                        descriptions: addLevel.Description,
+                        description: addLevel.Description,
+                        accountSettings: {
+                            [Account_Number]: {
+                                Caption: addLevel.Caption,
+                                displayLink: addLevel.Caption,
+                                caption: addLevel.Caption,
+                                Website_URL: addLevel.Website_URL,
+                                websiteUrl: addLevel.Website_URL
+                            }
+                        },
+                        Website_URL: addLevel.Website_URL,
+                        Caption: addLevel.Caption,
+
+                    })) :
+
+                        [{
+                            id: uuidv4(),
+                            AddName: addLevel.AddName || "",
+                            AdName: addLevel.AddName || "",
+                            page_id: [`${Account_Number} - ${addLevel.page_id}`],
+                            message: addLevel.message || "",
+                            primaryText: addLevel.message || "",
+                            messages: addLevel.message || "",
+                            headline: addLevel.headline || "",
+                            Description: addLevel.Description || "",
+                            descriptions: addLevel.Description || "",
+                            description: addLevel.Description || "",
+                            mediaSource: "creatives",
+                            accountSettings: {
+                                [Account_Number]: {
+                                    Caption: addLevel.Caption || "",
+                                    displayLink: addLevel.Caption || "",
+                                    caption: addLevel.Caption || "",
+                                    Website_URL: addLevel.Website_URL || "",
+                                    websiteUrl: addLevel.Website_URL || ""
+                                }
+                            },
+                            filename: "",
+                            Website_URL: addLevel.Website_URL,
+                            Caption: addLevel.Caption,
+                        }];
+                    const adSchedule = Array.isArray(adsetLevel.adschedule)
+                        ? adsetLevel.adschedule
+                        : [];
+
+                    const selectedScheduleCells =
+                        convertAdScheduleToSelectedCells(adSchedule);
+
+                    const selectedPositions = getSelectedPositionObjects(adsetLevel?.position || [], adsetConfig?.allPositionOptions);
+                    return ({
+                        id: uuidv4(),
+                        isDynamicCreative: adsetLevel.is_dynamic_creative ? adsetLevel.is_dynamic_creative : false,
+                        AdsetName: adsetLevel.AdsetName || "",
+                        action_source: adsetLevel.action_source || "",
+                        optimization_goal: adsetLevel.optimization_goal || "",
+                        custom_event_type: adsetLevel.custom_event_type || "",
+                        billing_event: adsetLevel.billing_event || "",
+                        DailyAdd_amount: adsetLevel.DailyAdd_amount ? (adsetLevel.DailyAdd_amount / 100) : 0,
+                        DatePicker: adsetLevel.DatePicker ? Dayjs(adsetLevel.DatePicker) : undefined,
+                        DatePickerEnd: adsetLevel.DatePickerEnd ? Dayjs(adsetLevel.DatePickerEnd) : undefined,
+                        bid_amount: adsetLevel.bid_amount ? (adsetLevel.bid_amount / 100) : 0,
+                        // countries: adsetLevel.countries || [],
+                        countries: Array.isArray(adsetLevel.countries)
+                            ? adsetLevel.countries
+                            : adsetLevel.countries
+                                ? [adsetLevel.countries]
+                                : ["US"],
+                        Min_Age: adsetLevel.Min_Age || "18",
+                        minAgeEnabled: adsetLevel.minAgeToggle ? adsetLevel.minAgeToggle : false,
+                        Max_Age: adsetLevel.Max_Age || "65",
+                        Gender: adsetLevel.Gender || "0",
+                        Language: adsetLevel.locales || [6],
+                        placements: adsetLevel.placements || "manual",
+                        platforms: adsetLevel.publisher_platforms || [],
+                        positions: adsetLevel.position || [],
+                        device_platforms: adsetLevel.device_platforms || [],
+                        pixel_id: adsetLevel.pixel_id ? [`${Account_Number} - ${adsetLevel.pixel_id}`] : [],
+                        Beneficiary: {
+                            [Account_Number]: adsetLevel.beneficiary ? adsetLevel.beneficiary : ""
+                        },
+                        Payer: {
+                            [Account_Number]: adsetLevel.payer ? adsetLevel.payer : "",
+                        },
+                        adSchedulingEnabled: Boolean(
+                            adsetLevel.is_day_parting_enabled
+                        ),
+                        selectedPositions: selectedPositions ? selectedPositions : [],
+
+                        ad_schedule: Array.isArray(adsetLevel.adschedule)
+                            ? [...adsetLevel.adschedule]
+                            : [],
+                        selectedScheduleCells: selectedScheduleCells || {},
+                        ads: newAds.length ? newAds : ads
+                    })
+                });
+
+            form.setFieldValue("adsets", adsets);
+            if (geo) setGeos(geo);
+            if (page) setPages(page);
+            if (pixel) setPixels(pixel);
+            if (categoryObject) {
+                form.setFieldsValue({
+                    reportCat: categoryObject?.categoryId,
+                });
+            }
+        }
+    }, [selectedTemplate]);
 
     const customRequest = async (
         campaign_name,
@@ -1197,14 +1713,14 @@ const CreateCampaignDrawer = ({
     };
 
     const MultipleAdsetsFetching = async (values) => {
-        // console.log(values);
+        console.log(values);
         const category = reportCategories.find(item => item.categoryId === values.reportCat);
         const multipleAccounts = values.Account_Number;
         const multipleAccountsData = [];
         for (const account of multipleAccounts) {
             const newImageHash = imageHashArray.find(item => item.accountNumber === account);
-            const list_of_page_id = values.adsets[0].pixel_id;
-            const list_of_pixel_id = values.adsets[0].ads[0].page_id;
+            const list_of_pixel_id = values.adsets[0].pixel_id;
+            const list_of_page_id = values.adsets[0].ads[0].page_id;
 
             const matchedPageIds = list_of_page_id.filter(item => item.includes(account)).map(item => item.split("-")[1]?.trim());
 
@@ -1534,6 +2050,1182 @@ const CreateCampaignDrawer = ({
 
     }
 
+    /* =====================================================================
+ * CreateTemplate  (single self-contained function)
+ *
+ * - Only uploads media to S3 (no image hash / video_id / thumbnail_url)
+ * - Does NOT use customRequest / buildAddLevelData, so those stay untouched
+ *   for the "create campaign" flow.
+ *
+ * Output per adset:
+ *   addlevel: {
+ *     AddName, Ads: [s3 urls], page_id, message, headline, Description,
+ *     Caption, Website_URL,
+ *     NewAds: [ { id, AddName, page_id, message, headline, Description,
+ *                 Caption, Website_URL, filename, mediaType, ... } ]
+ *   }
+ * ===================================================================== */
+    // const CreateTemplate = async (values) => {
+    //     // console.log(values);
+
+    //     /* ------------------------------------------------------------------
+    //      * Helpers (all local to this function)
+    //      * ---------------------------------------------------------------- */
+    //     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    //     const retryApi = async (apiCall, retries = 3, delay = 2000) => {
+    //         let lastError;
+    //         for (let attempt = 0; attempt < retries; attempt++) {
+    //             try {
+    //                 return await apiCall();
+    //             } catch (error) {
+    //                 lastError = error;
+    //                 if (attempt < retries - 1) {
+    //                     await sleep(delay);
+    //                 }
+    //             }
+    //         }
+    //         throw lastError;
+    //     };
+
+    //     const getFileMetadata = (file) => ({
+    //         ...(file?.uid != null && { uid: file.uid }),
+    //         ...(file?.key != null && { key: file.key }),
+    //         ...(file?.name != null && { name: file.name }),
+    //         ...(file?.type != null && { type: file.type }),
+    //         ...(file?.size != null && { size: file.size }),
+    //         ...(file?.lastModified != null && { lastModified: file.lastModified }),
+    //     });
+
+    //     const getFileType = (file, blob) => {
+    //         const type = file?.type || blob?.type;
+    //         if (type && type !== "application/octet-stream") {
+    //             return type;
+    //         }
+
+    //         const name = [file?.name, file?.filename, file?.url, file?.s3Url, file?.key]
+    //             .filter(Boolean)
+    //             .join(" ");
+
+    //         if (/\.(png|jpe?g|gif|webp|avif|bmp)(?:[?#].*)?$/i.test(name)) {
+    //             return "image/*";
+    //         }
+    //         if (/\.(mp4|mov|avi|webm|m4v|mkv)(?:[?#].*)?$/i.test(name)) {
+    //             return "video/*";
+    //         }
+    //         return "";
+    //     };
+
+    //     // If the media already has a URL (already in S3) we reuse it, no new upload.
+    //     const getExistingUrl = (file) =>
+    //         file?.url ||
+    //         file?.s3Url ||
+    //         (typeof file?.filename === "string" && /^https?:\/\//i.test(file.filename)
+    //             ? file.filename
+    //             : "");
+
+    //     /* ------------------------------------------------------------------
+    //      * Upload the media of one adset to S3.
+    //      *  - media that already has a URL  -> reused as it is (no new S3 url)
+    //      *  - local file (no URL)           -> uploaded to S3, new S3 url created
+    //      * Returns [] when there is no media.
+    //      * Result item: { ...metadata, success, filename: <s3 url>, mediaType, uploadFailed?, error? }
+    //      * ---------------------------------------------------------------- */
+    //     const uploadAdsetMediaToS3 = async (singleaccount, adset) => {
+    //         try {
+    //             // Media comes from adset.ads[].filename (File object, upload object, or array of them)
+    //             const files = (Array.isArray(adset?.ads) ? adset.ads : []).flatMap((ad) => {
+    //                 const filename = ad?.filename;
+    //                 if (Array.isArray(filename)) {
+    //                     return filename.filter(Boolean);
+    //                 }
+    //                 return filename ? [filename] : [];
+    //             });
+
+    //             if (!files.length) {
+    //                 console.warn("No media found in adset.ads[].filename", adset?.ads);
+    //                 return [];
+    //             }
+
+    //             // Upload context is needed only when at least one local file has to be uploaded
+    //             const hasLocalFiles = files.some((file) => !getExistingUrl(file));
+
+    //             let account = singleaccount;
+    //             let authToken = "";
+    //             let folderPath = "";
+    //             let getAuthHeaders = () => ({});
+
+    //             const createS3Folder = async () => {
+    //                 const response = await axios.post("/api/campaigns/s3", null, {
+    //                     headers: {
+    //                         ...getAuthHeaders(),
+    //                         "x-folder": `${folderPath.replace(/\/+$/, "")}/`,
+    //                         "x-action": "create-folder",
+    //                     },
+    //                 });
+
+    //                 if (response.status < 200 || response.status >= 300) {
+    //                     throw new Error(`S3 folder creation failed (${response.status})`);
+    //                 }
+    //             };
+
+    //             if (hasLocalFiles) {
+    //                 const accountData = imageHashArray.find(
+    //                     (item) => String(item.accountNumber) === String(singleaccount)
+    //                 );
+
+    //                 if (!accountData) {
+    //                     throw new Error(`Account data not found for account ${singleaccount}`);
+    //                 }
+
+    //                 const { accountNumber, username: accUsername = "default-user" } = accountData;
+    //                 account = accountNumber;
+
+    //                 authToken = localStorage.getItem("token");
+    //                 if (!authToken) {
+    //                     throw new Error("Authentication token not found");
+    //                 }
+
+    //                 getAuthHeaders = () => ({
+    //                     Authorization: authToken,
+    //                     username: accUsername,
+    //                 });
+
+    //                 folderPath = `${network}/${account}/${values.Name || "Drafts"}`;
+    //                 await createS3Folder();
+    //             }
+
+    //             const uploadFileToS3 = async (fileBlob, fileName) => {
+    //                 if (!fileBlob) {
+    //                     throw new Error(`Missing file data: ${fileName}`);
+    //                 }
+
+    //                 const formData = new FormData();
+    //                 formData.append("file", fileBlob, fileName);
+    //                 formData.append("filename", `${folderPath}/${fileName}`);
+
+    //                 const response = await axios.post("/api/campaigns/s3", formData, {
+    //                     headers: getAuthHeaders(),
+    //                 });
+
+    //                 const result = response?.data ?? null;
+    //                 if (!result?.imageUrl) {
+    //                     throw new Error(result?.message || "S3 upload failed");
+    //                 }
+    //                 return result.imageUrl;
+    //             };
+
+    //             const processSingleFile = async (file, fileIndex) => {
+    //                 const metadata = getFileMetadata(file);
+
+    //                 // 1. URL already exists -> reuse it, do NOT create a new S3 url
+    //                 const existingUrl = getExistingUrl(file);
+
+    //                 if (existingUrl) {
+    //                     const fileType = getFileType(file, null);
+    //                     const mediaType = fileType.startsWith("image/")
+    //                         ? "image"
+    //                         : fileType.startsWith("video/")
+    //                             ? "video"
+    //                             : "";
+
+    //                     return {
+    //                         ...metadata,
+    //                         success: true,
+    //                         filename: existingUrl,
+    //                         mediaType,
+    //                     };
+    //                 }
+
+    //                 // 2. Local file -> upload to S3 and create the new S3 url
+    //                 let s3FileUrl = "";
+    //                 let mediaType = "";
+
+    //                 let fileName = file?.name || file?.filename?.split("/").pop() || "media";
+
+    //                 const adName = `${account}_${adset?.AddName || "Ad"}_${fileIndex + 1}`;
+
+    //                 try {
+    //                     const originalFile = file?.originFileObj;
+    //                     let fileBlob;
+
+    //                     if (typeof Blob !== "undefined" && originalFile instanceof Blob) {
+    //                         fileBlob = originalFile;
+    //                     } else if (typeof Blob !== "undefined" && file instanceof Blob) {
+    //                         fileBlob = file;
+    //                     } else {
+    //                         throw new Error(`Unable to read media: ${fileName}`);
+    //                     }
+
+    //                     const fileType = getFileType(file, fileBlob);
+    //                     const isImage = fileType.startsWith("image/");
+    //                     const isVideo = fileType.startsWith("video/");
+
+    //                     if (!isImage && !isVideo) {
+    //                         throw new Error(`Unsupported media type: ${fileName}`);
+    //                     }
+
+    //                     mediaType = isImage ? "image" : "video";
+
+    //                     fileName = `blob_${uuidv4()}_${fileName}`;
+
+    //                     console.log(`[${adName}] Uploading to S3...`);
+
+    //                     s3FileUrl = await retryApi(
+    //                         () => uploadFileToS3(fileBlob, fileName),
+    //                         3,
+    //                         2000
+    //                     );
+
+    //                     onSuccess?.("ok", { filename: s3FileUrl });
+
+    //                     return {
+    //                         ...metadata,
+    //                         success: true,
+    //                         filename: s3FileUrl,
+    //                         mediaType,
+    //                     };
+    //                 } catch (error) {
+    //                     console.error(
+    //                         "Media processing failed:",
+    //                         error?.response?.data || error?.message || error
+    //                     );
+
+    //                     onError?.("error", error);
+
+    //                     return {
+    //                         ...metadata,
+    //                         success: false,
+    //                         filename: s3FileUrl,
+    //                         mediaType,
+    //                         uploadFailed: true,
+    //                         error:
+    //                             error?.response?.data?.error?.message ||
+    //                             error?.message ||
+    //                             "Media upload failed",
+    //                     };
+    //                 }
+    //             };
+
+    //             // Keep the same order as the selected media, process 3 at a time
+    //             const results = new Array(files.length);
+
+    //             for (let start = 0; start < files.length; start += 3) {
+    //                 const end = Math.min(start + 3, files.length);
+    //                 const chunk = files.slice(start, end);
+
+    //                 const settled = await Promise.allSettled(
+    //                     chunk.map((file, chunkIndex) =>
+    //                         processSingleFile(file, start + chunkIndex)
+    //                     )
+    //                 );
+
+    //                 settled.forEach((result, chunkIndex) => {
+    //                     results[start + chunkIndex] =
+    //                         result.status === "fulfilled"
+    //                             ? result.value
+    //                             : {
+    //                                 ...getFileMetadata(chunk[chunkIndex]),
+    //                                 success: false,
+    //                                 filename: "",
+    //                                 mediaType: "",
+    //                                 uploadFailed: true,
+    //                                 error: result.reason?.message || "Media processing failed",
+    //                             };
+    //                 });
+    //             }
+
+    //             console.log("Final uploaded media results:", results);
+    //             return results;
+    //         } catch (error) {
+    //             console.error(
+    //                 "S3 upload failed:",
+    //                 error?.response?.data || error?.message || error
+    //             );
+    //             onError?.("error", error);
+    //             return [];
+    //         }
+    //     };
+
+    //     /* ------------------------------------------------------------------
+    //      * Build addlevel: OBJECT (old structure) + NewAds array
+    //      * (no image_hash / video_id / thumbnail_url)
+    //      * ---------------------------------------------------------------- */
+    //     const buildAddLevel = ({ adset, account, page_id, mediaItems = [], isDynamicCreative = false }) => {
+    //         const accountSettings =
+    //             adset?.[account] ||
+    //             adset?.accountSettings?.[account] ||
+    //             {};
+
+    //         const getAdFields = (ad, index) => ({
+    //             id: uuidv4(),
+    //             AddName: `${String(ad?.AddName ?? adset?.AddName ?? "Ad")}`,
+    //             page_id,
+    //             message: ad?.primaryText ?? ad?.messages ?? ad?.message ?? adset?.message,
+    //             headline: ad?.headlines ?? ad?.headline ?? adset?.headline,
+    //             Description:
+    //                 ad?.descriptions ??
+    //                 ad?.Description ??
+    //                 ad?.description ??
+    //                 adset?.Description,
+    //             Caption: ad?.Caption ?? accountSettings?.Caption,
+    //             Website_URL: ad?.Website_URL ?? accountSettings?.Website_URL,
+    //         });
+
+    //         const hasUploadFailure = mediaItems.some((media) => media?.uploadFailed || !media?.filename);
+
+    //         let NewAds;
+
+    //         if (isDynamicCreative) {
+    //             // Dynamic creative: ONE ad (single object in the array),
+    //             // filename = array of all file urls (array of strings)
+    //             const sourceAd = adset?.ads?.[0] || {};
+
+    //             const hasImages = mediaItems.some((media) => media?.mediaType === "image" && media?.filename);
+    //             const hasVideos = mediaItems.some((media) => media?.mediaType === "video" && media?.filename);
+
+    //             NewAds = [
+    //                 {
+    //                     ...getAdFields({ ...sourceAd, AddName: adset?.AdName }, 0),
+
+    //                     filename: mediaItems
+    //                         .map((media) => media?.filename)
+    //                         .filter(Boolean),
+
+    //                     call_to_action_types: ["LEARN_MORE"],
+
+    //                     ad_formats: [
+    //                         ...(hasImages ? ["SINGLE_IMAGE"] : []),
+    //                         ...(hasVideos ? ["SINGLE_VIDEO"] : []),
+    //                     ],
+
+    //                     ...(hasUploadFailure ? { uploadFailed: true } : {}),
+    //                 },
+    //             ];
+    //         } else {
+    //             // Normal creative: one ad per media item
+    //             NewAds = mediaItems.map((media, index) => {
+    //                 const sourceAd = Array.isArray(adset?.ads) ? adset.ads[index] || {} : {};
+
+    //                 return {
+    //                     ...getAdFields({ ...sourceAd, AddName: sourceAd?.AdName }, index),
+    //                     filename: media?.filename || "",
+    //                     mediaType: media?.mediaType || "",
+    //                     ...(media?.uploadFailed || !media?.filename ? { uploadFailed: true } : {}),
+    //                 };
+    //             });
+    //         }
+
+    //         // addlevel object (old structure) - values taken from the first ad, falling back to adset level
+    //         const firstSourceAd = Array.isArray(adset?.ads) ? adset.ads[0] || {} : {};
+
+    //         return {
+    //             AddName: String(adset?.AddName ?? firstSourceAd?.AdName ?? ""),
+    //             Ads: mediaItems.map((media) => media?.filename).filter(Boolean),
+    //             page_id,
+    //             message:
+    //                 firstSourceAd?.primaryText ??
+    //                 firstSourceAd?.messages ??
+    //                 firstSourceAd?.message ??
+    //                 adset?.message ??
+    //                 "",
+    //             headline: firstSourceAd?.headlines ?? firstSourceAd?.headline ?? adset?.headline ?? "",
+    //             Description:
+    //                 firstSourceAd?.descriptions ??
+    //                 firstSourceAd?.Description ??
+    //                 firstSourceAd?.description ??
+    //                 adset?.Description ??
+    //                 "",
+    //             Caption: firstSourceAd?.Caption ?? accountSettings?.Caption ?? "",
+    //             Website_URL: firstSourceAd?.Website_URL ?? accountSettings?.Website_URL ?? "",
+    //             NewAds,
+    //         };
+    //     };
+
+    //     /* ------------------------------------------------------------------
+    //      * Main template creation
+    //      * ---------------------------------------------------------------- */
+    //     const category = reportCategories.find((item) => item.categoryId === values.reportCat);
+    //     const multipleAccounts = values.Account_Number;
+    //     const multipleAccountsData = [];
+
+    //     for (const account of multipleAccounts) {
+    //         const newImageHash = imageHashArray.find((item) => item.accountNumber === account);
+
+    //         if (!newImageHash) {
+    //             throw new Error(`Account data not found for account ${account}`);
+    //         }
+
+    //         const list_of_pixel_id = values.adsets[0].pixel_id;
+    //         const list_of_page_id = values.adsets[0].ads[0].page_id;
+
+    //         const matchedPageIds = list_of_page_id
+    //             .filter((item) => item.includes(account))
+    //             .map((item) => item.split("-")[1]?.trim());
+
+    //         const matchedPixelIds = list_of_pixel_id
+    //             .filter((item) => item.includes(account))
+    //             .map((item) => item.split("-")[1]?.trim());
+
+    //         const page_ids =
+    //             page === "Pages"
+    //                 ? matchedPageIds
+    //                 : matchedPageIds.length > 0 ? [matchedPageIds[0]] : [];
+
+    //         const pixel_ids =
+    //             pixel === "Pixels"
+    //                 ? matchedPixelIds
+    //                 : matchedPixelIds.length > 0 ? [matchedPixelIds[0]] : [];
+
+    //         // Upload each adset's local media to S3 only once per account
+    //         // (page / pixel / country combinations reuse the same result)
+    //         const uploadCache = {};
+    //         const getUploadedMedia = (i) => {
+    //             if (!uploadCache[i]) {
+    //                 uploadCache[i] = uploadAdsetMediaToS3(account, values.adsets[i]);
+    //             }
+    //             return uploadCache[i];
+    //         };
+
+    //         // Geos: one template per country. Otherwise one template (null = keep the adset countries)
+    //         const countryVariants =
+    //             geo == "Geos"
+    //                 ? (values.adsets[0].countries || []).map((country) => [String(country)])
+    //                 : [null];
+
+    //         for (const page_id of page_ids) {
+    //             for (const pixel_id of pixel_ids) {
+    //                 for (const countryOverride of countryVariants) {
+    //                     let AllAdsetsData = {
+    //                         Account_Number: account,
+    //                         Category: category?.name,
+    //                         Draft_Name: popupInputs?.input2 ?? "",
+    //                         geo: geo,
+    //                         pixel: pixel,
+    //                         page: page,
+    //                         camapaignlevel: {
+    //                             createdby: username,
+    //                             Name: values.Name || "",
+    //                             Objectives: values.Objectives ?? "",
+    //                             Special_categories:
+    //                                 Array.isArray(values?.Special_categories) &&
+    //                                     values.Special_categories.includes("NONE")
+    //                                     ? "NONE"
+    //                                     : values.Special_categories,
+    //                             ...(Array.isArray(values?.Special_categories) &&
+    //                                 !values.Special_categories.includes("NONE")
+    //                                 ? { Special_categories_countries: values.countries }
+    //                                 : {}),
+    //                             Bid_strategy: values.Bid_strategy,
+    //                             Budget_type: budgetType,
+    //                             ...(budgetType === "lifetime" &&
+    //                                 values.adSchedulingToShowCampaign && {
+    //                                 is_day_parting_enabled_campign: true,
+    //                                 pacing_type: ["day_parting"],
+    //                             }),
+    //                             Daily_amount: values.Daily_amount ? Math.round(parseFloat(values.Daily_amount) * 100) : 0,
+    //                             Status: "PAUSED",
+    //                             // access_token: newImageHash.launchingToken,
+    //                             createdDate: moment().tz(newImageHash.timeZone).format("YYYY-MM-DD"),
+    //                         },
+    //                     };
+
+    //                     for (let i = 0; i < values.adsets.length; i++) {
+    //                         let AdsetsData = {};
+    //                         const adset = values.adsets[i];
+
+    //                         const mediaItems = await getUploadedMedia(i);
+
+    //                         const addLevelData = buildAddLevel({
+    //                             adset,
+    //                             account,
+    //                             page_id,
+    //                             mediaItems,
+    //                             isDynamicCreative: Boolean(adset?.isDynamicCreative),
+    //                         });
+
+    //                         AdsetsData[`adsetlevel_${i + 1}`] = {
+    //                             id: adset.id,
+    //                             AdsetName: adset.AdsetName || "",
+    //                             Budget_type: budgetType,
+    //                             Daily_amount: adset.DailyAdd_amount
+    //                                 ? Math.round(parseFloat(adset.DailyAdd_amount) * 100)
+    //                                 : "",
+    //                             optimization_goal: adset.optimization_goal || "",
+    //                             billing_event: adset.billing_event || "",
+    //                             start_time: moment(adset.DatePicker.$d)
+    //                                 .tz(newImageHash.timeZone)
+    //                                 .format("YYYY-MM-DDTHH:mm:ssZ"),
+    //                             ...(adset.DatePickerEnd && budgetType === "lifetime"
+    //                                 ? {
+    //                                     end_time: moment(adset.DatePickerEnd.$d)
+    //                                         .tz(newImageHash.timeZone)
+    //                                         .format("YYYY-MM-DDTHH:mm:ssZ"),
+    //                                 }
+    //                                 : {}),
+    //                             ...(adset.isDynamicCreative ? { is_dynamic_creative: true } : {}),
+    //                             action_source: adset.action_source || "",
+    //                             custom_event_type: adset.custom_event_type || "",
+    //                             pixel_id: pixel_id,
+    //                             bid_amount: adset.bid_amount
+    //                                 ? Math.round(Number(adset.bid_amount) * 100)
+    //                                 : 0,
+    //                             countries: countryOverride ?? adset.countries,
+    //                             Min_Age: adset.Min_Age,
+    //                             minAgeToggle: adset.minAgeEnabled ?? true,
+    //                             Max_Age: adset.Max_Age,
+    //                             Gender: parseInt(adset.Gender),
+    //                             locales: adset.Language,
+    //                             ...(adSchedulingToShowCampaign
+    //                                 ? {
+    //                                     adschedule: adset.ad_schedule || [],
+    //                                 }
+    //                                 : adset.adSchedulingEnabled
+    //                                     ? {
+    //                                         is_day_parting_enabled: true,
+    //                                         pacing_type: ["day_parting"],
+    //                                         adschedule: adset.ad_schedule || [],
+    //                                     }
+    //                                     : {}),
+    //                             placements: adset.placements,
+    //                             ...(adset.placements !== "Advance" && {
+    //                                 publisher_platforms: adset.platforms,
+    //                                 Facebook_positions:
+    //                                     extractValuesByPartialLabel(adset.selectedPositions, "Facebook") || [],
+    //                                 instagram_positions:
+    //                                     extractValuesByPartialLabel(adset.selectedPositions, "Instagram") || [],
+    //                                 audience_network_positions:
+    //                                     extractValuesByPartialLabel(adset.selectedPositions, "Audience") || [],
+    //                                 messenger_positions:
+    //                                     extractValuesByPartialLabel(adset.selectedPositions, "Messenger") || [],
+    //                                 position: adset.positions,
+    //                                 device_platforms: adset.device_platforms,
+    //                             }),
+    //                             ...(adset.Beneficiary
+    //                                 ? { beneficiary: adset.Beneficiary[account].trim() }
+    //                                 : {}),
+    //                             ...(adset.Beneficiary
+    //                                 ? adset.Payer
+    //                                     ? { payer: adset.Payer[account].trim() }
+    //                                     : { payer: adset.Beneficiary[account].trim() }
+    //                                 : {}),
+    //                             buying_type: "AUCTION",
+    //                             addlevel: addLevelData, // object (old structure) + NewAds array
+    //                         };
+
+    //                         AllAdsetsData = { ...AllAdsetsData, ...AdsetsData };
+    //                     }
+
+    //                     multipleAccountsData.push(AllAdsetsData);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return multipleAccountsData;
+    // };
+
+    const CreateTemplate = async (values) => {
+        console.log(values);
+
+        /* ------------------------------------------------------------------
+         * Helpers (all local to this function)
+         * ---------------------------------------------------------------- */
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        const retryApi = async (apiCall, retries = 3, delay = 2000) => {
+            let lastError;
+            for (let attempt = 0; attempt < retries; attempt++) {
+                try {
+                    return await apiCall();
+                } catch (error) {
+                    lastError = error;
+                    if (attempt < retries - 1) {
+                        await sleep(delay);
+                    }
+                }
+            }
+            throw lastError;
+        };
+
+        // const getFileMetadata = (file) => ({
+        //     ...(file?.uid != null && { uid: file.uid }),
+        //     ...(file?.key != null && { key: file.key }),
+        //     ...(file?.name != null && { name: file.name }),
+        //     ...(file?.type != null && { type: file.type }),
+        //     ...(file?.size != null && { size: file.size }),
+        //     ...(file?.lastModified != null && { lastModified: file.lastModified }),
+        // });
+
+        const isBlob = (v) => typeof Blob !== "undefined" && v instanceof Blob;
+
+        const getFileMetadata = (file) =>
+            file && typeof file === "object"
+                ? {
+                    ...(file.uid != null && { uid: file.uid }),
+                    ...(file.key != null && { key: file.key }),
+                    ...(file.name != null && { name: file.name }),
+                    ...(file.type != null && { type: file.type }),
+                    ...(file.size != null && { size: file.size }),
+                    ...(file.lastModified != null && { lastModified: file.lastModified }),
+                }
+                : {};
+
+        // Turns whatever is in ad.filename into a flat array of usable media items
+        const flattenMedia = (value) => {
+            if (!value) return [];
+            if (Array.isArray(value)) return value.flatMap(flattenMedia);
+            if (typeof value === "string") return value.trim() ? [value.trim()] : [];
+            if (isBlob(value)) return [value];
+            if (typeof value === "object") {
+                if (value.originFileObj || value.url || value.s3Url) return [value];
+                if (typeof value.filename === "string") return value.filename.trim() ? [value] : [];
+                if (value.filename) return flattenMedia(value.filename); // nested object/array
+            }
+            return []; // {} and anything unrecognised
+        };
+
+        // const getFileType = (file, blob) => {
+        //     const type = file?.type || blob?.type;
+        //     if (type && type !== "application/octet-stream") {
+        //         return type;
+        //     }
+
+        //     const name = [file?.name, file?.filename, file?.url, file?.s3Url, file?.key]
+        //         .filter(Boolean)
+        //         .join(" ");
+
+        //     if (/\.(png|jpe?g|gif|webp|avif|bmp)(?:[?#].*)?$/i.test(name)) {
+        //         return "image/*";
+        //     }
+        //     if (/\.(mp4|mov|avi|webm|m4v|mkv)(?:[?#].*)?$/i.test(name)) {
+        //         return "video/*";
+        //     }
+        //     return "";
+        // };
+
+        const getFileType = (file, blob) => {
+            const type = (typeof file === "object" && file?.type) || blob?.type;
+            if (type && type !== "application/octet-stream") return type;
+
+            const f = typeof file === "string" ? { url: file } : file;
+            const name = [f?.name, typeof f?.filename === "string" && f.filename, f?.url, f?.s3Url, f?.key]
+                .filter(Boolean)
+                .join(" ");
+
+            if (/\.(png|jpe?g|gif|webp|avif|bmp)(?:[?#].*)?$/i.test(name)) return "image/*";
+            if (/\.(mp4|mov|avi|webm|m4v|mkv)(?:[?#].*)?$/i.test(name)) return "video/*";
+            return "";
+        };
+
+        // // If the media already has a URL (already in S3) we reuse it, no new upload.
+        // const getExistingUrl = (file) =>
+        //     file?.url ||
+        //     file?.s3Url ||
+        //     (typeof file?.filename === "string" && /^https?:\/\//i.test(file.filename)
+        //         ? file.filename
+        //         : "");
+
+        // Already-hosted URL for any supported shape, or "" if the file must be uploaded
+        const getExistingUrl = (file) => {
+            if (typeof file === "string") return file.trim();
+            if (!file || isBlob(file)) return "";
+            const url =
+                file.url ||
+                file.s3Url ||
+                (typeof file.filename === "string" ? file.filename.trim() : "") ||
+                "";
+            return /^blob:/i.test(url) ? "" : url;
+        };
+
+
+        // Same as the old template: take the entry that belongs to this account
+        // and use the last part after "-" (e.g. "act_123 - 456" -> "456")
+        const getIdForAccount = (list, account) => {
+            const found = (Array.isArray(list) ? list : []).find((item) => item.includes(account));
+            if (!found) return "";
+            const parts = found.split("-");
+            return parts[parts.length - 1].trim();
+        };
+
+        /* ------------------------------------------------------------------
+         * Upload the media of one adset to S3.
+         *  - media that already has a URL  -> reused as it is (no new S3 url)
+         *  - local file (no URL)           -> uploaded to S3, new S3 url created
+         * Returns [] when there is no media.
+         * Result item: { ...metadata, success, filename: <s3 url>, mediaType, uploadFailed?, error? }
+         * ---------------------------------------------------------------- */
+        const uploadAdsetMediaToS3 = async (singleaccount, adset) => {
+            try {
+                // Media comes from adset.ads[].filename (File object, upload object, or array of them)
+                // const files = (Array.isArray(adset?.ads) ? adset.ads : []).flatMap((ad) => {
+                //     const filename = ad?.filename;
+                //     if (Array.isArray(filename)) {
+                //         return filename.filter(Boolean);
+                //     }
+                //     return filename ? [filename] : [];
+                // });
+
+                // if (!files.length) {
+                //     console.warn("No media found in adset.ads[].filename", adset?.ads);
+                //     return [];
+                // }
+
+                const entries = (Array.isArray(adset?.ads) ? adset.ads : []).flatMap((ad, adIndex) =>
+                    flattenMedia(ad?.filename).map((file) => ({ file, adIndex }))
+                );
+                const files = entries.map((e) => e.file);
+
+                if (!files.length) {
+                    console.warn("No media found in adset.ads[].filename", adset?.ads);
+                    return [];
+                }
+
+                // Upload context is needed only when at least one local file has to be uploaded
+                const hasLocalFiles = files.some((file) => !getExistingUrl(file));
+
+                let account = singleaccount;
+                let authToken = "";
+                let folderPath = "";
+                let getAuthHeaders = () => ({});
+
+                const createS3Folder = async () => {
+                    const response = await axios.post("/api/campaigns/s3", null, {
+                        headers: {
+                            ...getAuthHeaders(),
+                            "x-folder": `${folderPath.replace(/\/+$/, "")}/`,
+                            "x-action": "create-folder",
+                        },
+                    });
+
+                    if (response.status < 200 || response.status >= 300) {
+                        throw new Error(`S3 folder creation failed (${response.status})`);
+                    }
+                };
+
+                if (hasLocalFiles) {
+                    const accountData = imageHashArray.find(
+                        (item) => String(item.accountNumber) === String(singleaccount)
+                    );
+
+                    if (!accountData) {
+                        throw new Error(`Account data not found for account ${singleaccount}`);
+                    }
+
+                    const { accountNumber, username: accUsername = "default-user" } = accountData;
+                    account = accountNumber;
+
+                    authToken = localStorage.getItem("token");
+                    if (!authToken) {
+                        throw new Error("Authentication token not found");
+                    }
+
+                    getAuthHeaders = () => ({
+                        Authorization: authToken,
+                        username: accUsername,
+                    });
+
+                    folderPath = `${network}/${account}/${values.Name || "Drafts"}`;
+                    await createS3Folder();
+                }
+
+                const uploadFileToS3 = async (fileBlob, fileName) => {
+                    if (!fileBlob) {
+                        throw new Error(`Missing file data: ${fileName}`);
+                    }
+
+                    const formData = new FormData();
+                    formData.append("file", fileBlob, fileName);
+                    formData.append("filename", `${folderPath}/${fileName}`);
+
+                    const response = await axios.post("/api/campaigns/s3", formData, {
+                        headers: getAuthHeaders(),
+                    });
+
+                    const result = response?.data ?? null;
+                    if (!result?.imageUrl) {
+                        throw new Error(result?.message || "S3 upload failed");
+                    }
+                    return result.imageUrl;
+                };
+
+                const processSingleFile = async (file, fileIndex) => {
+                    const metadata = getFileMetadata(file);
+
+                    // 1. URL already exists -> reuse it, do NOT create a new S3 url
+                    const existingUrl = getExistingUrl(file);
+
+                    if (existingUrl) {
+                        const fileType = getFileType(file, null);
+                        const mediaType = fileType.startsWith("image/")
+                            ? "image"
+                            : fileType.startsWith("video/")
+                                ? "video"
+                                : "";
+
+                        return {
+                            ...metadata,
+                            success: true,
+                            filename: existingUrl,
+                            mediaType,
+                        };
+                    }
+
+                    // 2. Local file -> upload to S3 and create the new S3 url
+                    let s3FileUrl = "";
+                    let mediaType = "";
+
+                    let fileName = file?.name || file?.filename?.split("/").pop() || "media";
+
+                    const adName = `${account}_${adset?.AddName || "Ad"}_${fileIndex + 1}`;
+
+                    try {
+                        const originalFile = file?.originFileObj;
+                        let fileBlob;
+
+                        if (typeof Blob !== "undefined" && originalFile instanceof Blob) {
+                            fileBlob = originalFile;
+                        } else if (typeof Blob !== "undefined" && file instanceof Blob) {
+                            fileBlob = file;
+                        } else {
+                            throw new Error(`Unable to read media: ${fileName}`);
+                        }
+
+                        const fileType = getFileType(file, fileBlob);
+                        const isImage = fileType.startsWith("image/");
+                        const isVideo = fileType.startsWith("video/");
+
+                        if (!isImage && !isVideo) {
+                            throw new Error(`Unsupported media type: ${fileName}`);
+                        }
+
+                        mediaType = isImage ? "image" : "video";
+
+                        fileName = `blob_${uuidv4()}_${fileName}`;
+
+                        console.log(`[${adName}] Uploading to S3...`);
+
+                        s3FileUrl = await retryApi(
+                            () => uploadFileToS3(fileBlob, fileName),
+                            3,
+                            2000
+                        );
+
+                        onSuccess?.("ok", { filename: s3FileUrl });
+
+                        return {
+                            ...metadata,
+                            success: true,
+                            filename: s3FileUrl,
+                            mediaType,
+                        };
+                    } catch (error) {
+                        console.error(
+                            "Media processing failed:",
+                            error?.response?.data || error?.message || error
+                        );
+
+                        onError?.("error", error);
+
+                        return {
+                            ...metadata,
+                            success: false,
+                            filename: s3FileUrl,
+                            mediaType,
+                            uploadFailed: true,
+                            error:
+                                error?.response?.data?.error?.message ||
+                                error?.message ||
+                                "Media upload failed",
+                        };
+                    }
+                };
+
+                // Keep the same order as the selected media, process 3 at a time
+                const results = new Array(files.length);
+
+                for (let start = 0; start < files.length; start += 3) {
+                    const end = Math.min(start + 3, files.length);
+                    const chunk = files.slice(start, end);
+
+                    const settled = await Promise.allSettled(
+                        chunk.map((file, chunkIndex) =>
+                            processSingleFile(file, start + chunkIndex)
+                        )
+                    );
+
+                    settled.forEach((result, chunkIndex) => {
+                        results[start + chunkIndex] =
+                            result.status === "fulfilled"
+                                ? result.value
+                                : {
+                                    ...getFileMetadata(chunk[chunkIndex]),
+                                    success: false,
+                                    filename: "",
+                                    mediaType: "",
+                                    uploadFailed: true,
+                                    error: result.reason?.message || "Media processing failed",
+                                };
+                    });
+                }
+
+                console.log("Final uploaded media results:", results);
+                return results;
+            } catch (error) {
+                console.error(
+                    "S3 upload failed:",
+                    error?.response?.data || error?.message || error
+                );
+                onError?.("error", error);
+                return [];
+            }
+        };
+
+        /* ------------------------------------------------------------------
+         * Build addlevel: OBJECT (old structure) + NewAds array
+         * (no image_hash / video_id / thumbnail_url)
+         * ---------------------------------------------------------------- */
+        const buildAddLevel = ({ adset, account, page_id, mediaItems = [], isDynamicCreative = false }) => {
+            const accountSettings =
+                adset?.[account] ||
+                adset?.accountSettings?.[account] ||
+                {};
+
+            const getAdFields = (ad, index) => ({
+                id: uuidv4(),
+                AddName: `${String(ad?.AddName ?? adset?.AddName ?? "Ad")}`,
+                page_id,
+                message: ad?.primaryText ?? ad?.messages ?? ad?.message ?? adset?.message ?? "",
+                headline: ad?.headlines ?? ad?.headline ?? adset?.headline ?? "",
+                Description:
+                    ad?.descriptions ??
+                    ad?.Description ??
+                    ad?.description ??
+                    adset?.Description ?? "",
+                Caption: ad?.Caption ?? accountSettings?.Caption ?? "",
+                Website_URL: ad?.Website_URL ?? accountSettings?.Website_URL ?? "",
+            });
+
+            const hasUploadFailure = mediaItems.some((media) => media?.uploadFailed || !media?.filename);
+
+            let NewAds;
+
+            if (isDynamicCreative) {
+                // Dynamic creative: ONE ad (single object in the array),
+                // filename = array of all file urls (array of strings)
+                const sourceAd = adset?.ads?.[0] || {};
+
+                const hasImages = mediaItems.some((media) => media?.mediaType === "image" && media?.filename);
+                const hasVideos = mediaItems.some((media) => media?.mediaType === "video" && media?.filename);
+
+                NewAds = [
+                    {
+                        ...getAdFields({ ...sourceAd, AddName: adset?.AdName }, 0),
+
+                        filename: mediaItems
+                            .map((media) => media?.filename)
+                            .filter(Boolean),
+
+                        // call_to_action_types: ["LEARN_MORE"],
+
+                        // ad_formats: [
+                        //     ...(hasImages ? ["SINGLE_IMAGE"] : []),
+                        //     ...(hasVideos ? ["SINGLE_VIDEO"] : []),
+                        // ],
+
+                        // ...(hasUploadFailure ? { uploadFailed: true } : {}),
+                    },
+                ];
+            } else {
+                // Normal creative: one ad per media item
+                NewAds = mediaItems.map((media, index) => {
+                    const sourceAd = Array.isArray(adset?.ads) ? adset.ads[index] || {} : {};
+
+                    return {
+                        ...getAdFields({ ...sourceAd, AddName: sourceAd?.AdName }, index),
+                        filename: media?.filename || "",
+                        mediaType: media?.mediaType || "",
+                        ...(media?.uploadFailed || !media?.filename ? { uploadFailed: true } : {}),
+                    };
+                });
+            }
+
+            // addlevel object (old structure) - values taken from the first ad, falling back to adset level
+            const firstSourceAd = Array.isArray(adset?.ads) ? adset.ads[0] || {} : {};
+
+            return {
+                AddName: String(adset?.AddName ?? firstSourceAd?.AdName ?? ""),
+                Ads: mediaItems.map((media) => media?.filename).filter(Boolean),
+                page_id,
+                message:
+                    firstSourceAd?.primaryText ??
+                    firstSourceAd?.messages ??
+                    firstSourceAd?.message ??
+                    adset?.message ??
+                    "",
+                headline: firstSourceAd?.headlines ?? firstSourceAd?.headline ?? adset?.headline ?? "",
+                Description:
+                    firstSourceAd?.descriptions ??
+                    firstSourceAd?.Description ??
+                    firstSourceAd?.description ??
+                    adset?.Description ??
+                    "",
+                Caption: firstSourceAd?.Caption ?? accountSettings?.Caption ?? "",
+                Website_URL: firstSourceAd?.Website_URL ?? accountSettings?.Website_URL ?? "",
+                NewAds,
+            };
+        };
+
+        /* ------------------------------------------------------------------
+         * Main template creation
+         * ONE template per selected account (same as the old template).
+         * No loops over pages / pixels / geos: geo, pixel and page are only
+         * stored as flags in the template, the campaign creation expands them later.
+         * ---------------------------------------------------------------- */
+        const category = reportCategories.find((item) => item.categoryId === values.reportCat);
+        const multipleAccounts = values.Account_Number;
+        const multipleAccountsData = [];
+
+        for (const account of multipleAccounts) {
+            const newImageHash = imageHashArray.find((item) => item.accountNumber === account);
+
+            if (!newImageHash) {
+                throw new Error(`Account data not found for account ${account}`);
+            }
+
+            // Single page id / pixel id of this account (same logic as the old template)
+            const page_id = getIdForAccount(values.adsets[0]?.ads?.[0]?.page_id, account);
+            const pixel_id = getIdForAccount(values.adsets[0]?.pixel_id, account);
+
+            let AllAdsetsData = {
+                Account_Number: account,
+                Category: category?.name,
+                Draft_Name: popupInputs?.input2 ?? "",
+                geo: geo,
+                pixel: pixel,
+                page: page,
+                createdby: username,
+                createdDate: moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss"),
+                editedDate: moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss"),
+                camapaignlevel: {
+                    createdby: username,
+                    Name: values.Name || "",
+                    Objectives: values.Objectives ?? "",
+                    Special_categories:
+                        Array.isArray(values?.Special_categories) &&
+                            values.Special_categories.includes("NONE")
+                            ? "NONE"
+                            : values.Special_categories,
+                    ...(Array.isArray(values?.Special_categories) &&
+                        !values.Special_categories.includes("NONE")
+                        ? { Special_categories_countries: values.countries }
+                        : {}),
+                    Bid_strategy: values.Bid_strategy,
+                    Budget_type: budgetType,
+                    ...(budgetType === "lifetime" &&
+                        values.adSchedulingToShowCampaign && {
+                        is_day_parting_enabled_campign: true,
+                        pacing_type: ["day_parting"],
+                    }),
+                    Daily_amount: values.Daily_amount ? Math.round(parseFloat(values.Daily_amount) * 100) : 0,
+                    Status: "PAUSED",
+                    // access_token: newImageHash.launchingToken,
+                    createdDate: moment().tz(newImageHash.timeZone).format("YYYY-MM-DD"),
+                },
+            };
+
+            for (let i = 0; i < values.adsets.length; i++) {
+                let AdsetsData = {};
+                const adset = values.adsets[i];
+
+                // Local files are uploaded to S3, existing urls are reused
+                const mediaItems = await uploadAdsetMediaToS3(account, adset);
+
+                const addLevelData = buildAddLevel({
+                    adset,
+                    account,
+                    page_id,
+                    mediaItems,
+                    isDynamicCreative: Boolean(adset?.isDynamicCreative),
+                });
+
+                AdsetsData[`adsetlevel_${i + 1}`] = {
+                    id: adset.id,
+                    AdsetName: adset.AdsetName || "",
+                    Budget_type: budgetType,
+                    Daily_amount: adset.DailyAdd_amount
+                        ? Math.round(parseFloat(adset.DailyAdd_amount) * 100)
+                        : "",
+                    optimization_goal: adset.optimization_goal || "",
+                    billing_event: adset.billing_event || "",
+                    start_time: moment(adset.DatePicker.$d)
+                        .tz(newImageHash.timeZone)
+                        .format("YYYY-MM-DDTHH:mm:ssZ"),
+                    ...(adset.DatePickerEnd && budgetType === "lifetime"
+                        ? {
+                            end_time: moment(adset.DatePickerEnd.$d)
+                                .tz(newImageHash.timeZone)
+                                .format("YYYY-MM-DDTHH:mm:ssZ"),
+                        }
+                        : {}),
+                    ...(adset.isDynamicCreative ? { is_dynamic_creative: true } : {}),
+                    action_source: adset.action_source || "",
+                    custom_event_type: adset.custom_event_type || "",
+                    pixel_id: pixel_id,
+                    bid_amount: adset.bid_amount
+                        ? Math.round(Number(adset.bid_amount) * 100)
+                        : 0,
+                    countries: adset.countries, // all selected countries as they are (no per-country split)
+                    Min_Age: adset.Min_Age,
+                    minAgeToggle: adset.minAgeEnabled ?? true,
+                    Max_Age: adset.Max_Age,
+                    Gender: parseInt(adset.Gender),
+                    locales: adset.Language,
+                    ...(adSchedulingToShowCampaign
+                        ? {
+                            adschedule: adset.ad_schedule || [],
+                        }
+                        : adset.adSchedulingEnabled
+                            ? {
+                                is_day_parting_enabled: true,
+                                pacing_type: ["day_parting"],
+                                adschedule: adset.ad_schedule || [],
+                            }
+                            : {}),
+                    placements: adset.placements,
+                    ...(adset.placements !== "Advance" && {
+                        publisher_platforms: adset.platforms,
+                        Facebook_positions:
+                            extractValuesByPartialLabel(adset.selectedPositions, "Facebook") || [],
+                        instagram_positions:
+                            extractValuesByPartialLabel(adset.selectedPositions, "Instagram") || [],
+                        audience_network_positions:
+                            extractValuesByPartialLabel(adset.selectedPositions, "Audience") || [],
+                        messenger_positions:
+                            extractValuesByPartialLabel(adset.selectedPositions, "Messenger") || [],
+                        position: adset.positions,
+                        device_platforms: adset.device_platforms,
+                    }),
+                    ...(adset.Beneficiary
+                        ? { beneficiary: adset.Beneficiary[account].trim() }
+                        : {}),
+                    ...(adset.Beneficiary
+                        ? adset.Payer
+                            ? { payer: adset.Payer[account].trim() }
+                            : { payer: adset.Beneficiary[account].trim() }
+                        : {}),
+                    buying_type: "AUCTION",
+                    addlevel: addLevelData, // object (old structure) + NewAds array
+                };
+
+                AllAdsetsData = { ...AllAdsetsData, ...AdsetsData };
+            }
+
+            multipleAccountsData.push(AllAdsetsData);
+        }
+
+        return multipleAccountsData;
+    };
 
     const handleFinishFailed = ({ errorFields = [] }) => {
         setValidationErrors(
@@ -1562,7 +3254,13 @@ const CreateCampaignDrawer = ({
                 setBudgetType("daily");
                 setPages("Page");
                 setPixels("Pixel");
-                setGeos("Geo")
+                setGeos("Geo");
+                setErrors({
+                    input1: "",
+                    input2: "",
+                    reportCat: ""
+                });
+                setSelectedTemplate(null);
                 onClose();
             }
             changeRRefrst();
@@ -1696,7 +3394,7 @@ const CreateCampaignDrawer = ({
         }
     ];
 
-    
+
     return (
         <Modal
             title={
@@ -1761,10 +3459,20 @@ const CreateCampaignDrawer = ({
                             }}
                         >
                             <CampaignTemplates
+                                userData={userData}
                                 accounts={accountis}
                                 draftsByAccount={draftsData}
                                 theme={theme}
-                                onSelectTemplate={(template, action) => { }}
+                                networksWithStatus={networksWithStatus}
+                                onSelectTemplate={(template, action) => {
+                                    console.log("Selected template:", template, "Action:", action);
+                                    setSelectedTemplate(template);
+                                    if (action === "edit") {
+                                        setIsEditingDraft(true);
+                                        setPopupInputs(prev => ({ ...prev, input2: template.Draft_Name }))
+                                    }
+                                }}
+                                userdetails={userdetails}
                             />
 
                             <Form.Item
@@ -1815,6 +3523,7 @@ const CreateCampaignDrawer = ({
                                     }
                                 }}
                             />
+                            {selectedTemplate && <p><strong>Selected Template:</strong> {selectedTemplate?.Draft_Name ?? "Draft"}</p>}
                         </div>
 
                         <div
@@ -2129,6 +3838,106 @@ const CreateCampaignDrawer = ({
                         <Button type="primary" htmlType="submit" style={{ backgroundColor: "#91c25F" }}>
                             Create Campaign
                         </Button>
+                        <Popconfirm
+                            icon={null}
+                            // overlayInnerStyle={{
+                            //     backgroundColor: theme === "dark" ? "#000000" : "#ffffff",
+                            //     color: theme === "dark" ? "#fff" : "#333",
+                            // }}
+                            styles={{
+                                container: {
+                                    backgroundColor: theme === "dark" ? "#000000" : "#ffffff",
+                                    color: theme === "dark" ? "#fff" : "#333",
+                                }
+                            }}
+                            description={
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        gap: 10,
+                                    }}
+                                >
+                                    {errors.input1 && (
+                                        <div style={{ color: "red", fontSize: 12 }}>
+                                            {errors.input1}
+                                        </div>
+                                    )}
+
+                                    <span
+                                        style={{
+                                            color: theme === "dark" ? "#fff" : "#333",
+                                        }}
+                                    >
+                                        Template Name
+                                    </span>
+
+                                    <Input
+                                        placeholder="Template Name"
+                                        value={popupInputs.input2}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+
+                                            setPopupInputs((s) => ({
+                                                ...s,
+                                                input2: value,
+                                            }));
+
+                                            // Remove error once user starts entering value
+                                            if (value.trim()) {
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    input2: "",
+                                                }));
+                                            }
+                                        }}
+                                        status={errors.input2 ? "error" : ""}
+                                        className={
+                                            theme === "dark"
+                                                ? "custom-input-dark"
+                                                : "custom-input-light"
+                                        }
+                                        style={{ width: 250 }}
+                                    />
+
+                                    {errors.input2 && (
+                                        <div style={{ color: "red", fontSize: 12 }}>
+                                            {errors.input2}
+                                        </div>
+                                    )}
+                                </div>
+                            }
+                            open={open}
+                            onOpenChange={setOpen}
+                            onConfirm={handleConfirmWithValidation}
+                            cancelButtonProps={{
+                                style: {
+                                    backgroundColor: theme === "dark" ? "#555" : "transparent",
+                                    color: theme === "dark" ? "#fff" : "#000",
+                                    border: "1px solid #4caf50",
+                                },
+                            }}
+                            okButtonProps={{
+                                loading: confirmLoading,
+                                style: {
+                                    backgroundColor: "#91C25F",
+                                    color: "#000",
+                                    border: "none",
+                                },
+                            }}
+                        >
+                            <Button
+                                type="primary"
+                                style={{
+                                    background: "#91c25f",
+                                    minWidth: "80px",
+                                    borderWidth: "0px",
+                                }}
+                                onClick={() => setOpen(true)}
+                            >
+                                {isEditingDraft ? "Save" : "Save Template"}
+                            </Button>
+                        </Popconfirm>
                         <Button onClick={handleDrawerClose} style={{ border: "1px solid #ff4d4f", color: "#ff4d4f" }}>
                             Cancel
                         </Button>
@@ -2168,6 +3977,23 @@ const CreateCampaignDrawer = ({
                     }`}
             >
                 <p>Are you sure you want to submit?</p>
+            </Modal>
+            <Modal
+                title="Edit Accounts"
+                open={isEditAccountsModalOpen}
+                onCancel={() => setIsEditAccountsModalOpen(false)}
+                okText="Yes, Update"
+                cancelText="Close"
+                confirmLoading={confirmLoading}
+                onOk={handleEditDraft}
+            >
+                <p>This draft is present in these accounts:</p>
+                <ul>
+                    {matchedAccounts.length > 0
+                        ? matchedAccounts.map((acc, idx) => <li key={idx}>{acc}</li>)
+                        : <li>No matching accounts found</li>
+                    }
+                </ul>
             </Modal>
         </Modal>
     );
