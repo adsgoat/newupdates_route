@@ -9,7 +9,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
 
     const groupId = searchParams.get("groupId");
-    console.log(groupId, "ID");
+    // console.log(groupId, "ID");
     const data = await GroupIdData(token, groupId);
     return Response.json(data);
 }
