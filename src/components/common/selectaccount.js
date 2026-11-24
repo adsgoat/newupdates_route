@@ -56,7 +56,7 @@ export default function SelectAccounts({ filteredAccounts, value, setValue, them
             ),
             value: "all",
             key: "all",
-            children: filteredAccounts.map((item) => ({
+            children: (filteredAccounts || []).map((item) => ({
                 key: String(item.accountNumber),
                 value: String(item.accountNumber),
                 title: (
@@ -105,6 +105,7 @@ export default function SelectAccounts({ filteredAccounts, value, setValue, them
             })),
         },
     ];
+    
     return (
         // <Select
         //     showSearch
