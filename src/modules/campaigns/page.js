@@ -18,6 +18,9 @@ import moment from 'moment-timezone';
 import { NetworkDefaultTimezones, newtworkCollections, revenuePartnerNames, timezones, rangePresets } from "../commonfunctionsforroutes"
 import { PlusOutlined, SyncOutlined, FilterOutlined, DownOutlined } from '@ant-design/icons';
 import CreateCampaignDrawer from "./create_campaign/page"
+import CloneCampaignDrawer from "./clone_campaign/page";
+import EditCampaignDrawer from "./edit_campaign/page";
+import ViewCampaignDrawer from "./view_campaign/page"
 import CampaignCard from "@/components/campaigns/campaigncard";
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -57,6 +60,9 @@ export default function CampaignsModule({ email, userData, userPermissions, auth
     const [accountBalance, setAccountBalance] = useState("");
     const [accountRemaining, setAccountRemaining] = useState("");
     const [cdrawerVisible, setDrawerVisible] = useState(false);
+    const [cloneDrawerVisible, setCloneDrawerVisible] = useState(false);
+    const [editDrawerVisible, setEditDrawerVisible] = useState(false);
+    const [viewDrawerVisible, setViewDrawerVisible] = useState(false);
     const [typeFilter, setTypeFilter] = useState('All');
     const [campaignStatusFilter, setCampaignStatusFilter] = useState("all");
     const [multipleAdsetCampaignData, setMultipleAdsetCampaignData] = useState([]);
@@ -83,6 +89,9 @@ export default function CampaignsModule({ email, userData, userPermissions, auth
     //         setCheckedRowRecords(selectedRows);
     //     },
     // };
+
+    const [identifier, setIdentifier] = useState(null);
+
     const [refreshTabs, setRefreshTabs] = useState(0);
     const handleFirstSelectChange = (newCategories) => {
         setRevenuePartner(newCategories);
@@ -128,6 +137,9 @@ export default function CampaignsModule({ email, userData, userPermissions, auth
     // console.log(multipleAdsetCampaignData, "data");
     const onCloseDrawer = () => {
         setDrawerVisible(false);
+        setCloneDrawerVisible(false);
+        setEditDrawerVisible(false);
+        setViewDrawerVisible(false);
     };
 
     const deleteTheCampaign = (record) => {
@@ -313,6 +325,8 @@ export default function CampaignsModule({ email, userData, userPermissions, auth
             searchInput.current = null;
         }
     }
+    console.log(identifier);
+    console.log(cloneDrawerVisible);
     return (
         <div style={{
             height: "100%",
@@ -335,6 +349,53 @@ export default function CampaignsModule({ email, userData, userPermissions, auth
                 userData={userData}
                 auth={auth}
                 username={userdetails.username}
+                networksWithStatus={networksWithStatus}
+                userdetails={userdetails}
+            />
+            <CloneCampaignDrawer
+                visible={cloneDrawerVisible}
+                accountis={updatedAccountsValue}
+                onClose={onCloseDrawer}
+                changeRRefrst={changeRRefrst}
+                network={revenuePartner}
+                draftsData={[]}
+                theme="light"
+                userData={userData}
+                auth={auth}
+                username={userdetails.username}
+                networksWithStatus={networksWithStatus}
+                userdetails={userdetails}
+                identifier={identifier}
+            />
+            <EditCampaignDrawer
+                visible={editDrawerVisible}
+                accountis={updatedAccountsValue}
+                onClose={onCloseDrawer}
+                changeRRefrst={changeRRefrst}
+                network={revenuePartner}
+                draftsData={[]}
+                theme="light"
+                userData={userData}
+                auth={auth}
+                username={userdetails.username}
+                networksWithStatus={networksWithStatus}
+                userdetails={userdetails}
+                identifier={identifier}
+            />
+            <ViewCampaignDrawer
+                visible={viewDrawerVisible}
+                accountis={updatedAccountsValue}
+                onClose={onCloseDrawer}
+                changeRRefrst={changeRRefrst}
+                network={revenuePartner}
+                draftsData={[]}
+                theme="light"
+                userData={userData}
+                auth={auth}
+                username={userdetails.username}
+                networksWithStatus={networksWithStatus}
+                userdetails={userdetails}
+                identifier={identifier}
             />
             <Row style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Col flex="auto">
@@ -759,6 +820,10 @@ export default function CampaignsModule({ email, userData, userPermissions, auth
                                 rejectTheCampaign={rejectTheCampaign}
                                 deleteTheCampaign={deleteTheCampaign}
                                 userData={userData}
+                                setCloneDrawerVisible={setCloneDrawerVisible}
+                                setEditDrawerVisible={setEditDrawerVisible}
+                                setViewDrawerVisible={setViewDrawerVisible}
+                                setIdentifier={setIdentifier}
                             />
                         </div>
                     ))

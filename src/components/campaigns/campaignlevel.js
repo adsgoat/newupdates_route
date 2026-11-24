@@ -31,6 +31,10 @@ const CampaignLevel = ({
     const specialCategories = Form.useWatch("Special_categories", form);
     const campaignBudget = Number(Form.useWatch("Daily_amount", form) || 0);
 
+    const campaignId = Form.useWatch("campaignid", form);
+    const isEditLocked = mode === "edit" && Boolean(campaignId);
+    const isView = mode === "view";
+
     const watchedCampaignScheduling =
         Form.useWatch("adSchedulingToShowCampaign", form, {
             preserve: true
@@ -54,7 +58,7 @@ const CampaignLevel = ({
             ? [specialCategories]
             : [];
 
-    const hasSpecialCategory = normalizedCategories.some( value => value !== "NONE" );
+    const hasSpecialCategory = normalizedCategories.some(value => value !== "NONE");
 
     const geoTreeData = useMemo(() => {
         const source = Array.isArray(continents)
@@ -282,7 +286,8 @@ const CampaignLevel = ({
                     placeholder: "Select account(s)",
                     optionFilterProp: "label",
                     allowClear: true,
-                    maxTagCount: 1
+                    maxTagCount: 1,
+                    disabled: isView
                 },
                 layout: { row: 1, flex: 0.28 },
                 validation: {
@@ -297,7 +302,8 @@ const CampaignLevel = ({
                 required: true,
                 props: {
                     placeholder: "Enter campaign name",
-                    maxLength: 255
+                    maxLength: 255,
+                    disabled: isView
                 },
                 layout: { row: 1, flex: 0.5 },
                 validation: {
@@ -325,7 +331,7 @@ const CampaignLevel = ({
                             size="small"
                             checked={Boolean(adSchedulingToShowCampaign)}
                             disabled={
-                                budgetType !== "lifetime" || hasAdsetBudget
+                                budgetType !== "lifetime" || hasAdsetBudget || isView
                             }
                             onChange={checked => {
                                 if (onCampaignSchedulingChange) {
@@ -358,7 +364,7 @@ const CampaignLevel = ({
                     step: 0.01,
                     precision: 2,
                     placeholder: "$",
-                    disabled: hasAdsetBudget
+                    disabled: hasAdsetBudget || isView
                 },
                 layout: { row: 1, flex: 0.22 },
                 validation: {
@@ -394,7 +400,8 @@ const CampaignLevel = ({
                     { value: "OUTCOME_SALES", label: "Sales" }
                 ],
                 props: {
-                    placeholder: "Select objective"
+                    placeholder: "Select objective",
+                    disabled: isEditLocked || isView
                 },
                 layout: { row: 2, flex: 1 },
                 validation: {
@@ -409,7 +416,8 @@ const CampaignLevel = ({
                 required: true,
                 options: filteredBidStrategies,
                 props: {
-                    placeholder: "Select bid strategy"
+                    placeholder: "Select bid strategy",
+                    disabled: isView
                 },
                 layout: { row: 2, flex: 1 },
                 validation: {
@@ -434,7 +442,8 @@ const CampaignLevel = ({
                 props: {
                     mode: "multiple",
                     allowClear: true,
-                    placeholder: "Select category"
+                    placeholder: "Select category",
+                    disabled: isEditLocked || isView
                 },
                 layout: { row: 2, flex: 1 },
                 validation: {
@@ -459,6 +468,7 @@ const CampaignLevel = ({
                     showCheckedStrategy: TreeSelect.SHOW_PARENT,
                     showSearch: true,
                     allowClear: true,
+                    disabled: isEditLocked || isView,
                     treeNodeFilterProp: "label",
                     treeLine: true,
                     switcherIcon: ({ expanded, isLeaf }) =>
@@ -470,16 +480,14 @@ const CampaignLevel = ({
                     treeDefaultExpandedKeys: ["all_countries"],
                     placeholder: "Select continents or countries",
                     maxTagCount: 2,
-                    className: `${
-                        theme === "dark" ? "dark-theme" : "light-theme"
-                    } green-border-select`,
+                    className: `${theme === "dark" ? "dark-theme" : "light-theme"
+                        } green-border-select`,
                     classNames: {
                         popup: {
-                            root: `${
-                                theme === "dark"
-                                    ? "custom-dropdown"
-                                    : "custom-dropdown-light"
-                            } campaigns-campaign-level-tree-dropdown`
+                            root: `${theme === "dark"
+                                ? "custom-dropdown"
+                                : "custom-dropdown-light"
+                                } campaigns-campaign-level-tree-dropdown`
                         }
                     },
                     style: { width: "100%" },
@@ -554,7 +562,7 @@ const CampaignLevel = ({
                 label: "Enable Ad Scheduling",
                 type: "switch",
                 required: false,
-                props: { size: "small" },
+                props: { size: "small", disabled: isView },
                 hidden: true,
                 order: 8
             }
@@ -702,6 +710,9 @@ const CampaignLevel = ({
 
     return (
         <>
+            <Form.Item name="campaignid" hidden preserve>
+                <Input />
+            </Form.Item>
             <style>{`
                 .campaigns-campaign-level {
                     width: 100%;

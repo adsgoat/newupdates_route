@@ -9,7 +9,7 @@ import axios from "axios";
 import moment from 'moment-timezone';
 const { Text } = Typography;
 
-const CampaignCard = ({ record, theme, selectedCampaigns, setSelectedCampaigns, userdetails, approveTheCampaign, rejectTheCampaign, deleteTheCampaign, userData }) => {
+const CampaignCard = ({ record, theme, selectedCampaigns, setSelectedCampaigns, userdetails, approveTheCampaign, rejectTheCampaign, deleteTheCampaign, userData, setIdentifier, setCloneDrawerVisible, setEditDrawerVisible, setViewDrawerVisible }) => {
     const doesAdsWentToFacebook = record.adsetsWithAds?.some(adset =>
         adset.ads?.some(ad => ad.facebookUploadFailed === true)
     );
@@ -221,13 +221,22 @@ const CampaignCard = ({ record, theme, selectedCampaigns, setSelectedCampaigns, 
 
     const handleView = () => {
         // Keep your existing view logic here.
-        handleEditClickMultipleAdsetData(record, true);
+        setViewDrawerVisible(true);
+        setIdentifier(record.identifier);
     };
 
     const handleEdit = () => {
         // Keep your existing edit logic here.
-        handleEditClickMultipleAdsetData(record);
+        // handleEditClickMultipleAdsetData(record);
+        setEditDrawerVisible(true);
+        setIdentifier(record.identifier);
+
     };
+
+    const handleClone = () => {
+        setCloneDrawerVisible(true);
+        setIdentifier(record.identifier);
+    }
 
     const handleComment = async (record) => {
         const editedTime = moment().tz("Asia/Kolkata").format("YYYY-MM-DD hh:mm:ss A");
@@ -1248,7 +1257,7 @@ const CampaignCard = ({ record, theme, selectedCampaigns, setSelectedCampaigns, 
                                         }}
                                     />
                                 }
-                                onClick={handleEdit}
+                                onClick={handleClone}
                             />
 
                             <Tooltip

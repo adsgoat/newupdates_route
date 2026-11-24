@@ -15,10 +15,27 @@ const createId = () => globalThis.crypto?.randomUUID?.() ||
 
 const emptyMedia = () => ({ images: [], videos: [], thumbnail: null });
 
-const getMediaItems = (media) => [
-    ...(Array.isArray(media?.images) ? media.images : []),
-    ...(Array.isArray(media?.videos) ? media.videos : []),
-];
+const getMediaItems = (ad) => {
+    if (Array.isArray(ad?.filename) && ad.filename.length) {
+        return ad.filename;
+    }
+
+    if (ad?.filename) {
+        return [ad.filename];
+    }
+
+    if (
+        Array.isArray(ad?.media?.images) ||
+        Array.isArray(ad?.media?.videos)
+    ) {
+        return [
+            ...(Array.isArray(ad?.media?.images) ? ad.media.images : []),
+            ...(Array.isArray(ad?.media?.videos) ? ad.media.videos : []),
+        ];
+    }
+
+    return [];
+};
 
 const getFileName = (file) => {
     if (!file) return "";
@@ -106,7 +123,8 @@ const getMediaPreviewUrl = (file) => {
 };
 
 const getFirstMedia = (ad) => {
-    const media = getMediaItems(ad?.media);
+    // const media = getMediaItems(ad?.media);
+    const media = getMediaItems(ad);
     if (media.length) return media[0];
 
     const legacy = Array.isArray(ad?.filename) ? ad.filename[0] : ad?.filename;
@@ -206,6 +224,7 @@ export const createInitialAd = (selectedAccounts = []) => ({
     ),
 });
 
+
 const getPageOptions = (pages) =>
     (Array.isArray(pages) ? pages : [])
         .map((page) => {
@@ -274,8 +293,10 @@ const AdLevel = ({
     adsetId,
     adsetIndex,
     adIndex,
+    displayAdIndex,
     field,
     adPath,
+    mediaFiles = [],
     selectedAccounts = [],
     pagesByAccount = {},
     instagramAccountsByAccount = {},
@@ -298,6 +319,7 @@ const AdLevel = ({
     pageidList,
     multiplePage = "Page"
 }) => {
+    const isView = mode === "view";
     const processedUids = useRef(new Set());
     const replacementUids = useRef(new Set());
 
@@ -422,9 +444,19 @@ const AdLevel = ({
     const activeAdId = watchedActiveAdId || firstExistingAdId || adId;
     const isActive = String(activeAdId || "") === String(adId || "");
 
-    const firstMedia = getFirstMedia(ad);
+    // const firstMedia = getFirstMedia(ad);
+    // const mediaName = getFileName(firstMedia);
+    // const hasMedia = Boolean(firstMedia);
+
+    const displayMediaFiles = Array.isArray(mediaFiles)
+        ? mediaFiles
+        : [];
+
+    const firstMedia = displayMediaFiles[0] || null;
     const mediaName = getFileName(firstMedia);
-    const hasMedia = Boolean(firstMedia);
+    const hasMedia = displayMediaFiles.length > 0;
+
+
     const adName = getAdName(ad);
     const overridesEnabled = ad.textOverridesEnabled === true;
     const campaign_name = Form.useWatch("Name", form) || "";
@@ -938,9 +970,280 @@ const AdLevel = ({
         );
     };
 
+    // const getMediaSource = (media, ad) => {
+    //     const source = String(
+    //         media?.mediaSource ||
+    //         media?.source ||
+    //         ""
+    //     ).toLowerCase();
+
+    //     if (
+    //         ["creatives", "creative", "library"].includes(source)
+    //     ) {
+    //         return "creatives";
+    //     }
+
+    //     if (
+    //         ["upload", "local", "device"].includes(source)
+    //     ) {
+    //         return "upload";
+    //     }
+
+    //     const adSource = String(
+    //         ad?.mediaSource || ""
+    //     ).toLowerCase();
+
+    //     if (
+    //         ["creatives", "creative", "library"].includes(adSource)
+    //     ) {
+    //         return "creatives";
+    //     }
+
+    //     if (
+    //         ["upload", "local", "device"].includes(adSource)
+    //     ) {
+    //         return "upload";
+    //     }
+
+    //     return (
+    //         media?.sourceCreative ||
+    //         media?.creativeId ||
+    //         media?.creativeAssetId
+    //     )
+    //         ? "creatives"
+    //         : "upload";
+    // };
+
+    // const getAdMediaItems = ad => {
+    //     const media = [
+    //         ...(Array.isArray(ad?.media?.images) ? ad.media.images : []),
+    //         ...(Array.isArray(ad?.media?.videos) ? ad.media.videos : []),
+    //     ];
+
+    //     if (media.length) return media;
+
+    //     if (Array.isArray(ad?.filename)) {
+    //         return ad.filename;
+    //     }
+
+    //     if (ad?.filename) return [ad.filename];
+
+    //     if (ad?.mediaUrl) {
+    //         return [{
+    //             uid: ad?.creativeId || ad?.creativeAssetId || ad?.id,
+    //             url: ad.mediaUrl,
+    //             name: ad?.mediaName || ad.mediaUrl.split("/").pop(),
+    //             type: ad?.mediaType,
+    //             mediaType: ad?.mediaType,
+    //             creativeId: ad?.creativeId,
+    //             creativeAssetId: ad?.creativeAssetId,
+    //             sourceCreative: ad?.sourceCreative,
+    //             mediaSource:
+    //                 ad?.mediaSource === "creatives"
+    //                     ? "creatives"
+    //                     : "upload",
+    //         }];
+    //     }
+
+    //     return [];
+    // };
+    // const getAdMediaItems = (ad) => {
+    //     if (Array.isArray(ad?.filename) && ad.filename.length) {
+    //         return ad.filename;
+    //     }
+
+    //     const media = [
+    //         ...(Array.isArray(ad?.media?.images) ? ad.media.images : []),
+    //         ...(Array.isArray(ad?.media?.videos) ? ad.media.videos : []),
+    //     ];
+
+    //     if (media.length) return media;
+
+    //     if (ad?.filename) {
+    //         return [ad.filename];
+    //     }
+
+    //     if (ad?.mediaUrl) {
+    //         return [{
+    //             uid: ad?.creativeId || ad?.creativeAssetId || ad?.id,
+    //             url: ad.mediaUrl,
+    //             name: ad?.mediaName || ad.mediaUrl.split("/").pop(),
+    //             type: ad?.mediaType,
+    //             mediaType: ad?.mediaType,
+    //             creativeId: ad?.creativeId,
+    //             creativeAssetId: ad?.creativeAssetId,
+    //             sourceCreative: ad?.sourceCreative,
+    //             mediaSource:
+    //                 ad?.mediaSource === "creatives"
+    //                     ? "creatives"
+    //                     : "upload",
+    //         }];
+    //     }
+
+    //     return [];
+    // };
+
+    const getMediaSource = (media, ad) => {
+        // Explicit column pin wins (set when an Addid ad's file is replaced from device)
+        const section = String(
+            media?.librarySection || ad?.librarySection || ""
+        ).toLowerCase();
+
+        if (section === "creatives") return "creatives";
+        if (section === "local") return "upload";
+
+        const source = String(media?.mediaSource || media?.source || "").toLowerCase();
+        if (["creatives", "creative", "library"].includes(source)) return "creatives";
+        if (["upload", "local", "device"].includes(source)) return "upload";
+
+        const adSource = String(ad?.mediaSource || "").toLowerCase();
+        if (["creatives", "creative", "library"].includes(adSource)) return "creatives";
+        if (["upload", "local", "device"].includes(adSource)) return "upload";
+
+        return (media?.sourceCreative || media?.creativeId || media?.creativeAssetId)
+            ? "creatives"
+            : "upload";
+    };
+
+    const getMediaIdentity = (media) => {
+        if (!media) return "";
+
+        return String(
+            media?.uid ||
+            media?.creativeId ||
+            media?.creativeAssetId ||
+            getMediaUrl(media) ||
+            getFileName(media)
+        );
+    };
+    // const getAdMediaItems = (ad) => {
+    //     // filename is the canonical ordered media list.
+    //     // It preserves:
+    //     // Creative Image
+    //     // Creative Video
+    //     // Creative Image
+    //     // Local Video
+    //     // Local Image
+    //     if (Array.isArray(ad?.filename) && ad.filename.length) {
+    //         return ad.filename;
+    //     }
+
+    //     if (ad?.filename) {
+    //         return [ad.filename];
+    //     }
+
+    //     // Backward compatibility for old ads that don't have
+    //     // an ordered filename array.
+    //     const media = [
+    //         ...(Array.isArray(ad?.media?.images) ? ad.media.images : []),
+    //         ...(Array.isArray(ad?.media?.videos) ? ad.media.videos : []),
+    //     ];
+
+    //     if (media.length) return media;
+
+    //     if (ad?.mediaUrl) {
+    //         return [{
+    //             uid: ad?.creativeId ||
+    //                 ad?.creativeAssetId ||
+    //                 ad?.id,
+
+    //             url: ad.mediaUrl,
+
+    //             name:
+    //                 ad?.mediaName ||
+    //                 ad.mediaUrl.split("/").pop(),
+
+    //             type: ad?.mediaType,
+    //             mediaType: ad?.mediaType,
+
+    //             creativeId: ad?.creativeId,
+    //             creativeAssetId: ad?.creativeAssetId,
+    //             sourceCreative: ad?.sourceCreative,
+
+    //             mediaSource:
+    //                 ad?.mediaSource === "creatives"
+    //                     ? "creatives"
+    //                     : "upload",
+    //         }];
+    //     }
+
+    //     return [];
+    // };
+
+    const getAdMediaItems = (ad) => {
+        if (Array.isArray(ad?.filename)) {
+            return ad.filename;
+        }
+
+        if (ad?.filename) {
+            return [ad.filename];
+        }
+
+        const media = [
+            ...(Array.isArray(ad?.media?.images) ? ad.media.images : []),
+            ...(Array.isArray(ad?.media?.videos) ? ad.media.videos : []),
+        ];
+
+        if (media.length) return media;
+
+        if (ad?.mediaUrl) {
+            return [{
+                uid: ad?.creativeId ||
+                    ad?.creativeAssetId ||
+                    ad?.id,
+                url: ad.mediaUrl,
+                name:
+                    ad?.mediaName ||
+                    ad.mediaUrl.split("/").pop(),
+                type: ad?.mediaType,
+                mediaType: ad?.mediaType,
+                creativeId: ad?.creativeId,
+                creativeAssetId: ad?.creativeAssetId,
+                sourceCreative: ad?.sourceCreative,
+                mediaSource:
+                    ad?.mediaSource === "creatives"
+                        ? "creatives"
+                        : "upload",
+            }];
+        }
+
+        return [];
+    };
+
+    const getOrderedAdMediaItems = (ad) => {
+        const mediaItems = getAdMediaItems(ad);
+
+        if (!mediaItems.length) return [];
+
+        return [
+            ...mediaItems.filter(
+                (item) => getMediaSource(item, ad) === "creatives"
+            ),
+            ...mediaItems.filter(
+                (item) => getMediaSource(item, ad) !== "creatives"
+            ),
+        ];
+    };
+
+    const orderAdsBySource = (ads = []) => [
+        ...ads.filter(
+            ad => getMediaSource(getAdMediaItems(ad)[0], ad) === "creatives"
+        ),
+        ...ads.filter(
+            ad => getMediaSource(getAdMediaItems(ad)[0], ad) !== "creatives"
+        ),
+    ];
 
     const useLibraryCreative = (creative) => {
+        // const normalized = normalizeRemoteCreative(creative);
         const normalized = normalizeRemoteCreative(creative);
+
+        const creativeMedia = normalized?.url
+            ? {
+                ...normalized,
+                mediaSource: "creatives",
+            }
+            : null;
 
         if (!normalized?.url) {
             messageApi.warning(
@@ -951,14 +1254,101 @@ const AdLevel = ({
 
         const currentAds = [...(form.getFieldValue(adsPath) || [])];
 
+        // if (isDynamicCreative) {
+        //     const target = currentAds[0] || ad || createInitialAd(selectedAccounts);
+        //     // const existingMedia = getMediaItems(target.media);
+        //     const existingMedia = Array.isArray(target.filename)
+        //         ? target.filename
+        //         : getMediaItems(target.media);
+
+        //     const duplicate = existingMedia.some(
+        //         (item) =>
+        //             (item?.creativeId &&
+        //                 String(item.creativeId) === String(normalized.creativeId)) ||
+        //             getMediaUrl(item) === normalized.url
+        //     );
+
+        //     if (duplicate) {
+        //         messageApi.info("This creative is already selected.");
+        //         return;
+        //     }
+
+        //     // const allMedia = [...existingMedia, normalized];
+        //     const libraryMedia = {
+        //         ...normalized,
+        //         mediaSource: "creatives",
+        //     };
+
+        //     // const allMedia = [
+        //     //     ...existingMedia,
+        //     //     libraryMedia,
+        //     // ];
+
+        //     // const allMedia = [
+        //     //     ...existingMedia.filter(
+        //     //         item => getMediaSource(item, target) === "creatives"
+        //     //     ),
+        //     //     libraryMedia,
+        //     //     ...existingMedia.filter(
+        //     //         item => getMediaSource(item, target) !== "creatives"
+        //     //     ),
+        //     // ];
+
+        //     const allMedia = [
+        //         ...existingMedia.filter(
+        //             item => item?.mediaSource === "creatives"
+        //         ),
+        //         libraryMedia,
+        //         ...existingMedia.filter(
+        //             item => item?.mediaSource !== "creatives"
+        //         ),
+        //     ];
+
+        //     const updatedAd = {
+        //         ...target,
+        //         media: {
+        //             images: allMedia.filter((item) => !isVideo(item)),
+        //             videos: allMedia.filter((item) => isVideo(item)),
+        //             thumbnail: target.media?.thumbnail ?? null,
+        //         },
+        //         filename: allMedia,
+        //         mediaSource: "creatives",
+        //         mediaUrl: undefined,
+        //         mediaName: undefined,
+        //         creativeId: undefined,
+        //         creativeAssetId: undefined,
+        //         sourceCreative: undefined,
+        //     };
+
+        //     form.setFieldValue(adsPath, [updatedAd]);
+        //     form.setFieldValue([...adsPath, 0], updatedAd);
+        //     form.setFieldValue(activeIdPath, updatedAd.id);
+
+        //     messageApi.success("Creative added to Dynamic Creative.");
+        //     return;
+        // }
+
+        // Preserve the existing non-dynamic behavior.
+
         if (isDynamicCreative) {
-            const target = currentAds[0] || ad || createInitialAd(selectedAccounts);
-            const existingMedia = getMediaItems(target.media);
+            const target =
+                currentAds[0] ||
+                ad ||
+                createInitialAd(selectedAccounts);
+
+            // const existingMedia = Array.isArray(target.filename)
+            //     ? target.filename
+            //     : getMediaItems(target.media);
+
+            const existingMedia = getAdMediaItems(target);
 
             const duplicate = existingMedia.some(
-                (item) =>
-                    (item?.creativeId &&
-                        String(item.creativeId) === String(normalized.creativeId)) ||
+                item =>
+                    (
+                        item?.creativeId &&
+                        String(item.creativeId) ===
+                        String(normalized.creativeId)
+                    ) ||
                     getMediaUrl(item) === normalized.url
             );
 
@@ -967,13 +1357,31 @@ const AdLevel = ({
                 return;
             }
 
-            const allMedia = [...existingMedia, normalized];
+            const libraryMedia = {
+                ...normalized,
+                mediaSource: "creatives",
+            };
+
+            // const allMedia = [
+            //     ...existingMedia.filter(
+            //         item => getMediaSource(item, target) === "creatives"
+            //     ),
+            //     libraryMedia,
+            //     ...existingMedia.filter(
+            //         item => getMediaSource(item, target) !== "creatives"
+            //     ),
+            // ];
+
+            const allMedia = getOrderedAdMediaItems({
+                ...target,
+                filename: [...existingMedia, libraryMedia],
+            });
 
             const updatedAd = {
                 ...target,
                 media: {
-                    images: allMedia.filter((item) => !isVideo(item)),
-                    videos: allMedia.filter((item) => isVideo(item)),
+                    images: allMedia.filter(item => !isVideo(item)),
+                    videos: allMedia.filter(item => isVideo(item)),
                     thumbnail: target.media?.thumbnail ?? null,
                 },
                 filename: allMedia,
@@ -993,7 +1401,6 @@ const AdLevel = ({
             return;
         }
 
-        // Preserve the existing non-dynamic behavior.
         const selectedId = form.getFieldValue(activeIdPath) || adId;
 
         let targetIndex = currentAds.findIndex(
@@ -1015,7 +1422,7 @@ const AdLevel = ({
         const targetAd = {
             ...target,
             media: mediaForFile(normalized),
-            filename: normalized,
+            filename: creativeMedia || normalized,
             mediaUrl: normalized.url,
             mediaName: normalized.name,
             mediaType: normalized.mediaType,
@@ -1025,17 +1432,45 @@ const AdLevel = ({
             sourceCreative: normalized.sourceCreative,
         };
 
+        // if (hasExistingMedia) {
+        //     const newAd = {
+        //         ...targetAd,
+        //         id: createId(),
+        //         accountSettings: cloneSettings(target.accountSettings),
+        //         carouselCards: [],
+        //     };
+
+        //     form.setFieldValue(adsPath, [...currentAds, newAd]);
+        //     form.setFieldValue(activeIdPath, newAd.id);
+        // } 
         if (hasExistingMedia) {
             const newAd = {
                 ...targetAd,
                 id: createId(),
+                Addid: undefined,            // <- add
                 accountSettings: cloneSettings(target.accountSettings),
                 carouselCards: [],
             };
 
-            form.setFieldValue(adsPath, [...currentAds, newAd]);
+            // const nextAds = [
+            //     ...currentAds.filter(
+            //         (item) => getMediaSource(item, item) === "creatives"
+            //     ),
+            //     newAd,
+            //     ...currentAds.filter(
+            //         (item) => getMediaSource(item, item) !== "creatives"
+            //     ),
+            // ];
+
+            const nextAds = orderAdsBySource([
+                ...currentAds,
+                newAd,
+            ]);
+
+            form.setFieldValue(adsPath, nextAds);
             form.setFieldValue(activeIdPath, newAd.id);
-        } else {
+        }
+        else {
             currentAds[targetIndex] = targetAd;
             form.setFieldValue(adsPath, currentAds);
             form.setFieldValue([...adsPath, targetIndex], targetAd);
@@ -1080,9 +1515,27 @@ const AdLevel = ({
                 : "creatives",
         };
 
+        // currentAds[targetIndex] = updatedAd;
+        // form.setFieldValue(adsPath, currentAds);
+        // form.setFieldValue([...adsPath, targetIndex], updatedAd);
+        // form.setFieldValue(activeIdPath, updatedAd.id);
         currentAds[targetIndex] = updatedAd;
-        form.setFieldValue(adsPath, currentAds);
-        form.setFieldValue([...adsPath, targetIndex], updatedAd);
+
+        const nextAds = orderAdsBySource(currentAds);
+
+        form.setFieldValue(adsPath, nextAds);
+
+        const newIndex = nextAds.findIndex(
+            item => String(item?.id) === String(updatedAd.id)
+        );
+
+        if (newIndex >= 0) {
+            form.setFieldValue(
+                [...adsPath, newIndex],
+                updatedAd
+            );
+        }
+
         form.setFieldValue(activeIdPath, updatedAd.id);
         return true;
     };
@@ -1143,6 +1596,7 @@ const AdLevel = ({
         return {
             ...source,
             id: createId(),
+            Addid: undefined,            // <- add
             AdName: name || getAdName(source),
             AddName: name || source?.AddName || "",
             media: mediaForFile(file),
@@ -1324,32 +1778,155 @@ const AdLevel = ({
 
         const targetAd = currentAds[targetIndex];
 
+        // if (isDynamicCreative) {
+        //     // const existingMedia = getMediaItems(targetAd.media);
+        //     const existingMedia = getAdMediaItems(targetAd);
+        //     const seen = new Set(
+        //         existingMedia.map(
+        //             (item) => item?.uid || getMediaUrl(item) || getFileName(item)
+        //         )
+        //     );
+
+        //     // const newMedia = incoming.filter((file) => {
+        //     //     const key = file.uid || getMediaUrl(file) || getFileName(file);
+        //     //     if (seen.has(key)) return false;
+        //     //     seen.add(key);
+        //     //     return true;
+        //     // });
+
+        //     // const allMedia = [...existingMedia, ...newMedia];
+
+        //     const newMedia = incoming
+        //         .filter((file) => {
+        //             const key =
+        //                 file.uid ||
+        //                 getMediaUrl(file) ||
+        //                 getFileName(file);
+
+        //             if (seen.has(key)) return false;
+
+        //             seen.add(key);
+        //             return true;
+        //         })
+        //         .map(file => ({
+        //             ...file,
+        //             mediaSource: "upload",
+        //         }));
+
+        //     // const allMedia = [...existingMedia, ...newMedia];
+        //     // const allMedia = [
+        //     //     ...existingMedia.filter(
+        //     //         item => getMediaSource(item, targetAd) === "creatives"
+        //     //     ),
+        //     //     ...newMedia.filter(
+        //     //         item => getMediaSource(item, targetAd) === "creatives"
+        //     //     ),
+        //     //     ...existingMedia.filter(
+        //     //         item => getMediaSource(item, targetAd) !== "creatives"
+        //     //     ),
+        //     //     ...newMedia.filter(
+        //     //         item => getMediaSource(item, targetAd) !== "creatives"
+        //     //     ),
+        //     // ];
+
+        //     const combinedMedia = [...existingMedia, ...newMedia];
+
+        //     const allMedia = [
+        //         ...combinedMedia.filter(
+        //             item => getMediaSource(item) === "creatives"
+        //         ),
+        //         ...combinedMedia.filter(
+        //             item => getMediaSource(item) !== "creatives"
+        //         ),
+        //     ];
+
+        //     const updatedAd = {
+        //         ...targetAd,
+        //         media: {
+        //             images: allMedia.filter((item) => !isVideo(item)),
+        //             videos: allMedia.filter((item) => isVideo(item)),
+        //             thumbnail: targetAd.media?.thumbnail ?? null,
+        //         },
+        //         filename: allMedia,
+        //         // mediaSource: "upload",
+        //         mediaSource: "dynamic",
+        //         mediaUrl: undefined,
+        //         mediaName: undefined,
+        //         creativeId: undefined,
+        //         creativeAssetId: undefined,
+        //         sourceCreative: undefined,
+        //     };
+
+        //     currentAds[targetIndex] = updatedAd;
+
+        //     form.setFieldValue(adsPath, [updatedAd]);
+        //     form.setFieldValue([...adsPath, 0], updatedAd);
+        //     form.setFieldValue(activeIdPath, updatedAd.id);
+
+        //     setMediaError(false);
+        //     return;
+        // }
         if (isDynamicCreative) {
-            const existingMedia = getMediaItems(targetAd.media);
+            const existingMedia = getAdMediaItems(targetAd);
+
             const seen = new Set(
                 existingMedia.map(
-                    (item) => item?.uid || getMediaUrl(item) || getFileName(item)
+                    (item) =>
+                        String(
+                            item?.uid ||
+                            item?.creativeId ||
+                            item?.creativeAssetId ||
+                            getMediaUrl(item) ||
+                            getFileName(item)
+                        )
                 )
             );
 
-            const newMedia = incoming.filter((file) => {
-                const key = file.uid || getMediaUrl(file) || getFileName(file);
-                if (seen.has(key)) return false;
-                seen.add(key);
-                return true;
-            });
+            const newMedia = incoming
+                .filter((file) => {
+                    const key = String(
+                        file?.uid ||
+                        getMediaUrl(file) ||
+                        getFileName(file)
+                    );
 
-            const allMedia = [...existingMedia, ...newMedia];
+                    if (seen.has(key)) return false;
+
+                    seen.add(key);
+                    return true;
+                })
+                .map((file) => ({
+                    ...file,
+                    mediaSource: "upload",
+                }));
+
+            // ALWAYS:
+            // 1. Creative Library files in their existing order
+            // 2. Local files in their existing order
+            const allMedia = [
+                ...existingMedia.filter(
+                    (item) => getMediaSource(item, targetAd) === "creatives"
+                ),
+                ...existingMedia.filter(
+                    (item) => getMediaSource(item, targetAd) !== "creatives"
+                ),
+                ...newMedia,
+            ];
 
             const updatedAd = {
                 ...targetAd,
+
                 media: {
                     images: allMedia.filter((item) => !isVideo(item)),
                     videos: allMedia.filter((item) => isVideo(item)),
                     thumbnail: targetAd.media?.thumbnail ?? null,
                 },
+
+                // THIS IS THE CANONICAL DISPLAY ORDER
                 filename: allMedia,
-                mediaSource: "upload",
+
+                mediaSource: "dynamic",
+
                 mediaUrl: undefined,
                 mediaName: undefined,
                 creativeId: undefined,
@@ -1394,11 +1971,13 @@ const AdLevel = ({
             }
         }
 
-        const newAds = remainingFiles.map((file) => ({
+        const newAds = remainingFiles.map((file, index) => ({
             ...activeAd,
             id: createId(),
-            AdName: getCurrentAdsetName(),
-            AddName: getCurrentAdsetName(),
+            Addid: undefined,            // <- add
+            librarySection: undefined,   // <- add 
+            AdName: mode === "edit" ? `${getCurrentAdsetName()}_${currentAds.length + index + 1}` : getCurrentAdsetName(),
+            AddName: mode === "edit" ? `${getCurrentAdsetName()}_${currentAds.length + index + 1}` : getCurrentAdsetName(),
             media: mediaForFile(file),
             filename: file,
             mediaUrl: undefined,
@@ -1411,7 +1990,22 @@ const AdLevel = ({
             carouselCards: [],
         }));
 
-        form.setFieldValue(adsPath, [...currentAds, ...newAds]);
+        // form.setFieldValue(adsPath, [...currentAds, ...newAds]);
+        // const nextAds = [
+        //     ...currentAds.filter(
+        //         (item) => getMediaSource(item, item) === "creatives"
+        //     ),
+        //     ...currentAds.filter(
+        //         (item) => getMediaSource(item, item) !== "creatives"
+        //     ),
+        //     ...newAds,
+        // ];
+        const nextAds = orderAdsBySource([
+            ...currentAds,
+            ...newAds,
+        ]);
+
+        form.setFieldValue(adsPath, nextAds);
         form.setFieldValue(
             activeIdPath,
             newAds[0]?.id || activeAd.id
@@ -1423,6 +2017,70 @@ const AdLevel = ({
 
         setMediaError(false);
     };
+    // const handleReplaceAdMedia = ({ file }) => {
+    //     if (!file?.uid || replacementUids.current.has(file.uid)) return;
+
+    //     if (!isSupportedMedia(file)) {
+    //         messageApi.warning("Upload an image or video.");
+    //         return;
+    //     }
+
+    //     const targetAdId = adId;
+    //     if (!targetAdId) {
+    //         messageApi.error("Unable to identify the selected ad.");
+    //         return;
+    //     }
+
+    //     const currentAds = form.getFieldValue(adsPath) || [];
+    //     const targetIndex = currentAds.findIndex(
+    //         (item) => String(item?.id) === String(targetAdId)
+    //     );
+
+    //     if (targetIndex === -1) {
+    //         messageApi.error("Ad not found. Please select the ad again.");
+    //         return;
+    //     }
+
+    //     replacementUids.current.add(file.uid);
+
+    //     // const nextAds = currentAds.map((item, index) =>
+    //     //     index === targetIndex
+    //     //         ? {
+    //     //             ...item,
+    //     //             media: mediaForFile(file),
+    //     //             filename: file,
+    //     //             mediaUrl: undefined,
+    //     //             mediaName: undefined,
+    //     //             creativeId: undefined,
+    //     //             creativeAssetId: undefined,
+    //     //             mediaSource: "upload",
+    //     //             sourceCreative: undefined,
+    //     //         }
+    //     //         : item
+    //     // );
+
+    //     // form.setFieldValue(adsPath, nextAds);
+    //     const nextAds = orderAdsBySource(
+    //         currentAds.map((item, index) =>
+    //             index === targetIndex
+    //                 ? {
+    //                     ...item,
+    //                     media: mediaForFile(file),
+    //                     filename: file,
+    //                     mediaUrl: undefined,
+    //                     mediaName: undefined,
+    //                     creativeId: undefined,
+    //                     creativeAssetId: undefined,
+    //                     mediaSource: "upload",
+    //                     sourceCreative: undefined,
+    //                 }
+    //                 : item
+    //         )
+    //     );
+
+    //     form.setFieldValue(adsPath, nextAds);
+    // };
+
     const handleReplaceAdMedia = ({ file }) => {
         if (!file?.uid || replacementUids.current.has(file.uid)) return;
 
@@ -1449,20 +2107,37 @@ const AdLevel = ({
 
         replacementUids.current.add(file.uid);
 
-        const nextAds = currentAds.map((item, index) =>
-            index === targetIndex
-                ? {
-                    ...item,
-                    media: mediaForFile(file),
-                    filename: file,
-                    mediaUrl: undefined,
-                    mediaName: undefined,
-                    creativeId: undefined,
-                    creativeAssetId: undefined,
-                    mediaSource: "upload",
-                    sourceCreative: undefined,
-                }
-                : item
+        const target = currentAds[targetIndex];
+
+        // Only existing ads (with Addid) that currently sit in the Creatives column
+        // keep their slot there after a local replacement.
+        const keepInCreatives =
+            Boolean(target?.Addid) &&
+            getMediaSource(getAdMediaItems(target)[0], target) === "creatives";
+
+        const section = keepInCreatives ? "creatives" : undefined;
+        // const replacement = keepInCreatives
+        //     ? { ...file, librarySection: "creatives" }
+        //     : file;
+        const replacement = file;
+
+        const nextAds = orderAdsBySource(
+            currentAds.map((item, index) =>
+                index === targetIndex
+                    ? {
+                        ...item,
+                        media: mediaForFile(replacement),
+                        filename: replacement,
+                        mediaUrl: undefined,
+                        mediaName: undefined,
+                        creativeId: undefined,
+                        creativeAssetId: undefined,
+                        mediaSource: "upload",       // still a local file for submit
+                        sourceCreative: undefined,
+                        librarySection: section,     // "creatives" only for Addid ads
+                    }
+                    : item
+            )
         );
 
         form.setFieldValue(adsPath, nextAds);
@@ -1483,6 +2158,7 @@ const AdLevel = ({
         const cloned = {
             ...sourceAd,
             id: createId(),
+            Addid: undefined,            // <- add
             media: {
                 images: [...(sourceAd.media?.images || [])],
                 videos: [...(sourceAd.media?.videos || [])],
@@ -1498,8 +2174,95 @@ const AdLevel = ({
                 : [],
         };
 
-        form.setFieldValue(adsPath, [...currentAds, cloned]);
+        // form.setFieldValue(adsPath, [...currentAds, cloned]);
+        // form.setFieldValue(activeIdPath, cloned.id);
+        const nextAds = orderAdsBySource([
+            ...currentAds,
+            cloned,
+        ]);
+
+        form.setFieldValue(adsPath, nextAds);
         form.setFieldValue(activeIdPath, cloned.id);
+    };
+
+    const isVideoMedia = item => {
+        const type = String(
+            item?.type ||
+            item?.mediaType ||
+            item?.mimeType ||
+            ""
+        ).toLowerCase();
+
+        const source = String(
+            item?.url ||
+            item?.src ||
+            item?.name ||
+            item?.filename ||
+            ""
+        );
+
+        return (
+            type.includes("video") ||
+            /\.(mp4|mov|webm|m4v|avi|mpeg|mpg)(?:$|\?)/i.test(source)
+        );
+    };
+
+    const removeMedia = (sourceAd, mediaToRemove) => {
+        const currentAds = form.getFieldValue(adsPath) || [];
+
+        const adIndex = currentAds.findIndex(
+            item => String(item?.id) === String(sourceAd?.id)
+        );
+
+        if (adIndex === -1) return;
+
+        const ad = currentAds[adIndex];
+
+        const mediaItems = getAdMediaItems(ad);
+
+        const removeKey =
+            mediaToRemove?.uid ||
+            getMediaUrl(mediaToRemove) ||
+            getFileName(mediaToRemove);
+
+        const remainingMedia = mediaItems.filter(media => {
+            const key =
+                media?.uid ||
+                getMediaUrl(media) ||
+                getFileName(media);
+
+            return String(key) !== String(removeKey);
+        });
+
+        const updatedAd = {
+            ...ad,
+
+            media: {
+                images: remainingMedia.filter(
+                    media => !isVideoMedia(media)
+                ),
+                videos: remainingMedia.filter(
+                    media => isVideoMedia(media)
+                ),
+                thumbnail: ad?.media?.thumbnail ?? null,
+            },
+
+            filename: remainingMedia.length
+                ? remainingMedia
+                : null,
+        };
+
+        const nextAds = [...currentAds];
+        nextAds[adIndex] = updatedAd;
+
+        form.setFieldValue(adsPath, nextAds);
+
+        if (
+            String(form.getFieldValue(activeIdPath)) ===
+            String(ad?.id)
+        ) {
+            form.setFieldValue(activeIdPath, updatedAd.id);
+        }
     };
 
     const deleteAd = (sourceAd = ad) => {
@@ -1512,23 +2275,45 @@ const AdLevel = ({
 
         if (remaining.length === currentAds.length) return;
 
+        // if (remaining.length === 0) {
+        //     const firstAd = createInitialAd(selectedAccounts);
+        //     form.setFieldValue(adsPath, [firstAd]);
+        //     form.setFieldValue(activeIdPath, firstAd.id);
+        //     messageApi.success("Default ad restored.");
+        //     return;
+        // }
+
         if (remaining.length === 0) {
-            const firstAd = createInitialAd(selectedAccounts);
-            form.setFieldValue(adsPath, [firstAd]);
-            form.setFieldValue(activeIdPath, firstAd.id);
+            const currentAd = currentAds[0];
+
+            const defaultAd = {
+                ...currentAd,
+                media: emptyMedia(),
+                filename: null,
+                mediaSource: "",
+            };
+
+            form.setFieldValue(adsPath, [defaultAd]);
+            form.setFieldValue(activeIdPath, defaultAd.id);
+
             messageApi.success("Default ad restored.");
             return;
         }
 
-        form.setFieldValue(adsPath, remaining);
+        // form.setFieldValue(adsPath, remaining);
+        const nextAds = orderAdsBySource(remaining);
+
+        form.setFieldValue(adsPath, nextAds);
 
         const activeId = form.getFieldValue(activeIdPath);
 
         if (
             String(activeId || "") === sourceId ||
-            !remaining.some((item) => String(item?.id) === String(activeId))
+            // !remaining.some((item) => String(item?.id) === String(activeId))
+            !nextAds.some((item) => String(item?.id) === String(activeId))
         ) {
-            form.setFieldValue(activeIdPath, remaining[0].id);
+            // form.setFieldValue(activeIdPath, remaining[0].id);
+            form.setFieldValue(activeIdPath, nextAds[0].id);
         }
     };
 
@@ -1536,7 +2321,7 @@ const AdLevel = ({
         <Upload
             accept="image/*,video/*"
             multiple
-            disabled={disabled}
+            // disabled={true}
             beforeUpload={(file) => {
                 if (!isSupportedMedia(file)) {
                     messageApi.warning("Upload an image or video.");
@@ -1547,11 +2332,13 @@ const AdLevel = ({
             showUploadList={false}
             onChange={handleUploadChange}
         >
-            <Button icon={<UploadOutlined />} disabled={disabled}>
+            <Button icon={<UploadOutlined />} disabled={disabled || isView}>
                 Add images / videos
             </Button>
         </Upload>
     );
+
+
 
     const renderCreativeStrip = () => {
         const currentAds = form.getFieldValue(adsPath) || ads || [];
@@ -1567,7 +2354,8 @@ const AdLevel = ({
             const allMedia = [];
             const seen = new Set();
 
-            [...mediaItems, ...legacyFiles].forEach((media) => {
+            // [...mediaItems, ...legacyFiles].forEach((media) => {
+            [...legacyFiles, ...mediaItems].forEach((media) => {
                 if (!media) return;
 
                 const identity = media?.uid
@@ -1610,23 +2398,109 @@ const AdLevel = ({
             }));
         };
 
-        const getMediaSource = (item) => {
-            const source = String(item?.mediaSource || "").toLowerCase();
+        // const getMediaSource = (item) => {
+        //     const source = String(item?.mediaSource || "").toLowerCase();
 
-            if (["creatives", "creative", "library"].includes(source)) {
-                return "creatives";
-            }
+        //     if (["creatives", "creative", "library"].includes(source)) {
+        //         return "creatives";
+        //     }
 
-            if (["upload", "local", "device"].includes(source)) {
-                return "upload";
-            }
+        //     if (["upload", "local", "device"].includes(source)) {
+        //         return "upload";
+        //     }
 
-            return item?.sourceCreative ||
-                item?.creativeId ||
-                item?.creativeAssetId
-                ? "creatives"
-                : "upload";
-        };
+        //     return item?.sourceCreative ||
+        //         item?.creativeId ||
+        //         item?.creativeAssetId
+        //         ? "creatives"
+        //         : "upload";
+        // };
+
+        // const localCards = [];
+        // const libraryCards = [];
+
+        // currentAds.forEach((item, index) => {
+        //     const cards = getAdMedia(item, index);
+
+        //     const section = mode === "edit"
+        //         ? item?.librarySection || "creatives"
+        //         : getMediaSource(item) === "creatives"
+        //             ? "creatives"
+        //             : "local";
+
+        //     if (section === "creatives") {
+        //         libraryCards.push(...cards);
+        //     } else {
+        //         localCards.push(...cards);
+        //     }
+        // });
+
+        // const getMediaSource = (media, ad) => {
+        //     const source = String(
+        //         media?.mediaSource ||
+        //         media?.source ||
+        //         ""
+        //     ).toLowerCase();
+
+        //     if (
+        //         ["creatives", "creative", "library"].includes(source)
+        //     ) {
+        //         return "creatives";
+        //     }
+
+        //     if (
+        //         ["upload", "local", "device"].includes(source)
+        //     ) {
+        //         return "upload";
+        //     }
+
+        //     // Backward compatibility for old data.
+        //     const adSource = String(
+        //         ad?.mediaSource || ""
+        //     ).toLowerCase();
+
+        //     if (
+        //         ["creatives", "creative", "library"].includes(adSource)
+        //     ) {
+        //         return "creatives";
+        //     }
+
+        //     if (
+        //         ["upload", "local", "device"].includes(adSource)
+        //     ) {
+        //         return "upload";
+        //     }
+
+        //     return (
+        //         media?.sourceCreative ||
+        //         media?.creativeId ||
+        //         media?.creativeAssetId
+        //     )
+        //         ? "creatives"
+        //         : "upload";
+        // };
+
+        // const localCards = [];
+        // const libraryCards = [];
+
+        // currentAds.forEach((item, index) => {
+        //     const cards = getAdMedia(item, index);
+
+        //     cards.forEach(card => {
+        //         if (!card.media) return;
+
+        //         const source = getMediaSource(
+        //             card.media,
+        //             item
+        //         );
+
+        //         if (source === "creatives") {
+        //             libraryCards.push(card);
+        //         } else {
+        //             localCards.push(card);
+        //         }
+        //     });
+        // });
 
         const localCards = [];
         const libraryCards = [];
@@ -1634,17 +2508,28 @@ const AdLevel = ({
         currentAds.forEach((item, index) => {
             const cards = getAdMedia(item, index);
 
-            const section = mode === "edit"
-                ? item?.librarySection || "creatives"
-                : getMediaSource(item) === "creatives"
-                    ? "creatives"
-                    : "local";
+            const currentLibraryCards = [];
+            const currentLocalCards = [];
 
-            if (section === "creatives") {
-                libraryCards.push(...cards);
-            } else {
-                localCards.push(...cards);
-            }
+            cards.forEach(card => {
+                if (!card.media) return;
+
+                const source = getMediaSource(
+                    card.media,
+                    item
+                );
+
+                if (source === "creatives") {
+                    currentLibraryCards.push(card);
+                } else {
+                    currentLocalCards.push(card);
+                }
+            });
+
+            // Always keep Creative Library files first,
+            // followed by Local Upload files for each ad.
+            libraryCards.push(...currentLibraryCards);
+            localCards.push(...currentLocalCards);
         });
 
         const totalFiles =
@@ -1677,6 +2562,8 @@ const AdLevel = ({
 
                         const selected =
                             String(item?.id || "") === String(activeAdId || "");
+
+                        const isExistingAd = Boolean(item?.Addid);
 
                         return (
                             <div
@@ -1724,7 +2611,7 @@ const AdLevel = ({
                                 </div>
 
                                 <div className="ad-creative-source-actions">
-                                    <Tooltip title="Clone ad">
+                                    {/* <Tooltip title="Clone ad">
                                         <Button
                                             size="small"
                                             type="text"
@@ -1735,7 +2622,7 @@ const AdLevel = ({
                                                 cloneAd(item);
                                             }}
                                         />
-                                    </Tooltip>
+                                    </Tooltip> */}
 
                                     <Tooltip title="Remove file">
                                         <Button
@@ -1743,10 +2630,19 @@ const AdLevel = ({
                                             type="text"
                                             danger
                                             icon={<DeleteOutlined />}
-                                            disabled={disabled}
+                                            disabled={disabled || (isExistingAd && !isDynamicCreative) || isView}
+                                            // onClick={(event) => {
+                                            //     event.stopPropagation();
+                                            //     deleteAd(item);
+                                            // }}
                                             onClick={(event) => {
                                                 event.stopPropagation();
-                                                deleteAd(item);
+
+                                                if (isDynamicCreative) {
+                                                    removeMedia(item, media);
+                                                } else {
+                                                    deleteAd(item);
+                                                }
                                             }}
                                         />
                                     </Tooltip>
@@ -1895,7 +2791,7 @@ const AdLevel = ({
                         <div>
                             <Button
                                 icon={<PictureOutlined />}
-                                disabled={disabled}
+                                disabled={disabled || isView}
                                 onClick={() => {
                                     setReplaceCreativeTargetId(null);
                                     setCreativesDrawerOpen(true);
@@ -1930,18 +2826,26 @@ const AdLevel = ({
             </Card>
         );
     };
+    // const renderPreview = () => {
+    //     const previewMedia = isDynamicCreative
+    //         ? (
+    //             getMediaItems(ad?.media).length
+    //                 ? getMediaItems(ad.media)
+    //                 : firstMedia
+    //                     ? [firstMedia]
+    //                     : []
+    //         )
+    //         : [firstMedia].filter(Boolean);
+
+    //     const previewItems = previewMedia.length ? previewMedia : [null];
     const renderPreview = () => {
         const previewMedia = isDynamicCreative
-            ? (
-                getMediaItems(ad?.media).length
-                    ? getMediaItems(ad.media)
-                    : firstMedia
-                        ? [firstMedia]
-                        : []
-            )
+            ? displayMediaFiles
             : [firstMedia].filter(Boolean);
 
-        const previewItems = previewMedia.length ? previewMedia : [null];
+        const previewItems = previewMedia.length
+            ? previewMedia
+            : [null];
 
         return (
             <Card size="small" styles={{ body: { padding: previewVisible ? 0 : 8 } }}>
@@ -2280,7 +3184,7 @@ const AdLevel = ({
                             {multiline ? (
                                 <TextArea
                                     value={value}
-                                    disabled={disabled}
+                                    disabled={disabled || isView}
                                     placeholder={`${placeholder} ${index + 1}`}
                                     autoSize={{ minRows: 2, maxRows: 5 }}
                                     style={{
@@ -2299,7 +3203,7 @@ const AdLevel = ({
                             ) : (
                                 <Input
                                     value={value}
-                                    disabled={disabled}
+                                    disabled={disabled || isView}
                                     placeholder={`${placeholder} ${index + 1}`}
                                     style={{
                                         ...textInputStyle,
@@ -2316,10 +3220,10 @@ const AdLevel = ({
                             )}
                         </div>
 
-                        <Button
+                        {/* <Button
                             type="text"
                             danger
-                            disabled={disabled}
+                            disabled={disabled || isView}
                             aria-label={`Remove ${label.toLowerCase()} ${index + 1}`}
                             icon={<DeleteOutlined />}
                             onClick={() => removeDynamicTextOption(name, index)}
@@ -2328,13 +3232,13 @@ const AdLevel = ({
                         {index === values.length - 1 && values.length < 5 && (
                             <Button
                                 type="text"
-                                disabled={disabled}
+                                disabled={disabled || isView}
                                 aria-label={`Add ${label.toLowerCase()}`}
                                 icon={<PlusOutlined />}
                                 style={{ color: "#39b54a" }}
                                 onClick={() => addDynamicTextOption(name)}
                             />
-                        )}
+                        )} */}
                     </div>
                 ))}
 
@@ -2429,12 +3333,16 @@ const AdLevel = ({
                     <Input />
                 </Form.Item>
 
+                <Form.Item name={[adIndex, "Addid"]} hidden preserve>
+                    <Input />
+                </Form.Item>
+
                 <Form.Item
                     name={fieldPath("AdName")}
                     label="Ad name"
                     rules={requiredRule("Ad name")}
                 >
-                    <Input disabled={disabled} placeholder="Enter ad name" />
+                    <Input disabled={disabled || isView} placeholder="Enter ad name" />
                 </Form.Item>
 
                 <Form.Item
@@ -2479,7 +3387,7 @@ const AdLevel = ({
                         className="ad-page-select"
                         mode="multiple"
                         maxTagCount={1}
-                        disabled={disabled}
+                        disabled={disabled || isView}
                         showSearch
                         optionFilterProp="label"
                         allowClear
@@ -2593,7 +3501,7 @@ const AdLevel = ({
                             }}
                         >
                             <TextArea
-                                disabled={disabled}
+                                disabled={disabled || isView}
                                 placeholder="Write primary text"
                                 autoSize={{ minRows: 2, maxRows: 5 }}
                             />
@@ -2610,7 +3518,7 @@ const AdLevel = ({
                             }}
                         >
                             <Input
-                                disabled={disabled}
+                                disabled={disabled || isView}
                                 placeholder="Enter headline"
                             />
                         </Form.Item>
@@ -2626,7 +3534,7 @@ const AdLevel = ({
                             }}
                         >
                             <TextArea
-                                disabled={disabled}
+                                disabled={disabled || isView}
                                 placeholder="Enter description"
                                 autoSize={{ minRows: 1, maxRows: 4 }}
                             />
@@ -2641,7 +3549,7 @@ const AdLevel = ({
                                 <Select
                                     value={accountKey || undefined}
                                     options={accountOptions}
-                                    disabled={disabled}
+                                    disabled={disabled || isView}
                                     placeholder="Select account"
                                     onChange={setPreviewAccountKey}
                                     classNames={{
@@ -2668,7 +3576,7 @@ const AdLevel = ({
                                         type="text"
                                         size="small"
                                         icon={<EditOutlined />}
-                                        disabled={disabled}
+                                        disabled={disabled || isView}
                                         onClick={() =>
                                             setIsModalVisibleForURLBuilder(true)
                                         }
@@ -2683,7 +3591,7 @@ const AdLevel = ({
                                                     color: "#91c25f",
                                                     fontSize: 12,
                                                 }}
-                                                disabled={disabled}
+                                                disabled={disabled || isView}
                                                 // onClick={async () => {
                                                 //     const websiteUrl =
                                                 //         form.getFieldValue([
@@ -2907,7 +3815,7 @@ const AdLevel = ({
                                                 style={{ fontSize: 12 }}
                                                 size="small"
                                                 danger
-                                                disabled={disabled}
+                                                disabled={disabled || isView}
                                                 // onClick={() => {
                                                 //     accountOptions.forEach(({ value }) => {
                                                 //         setAccountSetting(
@@ -3044,7 +3952,7 @@ const AdLevel = ({
                             }}
                         >
                             <Input.TextArea
-                                disabled={disabled}
+                                disabled={disabled || isView}
                                 placeholder="https://example.com"
                                 autoSize={{ minRows: 2, maxRows: 5 }}
                             />
@@ -3070,7 +3978,7 @@ const AdLevel = ({
                             }}
                         >
                             <Input
-                                disabled={disabled}
+                                disabled={disabled || isView}
                                 placeholder="example.com"
                             />
                         </Form.Item>
@@ -3150,7 +4058,7 @@ const AdLevel = ({
                         <Button
                             size="small"
                             type={!overridesEnabled ? "primary" : "default"}
-                            disabled={disabled || !overridesEnabled}
+                            disabled={disabled || !overridesEnabled || isView}
                             onClick={() => toggleOverrides(false)}
                         >
                             Edit all ads
@@ -3159,7 +4067,7 @@ const AdLevel = ({
                         <Button
                             size="small"
                             type={overridesEnabled ? "primary" : "default"}
-                            disabled={disabled || overridesEnabled}
+                            disabled={disabled || overridesEnabled || isView}
                             onClick={() => toggleOverrides(true)}
                         >
                             Edit individual ad
@@ -3288,7 +4196,8 @@ const AdLevel = ({
                 title={
                     <Space wrap>
                         <Title level={5} style={{ margin: 0 }}>
-                            {adName || `Ad ${Number(adIndex ?? field?.name ?? 0) + 1}`}
+                            {/* {adName || `Ad ${Number(adIndex ?? field?.name ?? 0) + 1}`} */}
+                            {adName || `Ad ${Number(displayAdIndex ?? adIndex ?? field?.name ?? 0) + 1}`}
                         </Title>
 
                         {hasMedia && (
@@ -3315,7 +4224,7 @@ const AdLevel = ({
                                 size="small"
                                 title="Media"
                                 extra={
-                                    <Space size={6} wrap>
+                                    !isDynamicCreative && (<Space size={6} wrap>
                                         <Upload
                                             accept="image/*,video/*"
                                             multiple={false}
@@ -3336,7 +4245,7 @@ const AdLevel = ({
                                             <Button
                                                 size="small"
                                                 icon={<UploadOutlined />}
-                                                disabled={disabled}
+                                                disabled={disabled || isView}
                                             >
                                                 Update image/video
                                             </Button>
@@ -3345,7 +4254,7 @@ const AdLevel = ({
                                         <Button
                                             size="small"
                                             icon={<PictureOutlined />}
-                                            disabled={disabled}
+                                            disabled={disabled || isView}
                                             onClick={() => {
                                                 setReplaceCreativeTargetId(adId);
                                                 setCreativesDrawerOpen(true);
@@ -3353,81 +4262,95 @@ const AdLevel = ({
                                         >
                                             Replace from Creatives
                                         </Button>
-                                    </Space>
+                                    </Space>)
                                 }
                                 styles={{ body: { padding: 8 } }}
                             >
-                                {getMediaItems(ad?.media).length || hasMedia ? (
+                                {/* {getMediaItems(ad?.media).length || hasMedia ? ( */}
+                                {/* {getMediaItems(ad).length || hasMedia ? (
                                     <Space
                                         orientation="vertical"
                                         size={8}
                                         style={{ width: "100%" }}
                                     >
-                                        {(getMediaItems(ad?.media).length
-                                            ? getMediaItems(ad.media)
+                                        {(
+                                            getMediaItems(ad).length
+                                                ? getMediaItems(ad)
+                                                : [firstMedia]
+                                        ).filter(Boolean).map((media, mediaIndex) => { */}
+                                {displayMediaFiles.length || hasMedia ? (
+                                    <Space
+                                        orientation="vertical"
+                                        size={8}
+                                        style={{ width: "100%" }}
+                                    >
+                                        {(displayMediaFiles.length
+                                            ? displayMediaFiles
                                             : [firstMedia]
-                                        ).filter(Boolean).map((media, mediaIndex) => {
-                                            const url = getMediaPreviewUrl(media);
-                                            const name = getFileName(media) ||
-                                                `Selected creative ${mediaIndex + 1}`;
+                                        )
+                                            .filter(Boolean)
+                                            .map((media, mediaIndex) => {
+                                                const url = getMediaPreviewUrl(media);
+                                                const name = getFileName(media) ||
+                                                    `Selected creative ${mediaIndex + 1}`;
 
-                                            return (
-                                                <Row
-                                                    key={`${media?.uid || url || name}-${mediaIndex}`}
-                                                    align="middle"
-                                                    gutter={10}
-                                                    wrap={false}
-                                                >
-                                                    <Col flex="56px">
-                                                        <div style={{
-                                                            width: 56,
-                                                            height: 56,
-                                                            borderRadius: 6,
-                                                            overflow: "hidden",
-                                                            display: "grid",
-                                                            placeItems: "center",
-                                                            background: "var(--ant-color-bg-layout)",
-                                                        }}>
-                                                            {url ? (
-                                                                isVideo(media) ? (
-                                                                    <video
-                                                                        src={url}
-                                                                        muted
-                                                                        preload="metadata"
-                                                                        style={{
-                                                                            width: "100%",
-                                                                            height: "100%",
-                                                                            objectFit: "contain",
-                                                                        }}
-                                                                    />
+                                                return (
+                                                    <Row
+                                                        key={`${media?.uid || url || name}-${mediaIndex}`}
+                                                        align="middle"
+                                                        gutter={10}
+                                                        wrap={false}
+                                                    >
+                                                        <Col flex="56px">
+                                                            <div style={{
+                                                                width: 56,
+                                                                height: 56,
+                                                                borderRadius: 6,
+                                                                overflow: "hidden",
+                                                                display: "grid",
+                                                                placeItems: "center",
+                                                                background: "var(--ant-color-bg-layout)",
+                                                            }}>
+                                                                {url ? (
+                                                                    isVideo(media) ? (
+                                                                        <video
+                                                                            src={url}
+                                                                            muted
+                                                                            preload="metadata"
+                                                                            style={{
+                                                                                width: "100%",
+                                                                                height: "100%",
+                                                                                objectFit: "contain",
+                                                                            }}
+                                                                        />
+                                                                    ) : (
+                                                                        <img
+                                                                            src={url}
+                                                                            alt={name}
+                                                                            style={{
+                                                                                width: "100%",
+                                                                                height: "100%",
+                                                                                objectFit: "contain",
+                                                                            }}
+                                                                        />
+                                                                    )
                                                                 ) : (
-                                                                    <img
-                                                                        src={url}
-                                                                        alt={name}
-                                                                        style={{
-                                                                            width: "100%",
-                                                                            height: "100%",
-                                                                            objectFit: "contain",
-                                                                        }}
-                                                                    />
-                                                                )
-                                                            ) : (
-                                                                <PictureOutlined />
-                                                            )}
-                                                        </div>
-                                                    </Col>
+                                                                    <PictureOutlined />
+                                                                )}
+                                                            </div>
+                                                        </Col>
 
-                                                    <Col flex="auto" style={{ minWidth: 0 }}>
-                                                        <Text strong ellipsis style={{ display: "block" }}>
-                                                            {name}
-                                                        </Text>
-                                                        <Text type="secondary" style={{ fontSize: 11 }}>
-                                                            {isVideo(media) ? "Video" : "Image"}
-                                                        </Text>
-                                                    </Col>
-                                                </Row>
-                                            );
-                                        })}
+                                                        <Col flex="auto" style={{ minWidth: 0 }}>
+                                                            <Text strong ellipsis style={{ display: "block" }}>
+                                                                {name}
+                                                            </Text>
+                                                            <Text type="secondary" style={{ fontSize: 11 }}>
+                                                                {isVideo(media) ? "Video" : "Image"}
+                                                            </Text>
+                                                        </Col>
+                                                    </Row>
+                                                );
+                                            })}
                                     </Space>
                                 ) : (
                                     <Text type="secondary" style={{ fontSize: 12 }}>
@@ -3525,5 +4448,4 @@ const AdLevel = ({
         </div>
     );
 };
-
 export default AdLevel;
