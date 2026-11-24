@@ -77,13 +77,13 @@ export default function CampaignTemplates({
         setToken(localStorage.getItem("token") || "");
     }, []);
 
-    const headers = useCallback(
-        (json = false) => ({
-            ...(json ? { "Content-Type": "application/json" } : {}),
-            Authorization: token,
-        }),
-        [token]
-    );
+    // const headers = useCallback(
+    //     (json = false) => ({
+    //         ...(json ? { "Content-Type": "application/json" } : {}),
+    //         Authorization: token,
+    //     }),
+    //     [token]
+    // );
 
     const accountOptions = useMemo(() => {
         const list = Array.isArray(accounts) ? accounts : [accounts];
@@ -447,12 +447,12 @@ export default function CampaignTemplates({
     };
 
     const openDelete = async (draft) => {
-        if (!token) {
-            messageApi.error(
-                "Authentication token not found. Please log in again."
-            );
-            return;
-        }
+        // if (!token) {
+        //     messageApi.error(
+        //         "Authentication token not found. Please log in again."
+        //     );
+        //     return;
+        // }
 
         setDeleteTemplate(draft);
         setDeleteAccounts(draft.accounts.map(String));
@@ -460,21 +460,24 @@ export default function CampaignTemplates({
         setAccountsLoading(true);
 
         try {
-            const response = await fetch(
-                `${API}/group/${encodeURIComponent(draft.groupId)}`,
-                {
-                    method: "GET",
-                    headers: headers(true),
-                }
-            );
+            // const response = await fetch(
+            //     `${API}/group/${encodeURIComponent(draft.groupId)}`,
+            //     {
+            //         method: "GET",
+            //         headers: headers(true),
+            //     }
+            // );
 
-            const data = await response.json();
+            // const data = await response.json();
 
-            if (!response.ok || !data?.ok) {
-                throw new Error(
-                    data?.message || "Failed to load template accounts."
-                );
-            }
+            const response = await axios.get(`/api/campaigns/templates/edit/groupid?groupId=${draft.groupId}`)
+            const data = response.data;
+
+            // if (!response.ok || !data?.ok) {
+            //     throw new Error(
+            //         data?.message || "Failed to load template accounts."
+            //     );
+            // }
 
             const list = Array.isArray(data.data) ? data.data : [];
 
@@ -509,46 +512,66 @@ export default function CampaignTemplates({
     };
 
     const deleteTemplateNow = async () => {
-        if (!token || !deleteTemplate?.groupId) {
-            messageApi.error(
-                "Missing authentication token or template group ID."
-            );
-            return;
-        }
+        // if (!token || !deleteTemplate?.groupId) {
+        //     messageApi.error(
+        //         "Missing authentication token or template group ID."
+        //     );
+        //     return;
+        // }
 
         setDeleteLoading(true);
 
         try {
-            const response = await fetch(API, {
-                method: "DELETE",
-                headers: headers(true),
-                body: JSON.stringify({
-                    groupId: deleteTemplate.groupId,
-                }),
-            });
+            // const response = await fetch(API, {
+            //     method: "DELETE",
+            //     headers: headers(true),
+            //     body: JSON.stringify({
+            //         groupId: deleteTemplate.groupId,
+            //     }),
+            // });
 
-            const data = await response.json().catch(() => ({}));
+            // const data = await response.json().catch(() => ({}));
 
-            if (!response.ok || !data?.ok) {
-                throw new Error(
-                    data?.message || "Failed to delete template."
+            // if (!response.ok || !data?.ok) {
+            //     throw new Error(
+            //         data?.message || "Failed to delete template."
+            //     );
+            // }
+            try {
+                const { data } = await axios.delete("/api/campaigns/templates/delete", {
+                    data: {
+                        groupId: deleteTemplate.groupId,
+                    },
+                    // groupId: deleteTemplate.groupId
+                });
+                setDeletedGroups((current) => [
+                    ...new Set([
+                        ...current,
+                        String(deleteTemplate.groupId),
+                    ]),
+                ]);
+
+                setDeleteOpen(false);
+                setDeleteTemplate(null);
+                setDeleteAccounts([]);
+
+                messageApi.success(
+                    "Template deleted successfully across all accounts."
                 );
             }
+            catch (err) {
+                console.log(err);
+                messageApi.error("Failed to delete template.")
+            }
 
-            setDeletedGroups((current) => [
-                ...new Set([
-                    ...current,
-                    String(deleteTemplate.groupId),
-                ]),
-            ]);
 
-            setDeleteOpen(false);
-            setDeleteTemplate(null);
-            setDeleteAccounts([]);
+            // if (!data?.ok) {
+            //     throw new Error(
+            //         data?.message || "Failed to delete template."
+            //     );
+            // }
 
-            messageApi.success(
-                "Template deleted successfully across all accounts."
-            );
+
         } catch (error) {
             messageApi.error(error.message || "Failed to delete template.");
         } finally {
@@ -787,7 +810,7 @@ export default function CampaignTemplates({
                 styles={modalTheme}
             >
                 <p>
-                    Delete{" "}
+                    Are you sure delete{" "}
                     <Text strong>
                         {deleteTemplate?.Draft_Name || "this template"}
                     </Text>{" "}
@@ -810,9 +833,9 @@ export default function CampaignTemplates({
                     <p>No matching accounts found.</p>
                 )}
 
-                <Text type="secondary">
+                {/* <Text type="secondary">
                     This action cannot be undone.
-                </Text>
+                </Text> */}
             </Modal>
 
             <style jsx global>{`
